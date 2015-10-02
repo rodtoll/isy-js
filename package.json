@@ -1,0 +1,16 @@
+{
+    "name": "isy-js",
+    "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application",
+    "license" : "BSD-3-Clause",
+    "keywords" : [
+        "isy",
+        "universal devies",
+        "insteon"
+    ],
+    "main": "isy.js",
+    "dependencies": {
+        "restler": "",
+        "faye-websocket": "",
+        "xmldoc": ""
+    }
+}
