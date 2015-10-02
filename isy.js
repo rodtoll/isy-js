@@ -4,18 +4,21 @@ var isyDevice = require('./isydevice');
 var isyConstants = require('./isyconstants.js');
 var WebSocket = require("faye-websocket");
 
-var ISY = function(address, username, password) {
+var ISY = function(address, username, password, changeCallback) {
     this.address  = address;
     this.userName = username;
     this.password = password;
     this.deviceIndex = {};
     this.deviceList = [];
     this.nodesLoaded = false;
+    this.changeCallback = changeCallback;
 };
 
 ISY.prototype.nodeChangedHandler = function(node) {
+    var that = this;
     if(this.nodesLoaded) {
         console.log('Node: '+node.address+' changed');
+        this.changeCallback(that, node);
     }
 }
 
@@ -170,25 +173,6 @@ ISY.prototype.sendCommand = function(device, command) {
             console.error('Unknown command: '+command+' for device '+device.name);
         }    
     }
-}
-
-ISY.prototype.setVariable = function(variableId, valueToSet) {
-
-    var options = {
-        username: this.username,
-        password: this.password
-    };
-
-    restler.get(
-        'http://'+this.address+'/rest/vars/set/2/' + variableId + '/' + valueToSet,
-        options
-    ).on('complete', function(result) {
-            if (result instanceof Error) {
-                console.log('Error:'+result.message);
-            } else {
-                console.log('ISY Success: '+result);
-            }
-        });
 }
 
 exports.ISY = ISY;
