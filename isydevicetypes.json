@@ -19,15 +19,5 @@
   { "type": "7.0.54.0", "address": "1", "name": "(2450) IOLinc v.36", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "15.6.66.0", "address": "1", "name": "MorningLinc v.42", "deviceType": "DoorLock", "connectionType": "Insteon MorningLinc", "batteryOperated": false },
   { "type": "16.2.0.0", "address": "", "name": "(2421) TriggerLinc v.00", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "4.64.3.0", "address": "", "name": "Yale Door Lock", "deviceType": "SecureLock", "connectionType": "ZWave", "batteryOperated": true },
-  { "type": "Honeywell5816", "address": "", "name": "Honeywell Ademco 5816WMWH White Door / Window Transmitter w/ Magnet", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "Honeywell5815", "address": "", "name": "5815 - Honeywell Wireless Door Window Transmitter", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "DoorContact", "address": "", "name": "Standard Door Contact", "deviceType": "DoorWindowSensor", "connectionType": "Elk Wired", "batteryOperated": false },
-  { "type": "EcolinkWst212", "address": "", "name": "Ecolink WST-212", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "AdemcoGlassBreak", "address": "", "name": "Ademco Wireless Glass Break", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "HoneywellCO", "address": "", "name": "5800CO - Honeywell Wireless CO Detector", "deviceType": "COAlarm", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "HoneywellMicra", "address": "", "name": "5800MICRA - Honeywell Ademco Wireless Recessed Transmitter", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "Honeywell5818", "address": "", "name": "5818MNL - Honeywell Ademco Recessed Door Window Transmitter", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "Honeywell5816OD", "address": "", "name": "Honeywell 5816OD Outdoor Wireless Magnetic Contact", "deviceType": "DoorWindowSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true },
-  { "type": "Honeywell5800", "address": "", "name": "Honeywell 5800 Motion Detector", "deviceType": "MotionSensor", "connectionType": "Elk Honeywell Wireless", "batteryOperated": true }
+  { "type": "4.64.3.0", "address": "", "name": "Yale Door Lock", "deviceType": "SecureLock", "connectionType": "ZWave", "batteryOperated": true }
 ]

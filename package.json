@@ -12,5 +12,8 @@
         "restler": "",
         "faye-websocket": "",
         "xmldoc": ""
+    },
+    "bugs": {
+        "url": "https://github.com/rodtoll/isy-js/issues"
     }
 }
