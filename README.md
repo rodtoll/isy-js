@@ -51,6 +51,13 @@ This library uses isydevicetypes.json to map between isy device types and friend
 
 Currently the library only handles Lights, Outlets and ZWave Locks. More will be added. 
 
+DESIGN
+------
+
+The ISY object hides all of the complexity of translating from the ISY REST protocol and Websocket protocol into high level state. The ISYDevice objects only operate with high level state and depends on ISY to translate.
+
+So, for example, when a status update comes in for a light the ISY.js module translates the updated into a is the light on or off. The ISYDevice object holds only the state of if it is on or not. Not what the ISY exact numeric state is.
+
 API
 ---
 
@@ -88,3 +95,12 @@ The sendXXXCommand are functions which tell the device to move the specified sta
 * `sendFanCommand(state)` - Sends the command to set the fan state to the specified state. Allowed values are Off, Low, Medium and High.
 * `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
 
+TODO
+----
+
+* Unit tests.
+* Better error checking.
+* Recoverability in the websocket connection. These can drop over time.
+* The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
+* The ISY-994 also supports ELK integration. Expose ELK objects through this same interface.
+* Support light dimming and dim state rather then just on and off.
