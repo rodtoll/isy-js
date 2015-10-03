@@ -125,6 +125,28 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
             } else {
                 deviceToUpdate.setCurrentLockState(false);
             }
+        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_LOCK) {
+            if(state == isyConstants.ISY_STATE_LOCK_UNLOCKED) {
+                deviceToUpdate.setCurrentLockState(false);
+            } else {
+                deviceToUpdate.setCurrentLockState(true);
+            }
+        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+            if(state == isyConstants.ISY_STATE_DOOR_WINDOW_CLOSED) {
+                deviceToUpdate.setCurrentDoorWindowState(false);
+            } else {
+                deviceToUpdate.setCurrentDoorWindowState(true);
+            }
+        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_FAN) {
+            if(state > 0 && state <= isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW) {
+                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_LOW);
+            } else if(state > isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW && state <= isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
+                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_MEDIUM);
+            } else if(state == 0) {
+                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_OFF);
+            } else {
+                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_HIGH);
+            }
         }
     }
 }
@@ -171,7 +193,27 @@ ISY.prototype.sendCommand = function(device, command) {
             this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
-        }    
+        }  
+    } else if(device.deviceType == isyConstants.DEVICE_TYPE_LOCK) {
+        if(command == isyConstants.USER_COMMAND_LOCK_LOCK) {
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_LOCK,null);            
+        } else if(command == isyConstants.USER_COMMAND_LOCK_UNLOCK) {
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_UNLOCK,null);
+        } else {
+            console.error('Unknown command: '+command+' for device '+device.name);
+        }            
+    } else if(device.deviceType == isyConstants.DEVICE_TYPE_FAN) {
+        if(command == isyConstants.USER_COMMAND_FAN_OFF) {
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_OFF,null);
+        } else if(command == isyConstants.USER_COMMAND_FAN_LOW) {
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW);
+        } else if(command == isyConstants.USER_COMMAND_FAN_MEDIUM) {
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM);
+        } else if(command == isyConstants.USER_COMMAND_FAN_HIGH) {
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE.isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGHT);
+        } else {
+            console.error("Error commanding fan: "+this.name+" to invalid state: "+command);
+        }        
     }
 }
 

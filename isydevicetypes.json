@@ -9,7 +9,7 @@
   { "type": "1.32.68.0", "address": "", "name": "(2477D) Dual Band SwitchLinc Dimmer v.44", "deviceType": "Light", "connectionType": "Insteon Wireless", "batteryOperated": false },
   { "type": "1.46.65.0", "address": "1", "name": "(2475F) FanLinc v.41", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "1.46.65.0", "address": "2", "name": "(2475F) FanLinc v.41", "deviceType": "Fan", "connectionType": "Insteon Wired", "batteryOperated": false },
-  { "type": "1.65.67.0", "address": "", "name": "(2334-2) KeypadLinc Dimmer 8 Buttons v.43", "deviceType": "Light", "connectionType": "Insteon", "batteryOperated": false },
+  { "type": "1.65.67.0", "address": "", "name": "(2334-2) KeypadLinc Dimmer 8 Buttons v.43", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.9.66.0", "address": "", "name": "(2456S3) ApplianceLinc v.42", "deviceType": "Outlet", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.15.54.0", "address": "", "name": "(2486S/WH6) KeypadLinc Relay v.36", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.15.54.157", "address": "", "name": "(2486S/WH6) KeypadLinc Relay v.36", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },

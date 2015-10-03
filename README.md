@@ -76,10 +76,15 @@ Properties:
 
 Functions:
 
+The sendXXXCommand are functions which tell the device to move the specified state. The local device will not update it's state until the ISY has acknowledged the change. To get the last acknowledged state call the getXXXXState commands.
+
 * `getCurrentLightState()` - Gets the current Light power state. true for on, false for off.
 * `sendLightCommand(state)` - Sends the command to set the Light power state. true to turn it on, false to turn it off
 * `getCurrentLockState()` - Gets the current locked state of the lock device. true for locked, false for unlocked.
 * `sendLockCommand(state)` - Sends the command to set the Lock state to the specified state. true to lock the door, false to unlock it.
 * `getCurrentOutletState()` - Gets the current state of the outlet. true for on, false for off.
 * `sendOutletCommand(state)` - Sends the command to set the outlet state to the specified state. true to turn it on, false to turn it off. 
+* `getCurrentFanState()`- Gets the current state of the fan. Off, Low, Medium, High.
+* `sendFanCommand(state)` - Sends the command to set the fan state to the specified state. Allowed values are Off, Low, Medium and High.
+* `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
 

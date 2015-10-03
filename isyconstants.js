@@ -2,11 +2,13 @@
 // Constants for ISY devices
 
 //  Device types
+module.exports.DEVICE_TYPE_LOCK = 'DoorLock';
 module.exports.DEVICE_TYPE_SECURE_LOCK = 'SecureLock';
 module.exports.DEVICE_TYPE_LIGHT = 'Light';
 module.exports.DEVICE_TYPE_OUTLET = 'Outlet';
 module.exports.DEVICE_TYPE_FAN = 'Fan';
 module.exports.DEVICE_TYPE_UNKNOWN = 'Unknown';
+module.exports.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
 
 // Underlying constants for Rest commands to ISY
 module.exports.ISY_COMMAND_LIGHT_ON = 'DON';
@@ -21,6 +23,12 @@ module.exports.ISY_COMMAND_FAN_OFF = 'DOF';
 module.exports.ISY_COMMAND_FAN_PARAMETER_LOW = '63';
 module.exports.ISY_COMMAND_FAN_PARAMETER_MEDIUM = '191';
 module.exports.ISY_COMMAND_FAN_PARAMETER_HIGH = '255';
+module.exports.ISY_COMMAND_LOCK_LOCK = 'DON';
+module.exports.ISY_COMMAND_LOCK_UNLOCK = 'DON';
+
+module.exports.ISY_STATE_DOOR_WINDOW_CLOSED = '0';
+module.exports.ISY_STATE_LOCK_UNLOCKED = '0';
+
 
 // User commands
 module.exports.USER_COMMAND_LIGHT_ON = 'On';

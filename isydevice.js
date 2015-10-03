@@ -30,7 +30,7 @@ ISYDevice.prototype.setCurrentLightState = function(lightState) {
 }
 
 ISYDevice.prototype.getCurrentLightState = function() {
-	return this.lightState;
+	return this.currentLightState;
 }
 
 ISYDevice.prototype.sendLightCommand = function(lightOn) {
@@ -61,6 +61,18 @@ ISYDevice.prototype.sendLockCommand = function(lock) {
 	}
 }
 
+ISYDevice.prototype.setCurrentDoorWindowState = function(doorWindowState) {
+	var tmpDoorWindowState = this.currentDoorWindowState;
+	this.currentDoorWindowState = doorWindowState;
+	if(doorWindowState != tmpDoorWindowState) {
+		this.isy.nodeChangedHandler(this);
+	}	
+}
+
+ISYDevice.prototype.getCurrentDoorWindowState = function() {
+	return this.currentDoorWindowState;
+}
+
 ISYDevice.prototype.setCurrentOutletState = function(outletState) {
 	var tmpOutletState = this.currentOutletState;
 	this.currentOutletState = outletState;
@@ -79,6 +91,22 @@ ISYDevice.prototype.sendOutletCommand = function(outletState) {
 	} else {
 		this.isy.sendCommand(this,isyConstants.USER_COMMAND_OUTLET_OFF);
 	}
+}
+
+ISYDevice.prototype.setCurrentFanState = function(fanState) {
+	var tmpFanState = this.currentFanState;
+	this.currentFanState = fanState;
+	if(fanState != tmpFanState) {
+		this.isy.nodeChangedHandler(this);
+	}
+}
+
+ISYDevice.prototype.getCurrentFanState = function() {
+	return this.currentFanState;
+}
+
+ISYDevice.prototype.sendFanCommand = function(fanState) {
+	this.isy.sendCommand(this,fanState);
 }
 
 function isyTypeToTypeName(isyType,address) {
