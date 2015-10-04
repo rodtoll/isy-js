@@ -94,6 +94,9 @@ The sendXXXCommand are functions which tell the device to move the specified sta
 * `getCurrentFanState()`- Gets the current state of the fan. Off, Low, Medium, High.
 * `sendFanCommand(state)` - Sends the command to set the fan state to the specified state. Allowed values are Off, Low, Medium and High.
 * `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
+* `sendLightDimCommand(level)` - Sets the dim level of the light to the specified value. 0 (off) to 100 (full on).
+* `setCurrentLightDimLevel(dimLevel)` - Sets the current dim level of the light.  
+* `getCurrentLightDimLevel()` - Gets the current dim level of the light. Values from 0 (off) to 100 (full on).
 
 TODO
 ----

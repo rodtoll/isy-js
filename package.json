@@ -1,7 +1,12 @@
 {
     "name": "isy-js",
     "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application",
-    "license" : "BSD-3-Clause",
+    "license" : "MIT",
+    "version" : "0.0.2",
+    "author" : {
+        "name": "Rod Toll",
+        "email": "rod_toll@hotmail.com"
+    },
     "keywords" : [
         "isy",
         "universal devies",
@@ -15,5 +20,9 @@
     },
     "bugs": {
         "url": "https://github.com/rodtoll/isy-js/issues"
+    },
+    "repository" : {
+         "type" : "git", 
+         "url" : "https://github.com/rodtoll/isy-js.git"
     }
 }

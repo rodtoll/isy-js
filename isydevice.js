@@ -41,6 +41,18 @@ ISYDevice.prototype.sendLightCommand = function(lightOn) {
 	}
 }
 
+ISYDevice.prototype.getCurrentLightDimLevel = function() {
+	return this.currentLightDimState;
+}
+
+ISYDevice.prototype.setCurrentLightDimLevel = function(lightDimState) {
+	this.currentLightDimState = lightDimState;	
+} 
+
+ISYDevice.prototype.sendLightDimCommand = function(lightLevel) {
+	this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_ON, lightLevel);
+}
+
 ISYDevice.prototype.setCurrentLockState = function(lockState) {
 	var tmpLockState = this.currentLockState;
 	this.currentLockState = lockState;

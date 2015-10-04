@@ -108,6 +108,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if(deviceToUpdate != undefined && deviceToUpdate != null) {
         if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
+            deviceToUpdate.setCurrentLightDimLevel(Math.floor(100 * state / 255));
             if(state > 0) {
                 deviceToUpdate.setCurrentLightState(true);
             } else {
@@ -171,10 +172,12 @@ ISY.prototype.sendCommand = function(device, command) {
     }
     
     if(device.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
-        if(command == isyConstants.USER_COMMAND_LIGHT_ON) {
+        if(command == isyConstants.USER_COMMAND_LIGHT_ON || command == 100) {
             this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,null);            
-        } else if(command == isyConstants.USER_COMMAND_LIGHT_OFF){
+        } else if(command == isyConstants.USER_COMMAND_LIGHT_OFF || command == 0){
             this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_OFF,null);
+        } else if(command > 0 && command < 100) {
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,Math.floor(command*255/100));
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
         }
