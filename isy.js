@@ -223,13 +223,13 @@ ISY.prototype.sendCommand = function(device, command, resultHandler) {
         }            
     } else if(device.deviceType == isyConstants.DEVICE_TYPE_FAN) {
         if(command == isyConstants.USER_COMMAND_FAN_OFF) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_OFF,null,resultHandler);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_OFF,null,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_LOW) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW,resultHandler);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_MEDIUM) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM,resultHandler);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_HIGH) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE.isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGHT,resultHandler);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGH,resultHandler);
         } else {
             console.error("Error commanding fan: "+this.name+" to invalid state: "+command);
             resultHandler(false);            
