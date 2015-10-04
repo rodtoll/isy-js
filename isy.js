@@ -173,7 +173,7 @@ ISY.prototype.sendCommand = function(device, command) {
     if(device.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
         if(command == isyConstants.USER_COMMAND_LIGHT_ON) {
             this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,null);            
-        } else if(command == isyConstants.USER_COMMAND.LIGHT.OFF){
+        } else if(command == isyConstants.USER_COMMAND_LIGHT_OFF){
             this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_OFF,null);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
