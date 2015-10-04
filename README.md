@@ -106,4 +106,3 @@ TODO
 * Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
 * The ISY-994 also supports ELK integration. Expose ELK objects through this same interface.
-* Support light dimming and dim state rather then just on and off.
