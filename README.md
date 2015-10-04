@@ -85,16 +85,18 @@ Functions:
 
 The sendXXXCommand are functions which tell the device to move the specified state. The local device will not update it's state until the ISY has acknowledged the change. To get the last acknowledged state call the getXXXXState commands.
 
+The resultCallback parameter specifies a required callback that will specify true if the command succeeded, false otherwise. 
+
 * `getCurrentLightState()` - Gets the current Light power state. true for on, false for off.
-* `sendLightCommand(state)` - Sends the command to set the Light power state. true to turn it on, false to turn it off
+* `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state. true to turn it on, false to turn it off
 * `getCurrentLockState()` - Gets the current locked state of the lock device. true for locked, false for unlocked.
-* `sendLockCommand(state)` - Sends the command to set the Lock state to the specified state. true to lock the door, false to unlock it.
+* `sendLockCommand(state,resultCallback(success))` - Sends the command to set the Lock state to the specified state. true to lock the door, false to unlock it.
 * `getCurrentOutletState()` - Gets the current state of the outlet. true for on, false for off.
-* `sendOutletCommand(state)` - Sends the command to set the outlet state to the specified state. true to turn it on, false to turn it off. 
+* `sendOutletCommand(state,resultCallback(success))` - Sends the command to set the outlet state to the specified state. true to turn it on, false to turn it off. 
 * `getCurrentFanState()`- Gets the current state of the fan. Off, Low, Medium, High.
-* `sendFanCommand(state)` - Sends the command to set the fan state to the specified state. Allowed values are Off, Low, Medium and High.
+* `sendFanCommand(state,resultCallback(success))` - Sends the command to set the fan state to the specified state. Allowed values are Off, Low, Medium and High.
 * `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
-* `sendLightDimCommand(level)` - Sets the dim level of the light to the specified value. 0 (off) to 100 (full on).
+* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the light to the specified value. 0 (off) to 100 (full on).
 * `setCurrentLightDimLevel(dimLevel)` - Sets the current dim level of the light.  
 * `getCurrentLightDimLevel()` - Gets the current dim level of the light. Values from 0 (off) to 100 (full on).
 

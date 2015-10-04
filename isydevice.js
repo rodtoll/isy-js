@@ -33,11 +33,11 @@ ISYDevice.prototype.getCurrentLightState = function() {
 	return this.currentLightState;
 }
 
-ISYDevice.prototype.sendLightCommand = function(lightOn) {
+ISYDevice.prototype.sendLightCommand = function(lightOn,resultHandler) {
 	if(lightOn) {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_ON);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_ON,resultHandler);
 	} else {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_OFF);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_OFF,resultHandler);
 	}
 }
 
@@ -49,8 +49,8 @@ ISYDevice.prototype.setCurrentLightDimLevel = function(lightDimState) {
 	this.currentLightDimState = lightDimState;	
 } 
 
-ISYDevice.prototype.sendLightDimCommand = function(lightLevel) {
-	this.isy.sendCommand(this,isyConstants.USER_COMMAND_LIGHT_ON, lightLevel);
+ISYDevice.prototype.sendLightDimCommand = function(lightLevel,resultHandler) {
+	this.isy.sendCommand(this, lightLevel,resultHandler);
 }
 
 ISYDevice.prototype.setCurrentLockState = function(lockState) {
@@ -65,11 +65,11 @@ ISYDevice.prototype.getCurrentLockState = function() {
 	return this.currentLockState;
 }
 
-ISYDevice.prototype.sendLockCommand = function(lock) {
+ISYDevice.prototype.sendLockCommand = function(lock,resultHandler) {
 	if(lock) {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LOCK_LOCK);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LOCK_LOCK,resultHandler);
 	} else {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LOCK_UNLOCK);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_LOCK_UNLOCK,resultHandler);
 	}
 }
 
@@ -97,11 +97,11 @@ ISYDevice.prototype.getCurrentOutletState = function() {
 	return this.currentOutletState;
 }
 
-ISYDevice.prototype.sendOutletCommand = function(outletState) {
+ISYDevice.prototype.sendOutletCommand = function(outletState,resultHandler) {
 	if(outletState) {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_OUTLET_ON);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_OUTLET_ON,resultHandler);
 	} else {
-		this.isy.sendCommand(this,isyConstants.USER_COMMAND_OUTLET_OFF);
+		this.isy.sendCommand(this,isyConstants.USER_COMMAND_OUTLET_OFF,resultHandler);
 	}
 }
 
@@ -117,8 +117,8 @@ ISYDevice.prototype.getCurrentFanState = function() {
 	return this.currentFanState;
 }
 
-ISYDevice.prototype.sendFanCommand = function(fanState) {
-	this.isy.sendCommand(this,fanState);
+ISYDevice.prototype.sendFanCommand = function(fanState,resultHandler) {
+	this.isy.sendCommand(this,fanState,resultHandler);
 }
 
 function isyTypeToTypeName(isyType,address) {

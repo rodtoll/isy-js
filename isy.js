@@ -108,6 +108,12 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if(deviceToUpdate != undefined && deviceToUpdate != null) {
         if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
+            if(state > 0) {
+                deviceToUpdate.setCurrentLightState(true);
+            } else {
+                deviceToUpdate.setCurrentLightState(false);
+            }
+        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT) {
             deviceToUpdate.setCurrentLightDimLevel(Math.floor(100 * state / 255));
             if(state > 0) {
                 deviceToUpdate.setCurrentLightState(true);
@@ -152,7 +158,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     }
 }
 
-ISY.prototype.sendRestCommand = function(address, command, parameter) {
+ISY.prototype.sendRestCommand = function(address, command, parameter, handleResult) {
     var uriToUse = 'http://'+this.address+'/rest/nodes/'+address+'/cmd/'+command;
     if(parameter != null) {
         uriToUse += '/' + parameter;
@@ -162,61 +168,75 @@ ISY.prototype.sendRestCommand = function(address, command, parameter) {
         username: this.userName,
         password: this.password
     }    
-    restler.get(uriToUse, options);
+    restler.get(uriToUse, options).on('complete', function(data, response) {
+        if(response.statusCode == 200) {
+            handleResult(true);
+        } else {
+            handleResult(false);
+        }
+    });
 }
 
-ISY.prototype.sendCommand = function(device, command) {
+ISY.prototype.sendCommand = function(device, command, resultHandler) {
     if(!(device instanceof isyDevice.ISYDevice)) {
         console.log("Attempted to send command on non device");
         return;
     }
     
-    if(device.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
+    if(device.deviceType == isyConstants.DEVICE_TYPE_LIGHT || device.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT) {
         if(command == isyConstants.USER_COMMAND_LIGHT_ON || command == 100) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,null);            
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,null,resultHandler);            
         } else if(command == isyConstants.USER_COMMAND_LIGHT_OFF || command == 0){
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_OFF,null);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_OFF,null,resultHandler);
         } else if(command > 0 && command < 100) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,Math.floor(command*255/100));
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,Math.floor(command*255/100),resultHandler);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
+            resultHandler(false);
         }
     } else if(device.deviceType == isyConstants.DEVICE_TYPE_OUTLET) {
         if(command == isyConstants.USER_COMMAND_OUTLET_ON) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_ON,null);            
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_ON,null,resultHandler);            
         } else if(command == isyConstants.USER_COMMAND_OUTLET_OFF) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_OFF,null);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_OFF,null,resultHandler);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
+            resultHandler(false);            
         }     
     } else if(device.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
         if(command == isyConstants.USER_COMMAND_LOCK_LOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK);            
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);            
         } else if(command == isyConstants.USER_COMMAND_LOCK_UNLOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
+            resultHandler(false);            
         }  
     } else if(device.deviceType == isyConstants.DEVICE_TYPE_LOCK) {
         if(command == isyConstants.USER_COMMAND_LOCK_LOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_LOCK,null);            
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_LOCK,null,resultHandler);            
         } else if(command == isyConstants.USER_COMMAND_LOCK_UNLOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_UNLOCK,null);
+            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_UNLOCK,null,resultHandler);
         } else {
             console.error('Unknown command: '+command+' for device '+device.name);
+            resultHandler(false);            
         }            
     } else if(device.deviceType == isyConstants.DEVICE_TYPE_FAN) {
         if(command == isyConstants.USER_COMMAND_FAN_OFF) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_OFF,null);
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_OFF,null,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_LOW) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW);
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_MEDIUM) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM);
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM,resultHandler);
         } else if(command == isyConstants.USER_COMMAND_FAN_HIGH) {
-            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE.isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGHT);
+            this.isy.sendCommand(this,isyConstants.ISY_COMMAND_FAN_BASE.isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGHT,resultHandler);
         } else {
             console.error("Error commanding fan: "+this.name+" to invalid state: "+command);
+            resultHandler(false);            
         }        
+    } else {
+        console.error("Unknown device type: "+this.name+" device type: "+device.deviceType);
+        resultHandler(false);
     }
 }
 

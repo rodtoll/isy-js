@@ -5,6 +5,7 @@
 module.exports.DEVICE_TYPE_LOCK = 'DoorLock';
 module.exports.DEVICE_TYPE_SECURE_LOCK = 'SecureLock';
 module.exports.DEVICE_TYPE_LIGHT = 'Light';
+module.exports.DEVICE_TYPE_DIMMABLE_LIGHT = 'DimmableLight';
 module.exports.DEVICE_TYPE_OUTLET = 'Outlet';
 module.exports.DEVICE_TYPE_FAN = 'Fan';
 module.exports.DEVICE_TYPE_UNKNOWN = 'Unknown';
