@@ -46,7 +46,11 @@ ISYDevice.prototype.getCurrentLightDimLevel = function() {
 }
 
 ISYDevice.prototype.setCurrentLightDimLevel = function(lightDimState) {
+	var tmpDimState = this.currentLightDimState;
 	this.currentLightDimState = lightDimState;	
+	if(lightDimState != tmpDimState) {
+		this.isy.nodeChangedHandler(this);
+	}
 } 
 
 ISYDevice.prototype.sendLightDimCommand = function(lightLevel,resultHandler) {
