@@ -25,7 +25,7 @@ module.exports.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
 module.exports.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
 module.exports.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
 module.exports.ISY_COMMAND_LOCK_LOCK = 'DON';
-module.exports.ISY_COMMAND_LOCK_UNLOCK = 'DON';
+module.exports.ISY_COMMAND_LOCK_UNLOCK = 'DOF';
 
 module.exports.ISY_STATE_DOOR_WINDOW_CLOSED = '0';
 module.exports.ISY_STATE_LOCK_UNLOCKED = '0';
