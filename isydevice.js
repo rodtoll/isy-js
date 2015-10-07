@@ -91,9 +91,9 @@ ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
 		}
 	} else if(this.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
 		if(lockState) {
-			this.isy.sendRestCommand(this.addres, isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);
+			this.isy.sendRestCommand(this.address, isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);
 		} else {
-			this.isy.sendRestCommand(this.addres, isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);			
+			this.isy.sendRestCommand(this.address, isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);			
 		}
 	}
 }
