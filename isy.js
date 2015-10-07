@@ -3,14 +3,37 @@ var xmldoc = require('xmldoc');
 var isyDevice = require('./isydevice');
 var isyConstants = require('./isyconstants.js');
 var WebSocket = require("faye-websocket");
+var elkDevice = require('./elkdevice.js');
+var isyDeviceTypeList = require("./isydevicetypes.json");
 
-var ISY = function(address, username, password, changeCallback) {
+function isyTypeToTypeName(isyType,address) {
+	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
+		if(isyDeviceTypeList[index].type == isyType) {
+			var addressElementValue = isyDeviceTypeList[index].address;
+			if( addressElementValue != "") {
+				var lastAddressNumber = address[address.length-1];
+				if(lastAddressNumber != addressElementValue) {
+					continue;
+				}
+			}
+			return isyDeviceTypeList[index];
+		}		
+	}
+	return null;
+} 
+
+var ISY = function(address, username, password, elkEnabled, changeCallback) {
     this.address  = address;
     this.userName = username;
     this.password = password;
     this.deviceIndex = {};
     this.deviceList = [];
     this.nodesLoaded = false;
+    this.elkEnabled = elkEnabled;
+    this.zoneMap = {};
+    if(this.elkEnabled) {
+        this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this,1);
+    }
     this.changeCallback = changeCallback;
 };
 
@@ -20,6 +43,120 @@ ISY.prototype.nodeChangedHandler = function(node) {
         console.log('Node: '+node.address+' changed');
         this.changeCallback(that, node);
     }
+}
+
+ISY.prototype.getElkAlarmPanel = function() {
+    return this.elkAlarmPanel;
+}
+
+ISY.prototype.loadNodes = function(result) {
+    var document = new xmldoc.XmlDocument(result);
+    var nodes = document.childrenNamed('node');
+    for(var index = 0; index < nodes.length; index++) {
+        var deviceAddress = nodes[index].childNamed('address').val;
+        var isyDeviceType = nodes[index].childNamed('type').val;
+        var deviceName = nodes[index].childNamed('name').val;
+        var newDevice = null;
+        var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
+        
+        if(deviceTypeInfo != null) {
+            if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT ||
+            deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
+            newDevice = new isyDevice.ISYLightDevice(
+                this,
+                deviceName,
+                deviceAddress,
+                deviceTypeInfo
+            )        
+            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                newDevice = new isyDevice.ISYDoorWindowDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    deviceTypeInfo
+                );
+            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_FAN) {
+                newDevice = new isyDevice.ISYFanDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    deviceTypeInfo
+                );
+            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_LOCK || 
+                    deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
+                newDevice = new isyDevice.ISYLockDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    deviceTypeInfo
+                );
+            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_OUTLET) {
+                newDevice = new isyDevice.ISYOutletDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    deviceTypeInfo
+                );
+            }
+            if(newDevice != null) {
+                this.deviceIndex[deviceAddress] = newDevice;
+                this.deviceList.push(newDevice);
+                if(nodes[index].childNamed('property') != null) {
+                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                }
+            }
+        }
+    }      
+}
+
+ISY.prototype.loadElkNodes = function(result) {
+    var document = new xmldoc.XmlDocument(result);
+    var nodes = document.childNamed('areas').childNamed('area').childrenNamed('zone');
+    for(var index = 0; index < nodes.length; index++) {
+        var id = nodes[index].attr.id;
+        var name = nodes[index].attr.name;
+        var alarmDef = nodes[index].attr.alarmDef;
+        
+        if(alarmDef != 17) {
+            var newDevice = new elkDevice.ElkAlarmSensor(
+                this,
+                name,
+                1,
+                id);
+            this.zoneMap[newDevice.zone] = newDevice;
+        }
+    }     
+}
+
+ISY.prototype.loadElkInitialStatus = function(result) {
+    var document = new xmldoc.XmlDocument(result);
+    var nodes = document.childrenNamed('ae');
+    for(var index = 0; index < nodes.length; index++) {
+        this.elkAlarmPanel.setFromAreaUpdate(nodes[index]);
+    }        
+    nodes = document.childrenNamed('ze');
+    for(var index = 0; index < nodes.length; index++) {
+        var id = nodes[index].attr.zone;
+        var zoneDevice = this.zoneMap[id];
+        if(zoneDevice != null) {
+            zoneDevice.setFromZoneUpdate(nodes[index]);
+            if(this.deviceIndex[zoneDevice.address] == null && zoneDevice.isPresent()) {
+                this.deviceList.push(zoneDevice);        
+                this.deviceIndex[zoneDevice.address] = zoneDevice;
+            }
+        }
+    }
+}
+
+ISY.prototype.finishInitialize = function(success, initializeCompleted) {
+    this.nodesLoaded = true;
+    initializeCompleted();
+    if(success) {
+        if(this.elkEnabled) {
+            this.deviceList.push(this.elkAlarmPanel);            
+        }
+        this.initializeWebSocket(); 
+    }  
 }
 
 ISY.prototype.initialize = function(initializeCompleted) {
@@ -37,30 +174,36 @@ ISY.prototype.initialize = function(initializeCompleted) {
     ).on('complete', function(result, response) {
         if(response instanceof Error) {
             console.log('Error:'+result.message);
-            this.nodesLoaded = true;
-            initializeCompleted();
+            that.finishInitialize(false, initializeCompleted);                         
         } else {
-            var document = new xmldoc.XmlDocument(result);
-            var nodes = document.childrenNamed('node');
-            for(var index = 0; index < nodes.length; index++) {
-                var deviceAddress = nodes[index].childNamed('address').val;
-                var newDevice = new isyDevice.ISYDevice(
-                    that,
-                    nodes[index].childNamed('name').val,
-                    deviceAddress,
-                    nodes[index].childNamed('type').val
-                );
-                if(newDevice.deviceType != isyConstants.DEVICE_TYPE_UNKNOWN) {
-                    that.deviceIndex[deviceAddress] = newDevice;
-                    that.deviceList.push(newDevice);
-                    if(nodes[index].childNamed('property') != null) {
-                        that.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+            that.loadNodes(result);
+            if(that.elkEnabled) {
+                restler.get(
+                    'http://'+that.address+'/rest/elk/get/topology',
+                    options
+                ).on('complete', function(result, response) {
+                    if(response instanceof Error) {
+                        console.log('Error loading from elk: '+result.message);
+                        that.finishInitialize(false,initializeCompleted);
+                    } else {
+                        that.loadElkNodes(result);
+                        restler.get(
+                            'http://'+that.address+'/rest/elk/get/status',
+                            options
+                        ).on('complete', function(result, response) {
+                            if(response instanceof Error) {
+                                console.log('Error:'+result.message);
+                                that.finishInitialize(false, initializeCompleted);                         
+                            } else {
+                                that.loadElkInitialStatus(result);
+                                that.finishInitialize(true,initializeCompleted);                                                        
+                            }
+                        });
                     }
-                }
-            }      
-            that.nodesLoaded = true;
-            initializeCompleted();
-            that.initializeWebSocket();
+                });                 
+            } else {
+                that.finishInitialize(true,initializeCompleted);                    
+            }
         } 
     });
 }
@@ -73,7 +216,25 @@ ISY.prototype.handleWebSocketMessage = function(event) {
         var address = document.childNamed('node').val;
         if(controlElement == 'ST') {
             this.handleISYStateUpdate(address, actionValue);
-        }  
+        } else if(controlElement == '_19') {
+            if(actionValue == 2) {
+                var aeElement = document.childNamed('eventInfo').childNamed('ae');
+                if(aeElement != null) {
+                    if(this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
+                        this.nodeChangedHandler(this.elkAlarmPanel);
+                    }
+                }
+            } else if(actionValue == 3) {
+                var zeElement = document.childNamed('eventInfo').childNamed('ze');
+                var zoneId = zeElement.attr.zone;
+                var zoneDevice = this.zoneMap[zoneId];
+                if(zoneDevice != null) {
+                    if(zoneDevice.setFromZoneUpdate(zeElement)) {
+                        this.nodeChangedHandler(zoneDevice);
+                    }
+                }
+            }            
+        }
     }
 }
 
@@ -107,59 +268,30 @@ ISY.prototype.getDevice = function(address) {
 ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if(deviceToUpdate != undefined && deviceToUpdate != null) {
-        if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
-            if(state > 0) {
-                deviceToUpdate.setCurrentLightState(true);
-            } else {
-                deviceToUpdate.setCurrentLightState(false);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT) {
-            deviceToUpdate.setCurrentLightDimLevel(Math.floor(100 * state / 255));
-            if(state > 0) {
-                deviceToUpdate.setCurrentLightState(true);
-            } else {
-                deviceToUpdate.setCurrentLightState(false);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_OUTLET) {
-            if(state > 0) {
-                deviceToUpdate.setCurrentOutletState(true);
-            } else {
-                deviceToUpdate.setCurrentOutletState(false);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
-            if(state > 0) {
-                deviceToUpdate.setCurrentLockState(true);
-            } else {
-                deviceToUpdate.setCurrentLockState(false);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_LOCK) {
-            if(state == isyConstants.ISY_STATE_LOCK_UNLOCKED) {
-                deviceToUpdate.setCurrentLockState(false);
-            } else {
-                deviceToUpdate.setCurrentLockState(true);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-            if(state == isyConstants.ISY_STATE_DOOR_WINDOW_CLOSED) {
-                deviceToUpdate.setCurrentDoorWindowState(false);
-            } else {
-                deviceToUpdate.setCurrentDoorWindowState(true);
-            }
-        } else if(deviceToUpdate.deviceType == isyConstants.DEVICE_TYPE_FAN) {
-            if(state > 0 && state <= isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW) {
-                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_LOW);
-            } else if(state > isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW && state <= isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
-                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_MEDIUM);
-            } else if(state == 0) {
-                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_OFF);
-            } else {
-                deviceToUpdate.setCurrentFanState(isyConstants.USER_COMMAND_FAN_HIGH);
-            }
+        if(deviceToUpdate.handleIsyUpdate(state)) {
+            this.nodeChangedHandler(deviceToUpdate);
         }
     }
 }
 
-ISY.prototype.sendRestCommand = function(address, command, parameter, handleResult) {
-    var uriToUse = 'http://'+this.address+'/rest/nodes/'+address+'/cmd/'+command;
+ISY.prototype.sendISYCommand = function(path, handleResult) {
+    var uriToUse = 'http://'+this.address+'/rest/'+path;
+    console.log("Sending ISY command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    }    
+    restler.get(uriToUse, options).on('complete', function(data, response) {
+        if(response.statusCode == 200) {
+            handleResult(true);
+        } else {
+            handleResult(false);
+        }
+    });    
+}
+
+ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, handleResult) {
+    var uriToUse = 'http://'+this.address+'/rest/nodes/'+deviceAddress+'/cmd/'+command;
     if(parameter != null) {
         uriToUse += '/' + parameter;
     }
@@ -175,69 +307,6 @@ ISY.prototype.sendRestCommand = function(address, command, parameter, handleResu
             handleResult(false);
         }
     });
-}
-
-ISY.prototype.sendCommand = function(device, command, resultHandler) {
-    if(!(device instanceof isyDevice.ISYDevice)) {
-        console.log("Attempted to send command on non device");
-        return;
-    }
-    
-    if(device.deviceType == isyConstants.DEVICE_TYPE_LIGHT || device.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT) {
-        if(command == isyConstants.USER_COMMAND_LIGHT_ON || command == 100) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,null,resultHandler);            
-        } else if(command == isyConstants.USER_COMMAND_LIGHT_OFF || command == 0){
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_OFF,null,resultHandler);
-        } else if(command > 0 && command < 100) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LIGHT_ON,Math.floor(command*255/100),resultHandler);
-        } else {
-            console.error('Unknown command: '+command+' for device '+device.name);
-            resultHandler(false);
-        }
-    } else if(device.deviceType == isyConstants.DEVICE_TYPE_OUTLET) {
-        if(command == isyConstants.USER_COMMAND_OUTLET_ON) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_ON,null,resultHandler);            
-        } else if(command == isyConstants.USER_COMMAND_OUTLET_OFF) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_OUTLET_OFF,null,resultHandler);
-        } else {
-            console.error('Unknown command: '+command+' for device '+device.name);
-            resultHandler(false);            
-        }     
-    } else if(device.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
-        if(command == isyConstants.USER_COMMAND_LOCK_LOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);            
-        } else if(command == isyConstants.USER_COMMAND_LOCK_UNLOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_SECURE_LOCK_BASE,isyConstants.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);
-        } else {
-            console.error('Unknown command: '+command+' for device '+device.name);
-            resultHandler(false);            
-        }  
-    } else if(device.deviceType == isyConstants.DEVICE_TYPE_LOCK) {
-        if(command == isyConstants.USER_COMMAND_LOCK_LOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_LOCK,null,resultHandler);            
-        } else if(command == isyConstants.USER_COMMAND_LOCK_UNLOCK) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_LOCK_UNLOCK,null,resultHandler);
-        } else {
-            console.error('Unknown command: '+command+' for device '+device.name);
-            resultHandler(false);            
-        }            
-    } else if(device.deviceType == isyConstants.DEVICE_TYPE_FAN) {
-        if(command == isyConstants.USER_COMMAND_FAN_OFF) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_OFF,null,resultHandler);
-        } else if(command == isyConstants.USER_COMMAND_FAN_LOW) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_LOW,resultHandler);
-        } else if(command == isyConstants.USER_COMMAND_FAN_MEDIUM) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_MEDIUM,resultHandler);
-        } else if(command == isyConstants.USER_COMMAND_FAN_HIGH) {
-            this.sendRestCommand(device.address,isyConstants.ISY_COMMAND_FAN_BASE,isyConstants.ISY_COMMAND_FAN_PARAMETER_HIGH,resultHandler);
-        } else {
-            console.error("Error commanding fan: "+this.name+" to invalid state: "+command);
-            resultHandler(false);            
-        }        
-    } else {
-        console.error("Unknown device type: "+this.name+" device type: "+device.deviceType);
-        resultHandler(false);
-    }
 }
 
 exports.ISY = ISY;
