@@ -22,6 +22,8 @@ Features
 * Basic commands for several device types.
 * Automatic updating of current state of devices while operating.
 * Change notifications when device state changes.
+* Support for elk connected alarm.
+* Support for elk sensors. 
 
 Setup
 -----
@@ -42,7 +44,7 @@ isy.initialize(handleInitialized);
 
 The callback, handleInitialized, takes no parameters and is called when the entire device list has been enumerated. Once this callback is called then the object is safe to use.
 
-You can then retrieve a list of devices, and operate on them, by calling isy.getDeviceList. You can then operate on the device objects.
+You can then retrieve a list of devices, and operate on them, by calling isy.getDeviceList(). You can then operate on the device objects through their properties and functions.
 
 DEVICE TYPES
 ------------
@@ -137,11 +139,11 @@ Represents a door/window sensor connected via wired or wireless to the Elk alarm
 
 Represents an Elk alarm panel. One is available per isy when elk is present. Only area 1 is supported. Available functions:
 
-* `sendSetAlarmModeCommand(mode)`
-* `clearAllBypasses()` 
-* `getAlarmTripState()` 
-* `getAlarmState()`
-* `getAlarmMode()` 
+* `sendSetAlarmModeCommand(mode)` - Sends the command to the alarm system to arm in the specified mode. See getAlarmMode() for possible values. 
+* `clearAllBypasses()` - Clears all current bypasses.
+* `getAlarmTripState()` - Returns the current alarm trip state. Possible values from isyConstants: ELK_ALARM_TRIP_STATE_DISARMED, ELK_ALARM_TRIP_STATE_EXIT_DELAY or ELK_ALARM_TRIP_STATE_TRIPPED.
+* `getAlarmState()` - Returns the current alarm state. Possible values from isyConstants: ELK_ALARM_STATE_NOT_READY_TO_ARM, ELK_ALARM_STATE_READY_TO_ARM, ELK_ALARM_STATE_READY_TO_ARM_VIOLATION, ELK_ALARM_STATE_ARMED_WITH_TIMER, ELK_ALARM_STATE_ARMED_FULLY, ELK_ALARM_STATE_FORCE_ARMED_VIOLATION or ELK_ALARM_STATE_ARMED_WITH_BYPASS.
+* `getAlarmMode()` - Returns the current alarm mode. Possible values from isyConstants: ELK_ALARM_MODE_DISARMED, ELK_ALARM_MODE_AWAY, ELK_ALARM_MODE_STAY, ELK_ALARM_MODE_STAY_INSTANT, ELK_ALARM_MODE_NIGHT, ELK_ALARM_MODE_NIGHT_INSTANT or ELK_ALARM_MODE_VACATION.
 
 TODO
 ----
