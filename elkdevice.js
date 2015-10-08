@@ -101,6 +101,10 @@ ElkAlarmSensor.prototype.getPhysicalState = function() {
 	return this.physicalState;
 }
 
+ElkAlarmSensor.prototype.isBypassed = function() {
+	return (this.logicalState == isyConstants.ELK_SENSOR_STATE_LOGICAL_BYPASSED);
+}
+
 ElkAlarmSensor.prototype.getLogicalState = function() {
 	return this.logicalState;
 }
