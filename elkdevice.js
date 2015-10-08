@@ -1,6 +1,5 @@
 var isy = require('./isy.js');
 var xmldoc = require('xmldoc');
-var isyConstants = require('./isyconstants.js');
 
 /////////////////////////////
 // ELKAlarmPanelDevice
@@ -9,20 +8,43 @@ var isyConstants = require('./isyconstants.js');
 function ELKAlarmPanelDevice(isy,area) {
 	this.isy = isy;
 	this.area = area;
-	this.alarmTripState = isyConstants.ELK_ALARM_TRIP_STATE_DISARMED;
-	this.alarmState = isyConstants.ELK_ALARM_STATE_NOT_READY_TO_ARM;
-	this.alarmMode = isyConstants.ELK_ALARM_MODE_DISARMED;
+	this.alarmTripState = ELKAlarmPanelDevice.ALARM_TRIP_STATE_DISARMED;
+	this.alarmState = ELKAlarmPanelDevice.ALARM_STATE_NOT_READY_TO_ARM;
+	this.alarmMode = ELKAlarmPanelDevice.ALARM_MODE_DISARMED;
 	this.name = "Elk Alarm Panel "+area;
 	this.address = "ElkPanel"+area;
 	this.deviceFriendlyName = "Elk Main Alarm Panel";
-	this.deviceType = isyConstants.DEVICE_TYPE_ALARM_PANEL;
+	this.deviceType = isy.DEVICE_TYPE_ALARM_PANEL;
 	this.connectionType = "Elk Network Module";
 	this.batteryOperated = false;	
 	this.voltage = 71;
 }
 
+// Alarm mode constanrs
+ELKAlarmPanelDevice.prototype.ALARM_MODE_DISARMED = 0;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_AWAY = 1;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_STAY = 2;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_STAY_INSTANT = 3;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_NIGHT = 4;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_NIGHT_INSTANT = 5;
+ELKAlarmPanelDevice.prototype.ALARM_MODE_VACATION = 6;
+
+// Alarm trip state
+ELKAlarmPanelDevice.prototype.ALARM_TRIP_STATE_DISARMED = 0;
+ELKAlarmPanelDevice.prototype.ALARM_TRIP_STATE_EXIT_DELAY = 1;
+ELKAlarmPanelDevice.prototype.ALARM_TRIP_STATE_TRIPPED = 2;
+
+// Alarm state
+ELKAlarmPanelDevice.prototype.ALARM_STATE_NOT_READY_TO_ARM = 0;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_READY_TO_ARM = 1;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_READY_TO_ARM_VIOLATION = 2;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_WITH_TIMER = 3;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_FULLY = 4;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_FORCE_ARMED_VIOLATION = 5;
+ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_WITH_BYPASS = 6;
+
 ELKAlarmPanelDevice.prototype.sendSetAlarmModeCommand = function(alarmState,handleResult) {
-	if(alarmState == isyConstants.ISY_COMMAND_ELK_ALARM_MODE_DISARMED) {
+	if(alarmState == isy.ISY_COMMAND_ELK_ALARM_MODE_DISARMED) {
 		this.isy.sendISYCommand('elk/area/'+this.area+'/cmd/disarm',handleResult);		
 	} else {
 		this.isy.sendISYCommand('elk/area/'+this.area+'/cmd/arm?armType='+alarmState,handleResult);
@@ -86,12 +108,24 @@ function ElkAlarmSensor(isy,name,area,zone) {
 	this.name = name;
 	this.address = "ElkZone"+zone;
 	this.deviceFriendlyName = "Elk Connected Sensor";
-	this.deviceType = isyConstants.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR;
+	this.deviceType = isy.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR;
 	this.connectionType = "Elk Network";
 	this.batteryOperated = false;	
-	this.physicalState = isyConstants.ELK_SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;
-	this.logicalState = isyConstants.ELK_SENSOR_STATE_LOGICAL_NORMAL;
+	this.physicalState = ElkAlarmSensor.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;
+	this.logicalState = ElkAlarmSensor.SENSOR_STATE_LOGICAL_NORMAL;
 }
+
+// Logical Status for sensors
+ElkAlarmSensor.prototype.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED = 0;
+ElkAlarmSensor.prototype.SENSOR_STATE_PHYSICAL_OPEN = 1;
+ElkAlarmSensor.prototype.SENSOR_STATE_PHYSICAL_EOL = 2;
+ElkAlarmSensor.prototype.SENSOR_STATE_PHYSICAL_SHORT = 3;
+
+// Physical status for sensors
+ElkAlarmSensor.prototype.SENSOR_STATE_LOGICAL_NORMAL = 0;
+ElkAlarmSensor.prototype.SENSOR_STATE_LOGICAL_TROUBLE = 1;
+ElkAlarmSensor.prototype.SENSOR_STATE_LOGICAL_VIOLATED = 2;
+ElkAlarmSensor.prototype.SENSOR_STATE_LOGICAL_BYPASSED = 3;
 
 ElkAlarmSensor.prototype.sendBypassToggleCommand = function(handleResult) {
 	this.isy.sendISYCommand('elk/zone/'+this.zone+'/cmd/toggle/bypass',handleResult);		
@@ -102,7 +136,7 @@ ElkAlarmSensor.prototype.getPhysicalState = function() {
 }
 
 ElkAlarmSensor.prototype.isBypassed = function() {
-	return (this.logicalState == isyConstants.ELK_SENSOR_STATE_LOGICAL_BYPASSED);
+	return (this.logicalState == ElkAlarmSensor.SENSOR_STATE_LOGICAL_BYPASSED);
 }
 
 ElkAlarmSensor.prototype.getLogicalState = function() {
@@ -110,7 +144,7 @@ ElkAlarmSensor.prototype.getLogicalState = function() {
 }
 
 ElkAlarmSensor.prototype.getCurrentDoorWindowState = function() {
-	return (this.physicalState == isyConstants.ELK_SENSOR_STATE_PHYSICAL_OPEN || this.logicalState == isyConstants.ELK_SENSOR_STATE_LOGICAL_VIOLATED );
+	return (this.physicalState == ElkAlarmSensor.SENSOR_STATE_PHYSICAL_OPEN || this.logicalState == ElkAlarmSensor.SENSOR_STATE_LOGICAL_VIOLATED );
 }
 
 ElkAlarmSensor.prototype.getSensorStatus = function() {

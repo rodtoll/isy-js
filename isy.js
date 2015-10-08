@@ -1,7 +1,6 @@
 var restler = require('restler');
 var xmldoc = require('xmldoc');
 var isyDevice = require('./isydevice');
-var isyConstants = require('./isyconstants.js');
 var WebSocket = require("faye-websocket");
 var elkDevice = require('./elkdevice.js');
 var isyDeviceTypeList = require("./isydevicetypes.json");
@@ -37,6 +36,18 @@ var ISY = function(address, username, password, elkEnabled, changeCallback) {
     this.changeCallback = changeCallback;
 };
 
+ISY.prototype.DEVICE_TYPE_LOCK = 'DoorLock';
+ISY.prototype.DEVICE_TYPE_SECURE_LOCK = 'SecureLock';
+ISY.prototype.DEVICE_TYPE_LIGHT = 'Light';
+ISY.prototype.DEVICE_TYPE_DIMMABLE_LIGHT = 'DimmableLight';
+ISY.prototype.DEVICE_TYPE_OUTLET = 'Outlet';
+ISY.prototype.DEVICE_TYPE_FAN = 'Fan';
+ISY.prototype.DEVICE_TYPE_UNKNOWN = 'Unknown';
+ISY.prototype.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
+ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor'
+ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
+ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
+
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
     if(this.nodesLoaded) {
@@ -60,37 +71,37 @@ ISY.prototype.loadNodes = function(result) {
         var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
         
         if(deviceTypeInfo != null) {
-            if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_DIMMABLE_LIGHT ||
-            deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_LIGHT) {
+            if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
+            deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
             newDevice = new isyDevice.ISYLightDevice(
                 this,
                 deviceName,
                 deviceAddress,
                 deviceTypeInfo
             )        
-            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
                 newDevice = new isyDevice.ISYDoorWindowDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );
-            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_FAN) {
+            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
                 newDevice = new isyDevice.ISYFanDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );
-            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_LOCK || 
-                    deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_SECURE_LOCK) {
+            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
+                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
                 newDevice = new isyDevice.ISYLockDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );
-            } else if(deviceTypeInfo.deviceType == isyConstants.DEVICE_TYPE_OUTLET) {
+            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
                 newDevice = new isyDevice.ISYOutletDevice(
                     this,
                     deviceName,
