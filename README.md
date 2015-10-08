@@ -212,5 +212,4 @@ TODO
 * Better error checking.
 * Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
-* Elk CO sensors
 * ELk > 1 areas

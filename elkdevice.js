@@ -101,14 +101,14 @@ ELKAlarmPanelDevice.prototype.setFromAreaUpdate = function(areaUpdate) {
 /////////////////////////////
 // ELKAlarmSensor
 //
-function ElkAlarmSensor(isy,name,area,zone) {
+function ElkAlarmSensor(isy,name,area,zone,deviceType) {
 	this.isy = isy;
 	this.area = area;
 	this.zone = zone;
 	this.name = name;
 	this.address = "ElkZone"+zone;
 	this.deviceFriendlyName = "Elk Connected Sensor";
-	this.deviceType = isy.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR;
+	this.deviceType = deviceType;
 	this.connectionType = "Elk Network";
 	this.batteryOperated = false;	
 	this.physicalState = ElkAlarmSensor.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;

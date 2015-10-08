@@ -128,14 +128,13 @@ ISY.prototype.loadElkNodes = function(result) {
         var name = nodes[index].attr.name;
         var alarmDef = nodes[index].attr.alarmDef;
         
-        if(alarmDef != 17) {
-            var newDevice = new elkDevice.ElkAlarmSensor(
-                this,
-                name,
-                1,
-                id);
-            this.zoneMap[newDevice.zone] = newDevice;
-        }
+        var newDevice = new elkDevice.ElkAlarmSensor(
+            this,
+            name,
+            1,
+            id,
+            (alarmDef==17) ? this.DEVICE_TYPE_CO_SENSOR : this.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR);
+        this.zoneMap[newDevice.zone] = newDevice;
     }     
 }
 
