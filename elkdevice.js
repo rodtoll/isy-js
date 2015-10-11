@@ -8,9 +8,9 @@ var xmldoc = require('xmldoc');
 function ELKAlarmPanelDevice(isy,area) {
 	this.isy = isy;
 	this.area = area;
-	this.alarmTripState = ELKAlarmPanelDevice.ALARM_TRIP_STATE_DISARMED;
-	this.alarmState = ELKAlarmPanelDevice.ALARM_STATE_NOT_READY_TO_ARM;
-	this.alarmMode = ELKAlarmPanelDevice.ALARM_MODE_DISARMED;
+	this.alarmTripState = this.ALARM_TRIP_STATE_DISARMED;
+	this.alarmState = this.ALARM_STATE_NOT_READY_TO_ARM;
+	this.alarmMode = this.ALARM_MODE_DISARMED;
 	this.name = "Elk Alarm Panel "+area;
 	this.address = "ElkPanel"+area;
 	this.deviceFriendlyName = "Elk Main Alarm Panel";
