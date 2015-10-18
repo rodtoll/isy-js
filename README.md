@@ -46,6 +46,10 @@ The callback, handleInitialized, takes no parameters and is called when the enti
 
 You can then retrieve a list of devices, and operate on them, by calling isy.getDeviceList(). You can then operate on the device objects through their properties and functions.
 
+DEBUG MESSAGES
+--------------
+You need to set the environment variable ISYJSDEBUG to a value to enable debug log message output. Otherwise log messages are suppressed.
+
 DEVICE TYPES
 ------------
 

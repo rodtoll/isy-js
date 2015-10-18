@@ -21,6 +21,12 @@ function isyTypeToTypeName(isyType,address) {
 	return null;
 } 
 
+function debugLog(message) {
+    if(process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null) {
+        console.log("ISY-JS: "+message);
+    }
+}
+
 var ISY = function(address, username, password, elkEnabled, changeCallback) {
     this.address  = address;
     this.userName = username;
@@ -51,7 +57,7 @@ ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
     if(this.nodesLoaded) {
-        console.log('Node: '+node.address+' changed');
+        debugLog('Node: '+node.address+' changed');
         this.changeCallback(that, node);
     }
 }
@@ -182,9 +188,9 @@ ISY.prototype.initialize = function(initializeCompleted) {
         'http://'+this.address+'/rest/nodes',
         options
     ).on('complete', function(result, response) {
-        if(response instanceof Error) {
-            console.log('Error:'+result.message);
-            that.finishInitialize(false, initializeCompleted);                         
+        if(response instanceof Error || response.statuscode != 200) {
+            debugLog('Error:'+result.message);
+            throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
             that.loadNodes(result);
             if(that.elkEnabled) {
@@ -192,18 +198,18 @@ ISY.prototype.initialize = function(initializeCompleted) {
                     'http://'+that.address+'/rest/elk/get/topology',
                     options
                 ).on('complete', function(result, response) {
-                    if(response instanceof Error) {
-                        console.log('Error loading from elk: '+result.message);
-                        that.finishInitialize(false,initializeCompleted);
+                    if(response instanceof Error || response.statuscode != 200) {
+                        debugLog('Error loading from elk: '+result.message);
+                        throw new Error("Unable to contact the ELK to get the topology");
                     } else {
                         that.loadElkNodes(result);
                         restler.get(
                             'http://'+that.address+'/rest/elk/get/status',
                             options
                         ).on('complete', function(result, response) {
-                            if(response instanceof Error) {
-                                console.log('Error:'+result.message);
-                                that.finishInitialize(false, initializeCompleted);                         
+                            if(response instanceof Error || response.statuscode != 200) {
+                                debugLog('Error:'+result.message);
+                                throw new Error("Unable to get the status from the elk");
                             } else {
                                 that.loadElkInitialStatus(result);
                                 that.finishInitialize(true,initializeCompleted);                                                        
@@ -215,6 +221,18 @@ ISY.prototype.initialize = function(initializeCompleted) {
                 that.finishInitialize(true,initializeCompleted);                    
             }
         } 
+    }).on('error', function(err,response) {
+        debugLog("Error while contacting ISY"+err);
+        throw new Error("Error calling ISY");
+    }).on('fail', function(data,response) {
+        debugLog("Error while contacting ISY -- failure");
+        throw new Error("Failed calling ISY");
+    }).on('abort', function() {
+        debugLog("Abort while contacting ISY");
+        throw new Error("Call to ISY was aborted");
+    }).on('timeout', function(ms) {
+        debugLog("Timed out contacting ISY");
+        throw new Error("Timeout contacting ISY");
     });
 }
 
@@ -286,7 +304,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
     var uriToUse = 'http://'+this.address+'/rest/'+path;
-    console.log("Sending ISY command..."+uriToUse);
+    debugLog("Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -305,7 +323,7 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
     if(parameter != null) {
         uriToUse += '/' + parameter;
     }
-    console.log("Sending command..."+uriToUse);
+    debugLog("Sending command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -320,3 +338,4 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
 }
 
 exports.ISY = ISY;
+exports.debugLog = debugLog;
