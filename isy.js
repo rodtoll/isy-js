@@ -188,7 +188,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
         'http://'+this.address+'/rest/nodes',
         options
     ).on('complete', function(result, response) {
-        if(response instanceof Error || response.statuscode != 200) {
+        if(response instanceof Error || response.statusCode != 200) {
             debugLog('Error:'+result.message);
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
@@ -198,7 +198,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                     'http://'+that.address+'/rest/elk/get/topology',
                     options
                 ).on('complete', function(result, response) {
-                    if(response instanceof Error || response.statuscode != 200) {
+                    if(response instanceof Error || response.statusCode != 200) {
                         debugLog('Error loading from elk: '+result.message);
                         throw new Error("Unable to contact the ELK to get the topology");
                     } else {
@@ -207,7 +207,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                             'http://'+that.address+'/rest/elk/get/status',
                             options
                         ).on('complete', function(result, response) {
-                            if(response instanceof Error || response.statuscode != 200) {
+                            if(response instanceof Error || response.statusCode != 200) {
                                 debugLog('Error:'+result.message);
                                 throw new Error("Unable to get the status from the elk");
                             } else {
