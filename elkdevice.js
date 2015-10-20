@@ -111,8 +111,8 @@ function ElkAlarmSensor(isy,name,area,zone,deviceType) {
 	this.deviceType = deviceType;
 	this.connectionType = "Elk Network";
 	this.batteryOperated = false;	
-	this.physicalState = ElkAlarmSensor.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;
-	this.logicalState = ElkAlarmSensor.SENSOR_STATE_LOGICAL_NORMAL;
+	this.physicalState = this.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;
+	this.logicalState = this.SENSOR_STATE_LOGICAL_NORMAL;
 }
 
 // Logical Status for sensors
@@ -144,7 +144,7 @@ ElkAlarmSensor.prototype.getLogicalState = function() {
 }
 
 ElkAlarmSensor.prototype.getCurrentDoorWindowState = function() {
-	return (this.physicalState == ElkAlarmSensor.SENSOR_STATE_PHYSICAL_OPEN || this.logicalState == ElkAlarmSensor.SENSOR_STATE_LOGICAL_VIOLATED );
+	return (this.physicalState == this.SENSOR_STATE_PHYSICAL_OPEN || this.logicalState == this.SENSOR_STATE_LOGICAL_VIOLATED );
 }
 
 ElkAlarmSensor.prototype.getSensorStatus = function() {
