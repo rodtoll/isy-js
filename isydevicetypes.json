@@ -1,5 +1,6 @@
 [
   { "type": "1.0.56.0", "address": "", "name": "(2456D3) LampLinc v.38", "deviceType":"Outlet", "connectionType":"Insteon Wired", "batteryOperated": false },
+  { "type": "1.14.65.0", "address": "", "name": "(B2457D2) Dual Band LampLinc Dimmer v.41", "deviceType":"DimmableLight", "connectionType":"Insteon Wireless", "batteryOperated": false },
   { "type": "1.25.56.0", "address": "", "name": "(2476D) SwitchLinc Dimmer W/Beeper v.38", "deviceType": "DimmableLight", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "1.27.65.0", "address": "", "name": "(2486D) KeypadLinc Dimmer 6 Buttons v.41", "deviceType": "DimmableLight", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "1.28.54.0", "address": "", "name": "(2486D) KeypadLinc Dimmer 8 Buttons v.36", "deviceType": "DimmableLight", "connectionType": "Insteon Wired", "batteryOperated": false },
