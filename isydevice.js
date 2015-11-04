@@ -158,6 +158,31 @@ ISYDoorWindowDevice.prototype.handleIsyUpdate = function(actionValue) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// ISYMotionSensorDevice
+//
+
+var ISYMotionSensorDevice = function(isy, name, address, deviceTypeInfo) {
+	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
+	this.currentMotionSensorState = false;
+}
+
+ISYMotionSensorDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = '255';
+
+ISYMotionSensorDevice.prototype.getCurrentMotionSensorState = function() {
+	return this.currentMotionSensorState;
+}
+
+ISYMotionSensorDevice.prototype.handleIsyUpdate = function(actionValue) {
+	var newSensorState = (actionValue == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
+	if(newSensorState != this.currentMotionSensorState) {
+		this.currentMotionSensorState = newSensorState;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
 // ISYOutletDevice
 //
 
@@ -247,3 +272,4 @@ exports.ISYLightDevice = ISYLightDevice;
 exports.ISYLockDevice = ISYLockDevice;
 exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
 exports.ISYFanDevice = ISYFanDevice;
+exports.ISYMotionSensorDevice = ISYMotionSensorDevice;

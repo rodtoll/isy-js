@@ -31,6 +31,8 @@ function handleChanged(isy, device) {
 		logMessage += ' door window sensor state: '+device.getCurrentDoorWindowState();
 	} else if(device.deviceType == isy.DEVICE_TYPE_ALARM_PANEL) {
 		logMessage += ' alarm panel state: '+device.getAlarmStatusAsText();
+	} else if(device.deviceType == isy.DEVICE_TYPE_MOTION_SENSOR) {
+		logMessage += ' motion sensor state: '+device.getCurrentMotionSensorState();        
 	} else {
 		logMessage += ' unknown device, cannot parse state';
 	}

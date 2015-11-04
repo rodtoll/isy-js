@@ -53,6 +53,7 @@ ISY.prototype.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
 ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor'
 ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
+ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
@@ -92,6 +93,13 @@ ISY.prototype.loadNodes = function(result) {
                     deviceAddress,
                     deviceTypeInfo
                 );
+            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
+                newDevice = new isyDevice.ISYMotionSensorDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    deviceTypeInfo
+                );                
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
                 newDevice = new isyDevice.ISYFanDevice(
                     this,
@@ -114,7 +122,7 @@ ISY.prototype.loadNodes = function(result) {
                     deviceAddress,
                     deviceTypeInfo
                 );
-            }
+            } 
             if(newDevice != null) {
                 this.deviceIndex[deviceAddress] = newDevice;
                 this.deviceList.push(newDevice);
