@@ -88,6 +88,7 @@ Constants:
 * `DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR` - Indicates an elk door/window sensor device type.
 * `DEVICE_TYPE_CO_SENSOR` - Indicates an Elk CO sensor device type.
 * `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
+* `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
 
 ### All Devices
 
@@ -157,6 +158,13 @@ Represents an Insteon door/window sensor like I/O Linc, TriggerLinc.
 
 Functions:
 * `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
+
+### ISYMotionSensorDevice
+
+Represents an Insteon motion sensor.
+
+Functions:
+* `getCurrentMotionSensorState()` - Gets the current state of the motion sensor.
 
 ### ELKAlarmSensor
 
