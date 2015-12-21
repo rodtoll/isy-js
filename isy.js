@@ -232,7 +232,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
         } 
     }).on('error', function(err,response) {
         debugLog("Error while contacting ISY"+err);
-        throw new Error("Error calling ISY");
+        throw new Error("Error calling ISY"+err);
     }).on('fail', function(data,response) {
         debugLog("Error while contacting ISY -- failure");
         throw new Error("Failed calling ISY");
