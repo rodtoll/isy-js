@@ -27,13 +27,14 @@ function debugLog(message) {
     }
 }
 
-var ISY = function(address, username, password, elkEnabled, changeCallback) {
+var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps) {
     this.address  = address;
     this.userName = username;
     this.password = password;
     this.deviceIndex = {};
     this.deviceList = [];
     this.nodesLoaded = false;
+    this.protocol = (useHttps == true) ? 'https' : 'http';
     this.elkEnabled = elkEnabled;
     this.zoneMap = {};
     if(this.elkEnabled) {
@@ -191,9 +192,9 @@ ISY.prototype.initialize = function(initializeCompleted) {
         username: this.userName,
         password: this.password
     }
-    
+
     restler.get(
-        'http://'+this.address+'/rest/nodes',
+        this.protocol+'://'+this.address+'/rest/nodes',
         options
     ).on('complete', function(result, response) {
         if(response instanceof Error || response.statusCode != 200) {
@@ -203,7 +204,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
             that.loadNodes(result);
             if(that.elkEnabled) {
                 restler.get(
-                    'http://'+that.address+'/rest/elk/get/topology',
+                    that.protocol+'://'+that.address+'/rest/elk/get/topology',
                     options
                 ).on('complete', function(result, response) {
                     if(response instanceof Error || response.statusCode != 200) {
@@ -212,7 +213,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                     } else {
                         that.loadElkNodes(result);
                         restler.get(
-                            'http://'+that.address+'/rest/elk/get/status',
+                            that.protocol+'://'+that.address+'/rest/elk/get/status',
                             options
                         ).on('complete', function(result, response) {
                             if(response instanceof Error || response.statusCode != 200) {
@@ -311,7 +312,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
 }
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
-    var uriToUse = 'http://'+this.address+'/rest/'+path;
+    var uriToUse = this.protocol+'://'+this.address+'/rest/'+path;
     debugLog("Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
@@ -327,7 +328,7 @@ ISY.prototype.sendISYCommand = function(path, handleResult) {
 }
 
 ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, handleResult) {
-    var uriToUse = 'http://'+this.address+'/rest/nodes/'+deviceAddress+'/cmd/'+command;
+    var uriToUse = this.protocol+'://'+this.address+'/rest/nodes/'+deviceAddress+'/cmd/'+command;
     if(parameter != null) {
         uriToUse += '/' + parameter;
     }
