@@ -72,63 +72,66 @@ ISY.prototype.loadNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
     var nodes = document.childrenNamed('node');
     for(var index = 0; index < nodes.length; index++) {
-        var deviceAddress = nodes[index].childNamed('address').val;
-        var isyDeviceType = nodes[index].childNamed('type').val;
-        var deviceName = nodes[index].childNamed('name').val;
-        var newDevice = null;
-        var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
-        
-        if(deviceTypeInfo != null) {
-            if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
-            deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-            newDevice = new isyDevice.ISYLightDevice(
-                this,
-                deviceName,
-                deviceAddress,
-                deviceTypeInfo
-            )        
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-                newDevice = new isyDevice.ISYDoorWindowDevice(
+        var enabled = nodes[index].childNamed('enabled').val;
+        if(enabled !== 'false') {
+            var deviceAddress = nodes[index].childNamed('address').val;
+            var isyDeviceType = nodes[index].childNamed('type').val;
+            var deviceName = nodes[index].childNamed('name').val;
+            var newDevice = null;
+            var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
+
+            if(deviceTypeInfo != null) {
+                if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
+                deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
+                newDevice = new isyDevice.ISYLightDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
-                newDevice = new isyDevice.ISYMotionSensorDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );                
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
-                newDevice = new isyDevice.ISYFanDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
-                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
-                newDevice = new isyDevice.ISYLockDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
-                newDevice = new isyDevice.ISYOutletDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } 
-            if(newDevice != null) {
-                this.deviceIndex[deviceAddress] = newDevice;
-                this.deviceList.push(newDevice);
-                if(nodes[index].childNamed('property') != null) {
-                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                )        
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                    newDevice = new isyDevice.ISYDoorWindowDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
+                    newDevice = new isyDevice.ISYMotionSensorDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );                
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
+                    newDevice = new isyDevice.ISYFanDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
+                        deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
+                    newDevice = new isyDevice.ISYLockDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
+                    newDevice = new isyDevice.ISYOutletDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } 
+                if(newDevice != null) {
+                    this.deviceIndex[deviceAddress] = newDevice;
+                    this.deviceList.push(newDevice);
+                    if(nodes[index].childNamed('property') != null) {
+                        this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                    }
                 }
             }
         }
