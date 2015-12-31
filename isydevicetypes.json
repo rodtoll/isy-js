@@ -39,6 +39,7 @@
   { "type": "2.57.68.0", "address": "1", "name": "(2663-222) Insteon Dual On/Off Outlet Top", "deviceType": "Outlet", "connectionType": "Insteon Wireless", "batteryOperated": false },
   { "type": "2.57.68.0", "address": "2", "name": "(2663-222) Insteon Dual On/Off Outlet Bottom", "deviceType": "Outlet", "connectionType": "Insteon Wireless", "batteryOperated": false },
   { "type": "2.44.65.0", "address": "", "name": "(2487S) Dual Band KeypadLinc Relay v.41", "deviceType": "Light", "connectionType": "Insteon Wireless", "batteryOperated": false },
+  { "type": "4.16.1.0", "address": "", "name": "ZW002_1 - On/Off Power Switch", "deviceType": "Light", "connectionType": "ZWave", "batteryOperated": false },
   { "type": "4.64.3.0", "address": "", "name": "Yale Door Lock", "deviceType": "SecureLock", "connectionType": "ZWave", "batteryOperated": true },
   { "type": "7.0.54.0", "address": "1", "name": "(2450) IOLinc v.36", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "7.0.65.0", "address": "1", "name": "(2450) IOLinc v.41", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wired", "batteryOperated": false },
