@@ -99,7 +99,7 @@ Constants:
 * `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
 * `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
 
-### All Devices
+### All Devices/Scenes
 
 Properties:
 * `isy` - Gets the isy instance this device is from.
@@ -133,7 +133,12 @@ Constants:
 
 ### ISYScene
 
-Represents an Inseton Scene. Currently supports only lighting commands against the scene.
+Represents an Inseton Scene. Currently supports only lighting commands against the scene. 
+
+NOTE: name and address properties are valid but the other general properties are set to default values as they don't make sense for a scene.
+
+Properties:
+* `childDevices` - Array of devices which are in the scene.
 
 Functions (All Lights):
 * `getCurrentLightState()` - Gets the virtual light state for all the lights in the scene. true if any lights are on, false if none are on.
