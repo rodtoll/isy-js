@@ -150,9 +150,7 @@ Functions (All Lights):
 
 Functions (Dimmable Lights):
 * `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the lights in the scene which support it to the specified value. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
-* `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
-
-Functions 
+* `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM. 
 
 ### ISYLockDevice
 
