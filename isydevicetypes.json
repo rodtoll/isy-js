@@ -44,9 +44,10 @@
   { "type": "7.0.54.0", "address": "1", "name": "(2450) IOLinc v.36", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "7.0.65.0", "address": "1", "name": "(2450) IOLinc v.41", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "15.6.66.0", "address": "1", "name": "MorningLinc v.42", "deviceType": "DoorLock", "connectionType": "Insteon MorningLinc", "batteryOperated": false },
-  { "type": "16.1.36.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor v.24", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.1.0.0", "address": "1", "name": "(2842-2) Insteon Motion Sensor", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.1.36.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor v.24", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.1.38.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor v.24", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.1.65.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.2.0.0", "address": "", "name": "(2421) TriggerLinc v.00", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.2.40.0", "address": "", "name": "(2421) TriggerLinc v.28", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wireless", "batteryOperated": true }
 ]
