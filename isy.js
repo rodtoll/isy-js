@@ -116,60 +116,65 @@ ISY.prototype.loadDevices = function(document) {
         var deviceName = nodes[index].childNamed('name').val;
         var newDevice = null;
         var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
+        var enabled = nodes[index].childNamed('enabled').val;
         
-        if(deviceTypeInfo != null) {
-            if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
-            deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-            newDevice = new ISYLightDevice(
-                this,
-                deviceName,
-                deviceAddress,
-                deviceTypeInfo
-            )        
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-                newDevice = new ISYDoorWindowDevice(
+        if(enabled !== 'false') {        
+            if(deviceTypeInfo != null) {
+                if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
+                deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
+                newDevice = new ISYLightDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
-                newDevice = new ISYMotionSensorDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );                
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
-                newDevice = new ISYFanDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
-                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
-                newDevice = new ISYLockDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
-                newDevice = new ISYOutletDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                );
-            } 
-            if(newDevice != null) {
-                this.deviceIndex[deviceAddress] = newDevice;
-                this.deviceList.push(newDevice);
-                if(nodes[index].childNamed('property') != null) {
-                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                )        
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                    newDevice = new ISYDoorWindowDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
+                    newDevice = new ISYMotionSensorDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );                
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
+                    newDevice = new ISYFanDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
+                        deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
+                    newDevice = new ISYLockDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
+                    newDevice = new ISYOutletDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } 
+                if(newDevice != null) {
+                    this.deviceIndex[deviceAddress] = newDevice;
+                    this.deviceList.push(newDevice);
+                    if(nodes[index].childNamed('property') != null) {
+                        this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                    }
                 }
             }
+        } else {
+            debugLog('Ignoring disabled device: '+deviceName);
         }
     }      
 }
