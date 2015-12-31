@@ -99,6 +99,10 @@ Constants:
 * `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
 * `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
 
+### Notifications
+
+When a device's state changes the function passed into the `changeCallback` parameter in the ISY constructor will be called with the device that changed. When a device changes which impacts a scene a change notification for the scene is also generated for the scene.
+
 ### All Devices/Scenes
 
 Properties:
@@ -133,7 +137,7 @@ Constants:
 
 ### ISYScene
 
-Represents an Inseton Scene. Currently supports only lighting commands against the scene. 
+Represents an Inseton Scene. Currently supports only lighting commands against the scene. NOTE: Changes to any devices in a scene will result in a change notification for the scene.
 
 NOTE: name and address properties are valid but the other general properties are set to default values as they don't make sense for a scene.
 
