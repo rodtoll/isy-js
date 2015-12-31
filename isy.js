@@ -4,6 +4,13 @@ var isyDevice = require('./isydevice');
 var WebSocket = require("faye-websocket");
 var elkDevice = require('./elkdevice.js');
 var isyDeviceTypeList = require("./isydevicetypes.json");
+var ISYOutletDevice = require('./isydevice').ISYOutletDevice;
+var ISYLightDevice = require('./isydevice').ISYLightDevice;
+var ISYLockDevice = require('./isydevice').ISYLockDevice;
+var ISYDoorWindowDevice = require('./isydevice').ISYDoorWindowDevice;
+var ISYFanDevice = require('./isydevice').ISYFanDevice;
+var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
+var ISYScene = require('./isyscene').ISYScene;
 
 function isyTypeToTypeName(isyType,address) {
 	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
@@ -27,7 +34,7 @@ function debugLog(message) {
     }
 }
 
-var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps) {
+var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList) {
     this.address  = address;
     this.userName = username;
     this.password = password;
@@ -37,6 +44,9 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     this.protocol = (useHttps == true) ? 'https' : 'http';
     this.elkEnabled = elkEnabled;
     this.zoneMap = {};
+    this.sceneList = [];
+    this.sceneIndex = {};
+    this.scenesInDeviceList = (scenesInDeviceList==undefined) ? false : scenesInDeviceList;
     if(this.elkEnabled) {
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this,1);
     }
@@ -55,6 +65,7 @@ ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor'
 ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
+ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
 
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
@@ -70,6 +81,34 @@ ISY.prototype.getElkAlarmPanel = function() {
 
 ISY.prototype.loadNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
+    this.loadDevices(document);
+    this.loadScenes(document);
+}
+
+ISY.prototype.loadScenes = function(document) {
+    var nodes = document.childrenNamed('group');
+    for(var index = 0; index < nodes.length; index++) {
+        var sceneAddress = nodes[index].childNamed('address').val;
+        var sceneName = nodes[index].childNamed('name').val;
+        var linkNodes = nodes[index].childNamed('members').childrenNamed('link');
+        var childDevices = [];
+        for(var linkIndex = 0; linkIndex < linkNodes.length; linkIndex++) {
+            var linkDevice = this.deviceIndex[linkNodes[linkIndex].val];
+            if(linkDevice != null && linkDevice != undefined) {
+                childDevices.push(linkDevice);
+            }
+        }
+        var newScene = new ISYScene(this, sceneName, sceneAddress, childDevices);
+        this.sceneList.push(newScene);
+        this.sceneIndex[newScene.address] = newScene;
+        if(this.scenesInDeviceList) {
+            this.deviceIndex[newScene.address] = newScene;
+            this.deviceList.push(newScene);
+        }
+    }
+}
+
+ISY.prototype.loadDevices = function(document) {
     var nodes = document.childrenNamed('node');
     for(var index = 0; index < nodes.length; index++) {
         var deviceAddress = nodes[index].childNamed('address').val;
@@ -81,28 +120,28 @@ ISY.prototype.loadNodes = function(result) {
         if(deviceTypeInfo != null) {
             if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
             deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-            newDevice = new isyDevice.ISYLightDevice(
+            newDevice = new ISYLightDevice(
                 this,
                 deviceName,
                 deviceAddress,
                 deviceTypeInfo
             )        
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-                newDevice = new isyDevice.ISYDoorWindowDevice(
+                newDevice = new ISYDoorWindowDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
-                newDevice = new isyDevice.ISYMotionSensorDevice(
+                newDevice = new ISYMotionSensorDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );                
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
-                newDevice = new isyDevice.ISYFanDevice(
+                newDevice = new ISYFanDevice(
                     this,
                     deviceName,
                     deviceAddress,
@@ -110,14 +149,14 @@ ISY.prototype.loadNodes = function(result) {
                 );
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
                     deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
-                newDevice = new isyDevice.ISYLockDevice(
+                newDevice = new ISYLockDevice(
                     this,
                     deviceName,
                     deviceAddress,
                     deviceTypeInfo
                 );
             } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
-                newDevice = new isyDevice.ISYOutletDevice(
+                newDevice = new ISYOutletDevice(
                     this,
                     deviceName,
                     deviceAddress,
@@ -302,13 +341,31 @@ ISY.prototype.getDevice = function(address) {
     return this.deviceIndex[address];
 }
 
+ISY.prototype.getScene = function(address) {
+    return this.sceneIndex[address];
+}
+
+ISY.prototype.getSceneList = function() {
+    return this.sceneList;
+}
+
 ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if(deviceToUpdate != undefined && deviceToUpdate != null) {
         if(deviceToUpdate.handleIsyUpdate(state)) {
             this.nodeChangedHandler(deviceToUpdate);
+            if(this.scenesInDeviceList) {
+                // Inefficient, we could build a reverse index (device->scene list)
+                // but device list is relatively small
+                for(var sceneIndex = 0; sceneIndex < this.sceneList.length; sceneIndex++) {
+                    if(this.sceneList[sceneIndex].isDeviceIncluded(deviceToUpdate)) {
+                        this.nodeChangedHandler(this.sceneList[sceneIndex]);
+                    }
+                }            
+            }
         }
     }
+
 }
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {

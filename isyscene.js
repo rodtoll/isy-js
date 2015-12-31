@@ -1,0 +1,62 @@
+var isy = require('./isy.js');
+var ISYLightDevice = require('./isydevice.js').ISYLightDevice;
+
+var ISYScene = function(isy, name, address, childDevices) {
+    this.isy = isy;
+    this.name = name;
+    this.address = address;
+    this.childDevices = childDevices;    
+    this.deviceType = isy.DEVICE_TYPE_SCENE;
+    this.deviceFriendlyName = "Insteon Scene";
+}
+
+// Get the current light state
+ISYScene.prototype.getCurrentLightState = function() {
+    for(var i = 0; i < this.childDevices.length; i++) {
+        var device = this.childDevices[i];
+        if(device instanceof ISYLightDevice) {
+            if(device.getCurrentLightState()) {
+                return true;
+            }
+        } 
+    }
+	return false;
+}
+
+// Current light dim state is always calculated
+ISYScene.prototype.getCurrentLightDimState = function() {
+    var lightDeviceCount = 0;
+    var calculatedDimLevel = 0;
+    for(var i = 0; i < this.childDevices.length; i++) {
+        var device = this.childDevices[i];
+        if(device instanceof ISYLightDevice) {
+            calculatedDimLevel += device.getCurrentLightDimState();
+            lightDeviceCount++;
+        } 
+    }
+    if(lightDeviceCount > 0) {
+        return (calculatedDimLevel / lightDeviceCount);
+    } else {
+        return 0;        
+    }
+}
+
+ISYScene.prototype.sendLightCommand = function(lightState,resultHandler) {
+	this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
+}
+
+ISYScene.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
+	var isyDimLevel = Math.floor(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
+	this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);	
+}
+
+ISYScene.prototype.isDeviceIncluded = function(device) {
+    for(var i = 0; i < this.childDevices.length; i++) {
+        if(this.childDevices[i].address == device.address) {
+            return true;
+        }
+    }
+    return false;
+}
+
+exports.ISYScene = ISYScene;

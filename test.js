@@ -33,14 +33,21 @@ function handleChanged(isy, device) {
 		logMessage += ' alarm panel state: '+device.getAlarmStatusAsText();
 	} else if(device.deviceType == isy.DEVICE_TYPE_MOTION_SENSOR) {
 		logMessage += ' motion sensor state: '+device.getCurrentMotionSensorState();        
-	} else {
+	} else if(device.deviceType == isy.DEVICE_TYPE_SCENE) {
+		logMessage += ' scene. light state: '+device.getCurrentLightState()+' dimm Level: '+device.getCurrentLightDimState();
+    } else {
 		logMessage += ' unknown device, cannot parse state';
 	}
-	
+
+    console.log(logMessage);	
     ISY.debugLog(logMessage);
 }
 
-var isy = new ISY.ISY('10.0.1.19', 'admin', 'ErgoFlat91', true, handleChanged);
+var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true);
 var devices = isy.initialize(handleInitialized);
 
+console.log('Hello world!');
 
+setTimeout(function() {
+  console.log('hello world!');
+}, 225000);
