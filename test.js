@@ -44,10 +44,5 @@ function handleChanged(isy, device) {
 }
 
 var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true);
+
 var devices = isy.initialize(handleInitialized);
-
-console.log('Hello world!');
-
-setTimeout(function() {
-  console.log('hello world!');
-}, 225000);
