@@ -10,6 +10,12 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.deviceFriendlyName = "Insteon Scene";
 }
 
+ISYScene.prototype.DIM_LEVEL_MINIMUM = 0;
+ISYScene.prototype.DIM_LEVEL_MAXIMUM = 100;
+ISYScene.prototype.ISY_DIM_LEVEL_MAXIMUM = 255;
+ISYScene.prototype.ISY_COMMAND_LIGHT_ON = "DON";
+ISYScene.prototype.ISY_COMMAND_LIGHT_OFF = "DOF";
+
 // Get the current light state
 ISYScene.prototype.getCurrentLightState = function() {
     for(var i = 0; i < this.childDevices.length; i++) {

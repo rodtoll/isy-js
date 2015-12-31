@@ -11,6 +11,7 @@ function handleInitialized() {
 			ISY.debugLog("Device: "+deviceList[index].name+", "+deviceList[index].deviceType+", "+deviceList[index].address+", "+deviceList[index].deviceFriendlyName);
 		}
 	}
+    runBasicSceneTest(deviceList);
 }
 
 function handleChanged(isy, device) {
@@ -43,6 +44,35 @@ function handleChanged(isy, device) {
     ISY.debugLog(logMessage);
 }
 
+//var isy = new ISY.ISY('10.0.1.19', 'admin', 'Password', true, handleChanged, false, true);
 var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true);
 
-var devices = isy.initialize(handleInitialized);
+isy.initialize(handleInitialized);
+
+function runBasicSceneTest(devices) {
+    for(var index = 0; index < devices.length; index++) {
+        var device = devices[index];
+        if(device.deviceType == isy.DEVICE_TYPE_SCENE && device.childDevices.length > 0 && device.childDevices.length < 5) {
+            console.log('Using scene: '+device.name);
+            console.log('Contains devices: ');
+            for(var childIndex = 0; childIndex < device.childDevices.length; childIndex++) {
+                console.log('Device: name='+device.childDevices[childIndex].name+' type='+device.childDevices[childIndex].deviceType);
+            }
+            console.log('Light state: '+devices[index].getCurrentLightState());
+            device.sendLightCommand(true, function() {      
+                console.log('Turned them off to start so we make sure to get an on');      
+                device.sendLightCommand(true, function() {
+                    console.log('SHould have seen them all turn on');
+                    device.sendLightCommand(false, function() {
+                        console.log('Should have seen them all turn off');
+                        device.sendLightDimCommand(50, function() {
+                            console.log('Should have seen them all set to 50%');
+                            device.sendLightCommand(false, function() {});
+                        });
+                    });
+                });
+            });
+            break;
+        }
+    }
+}

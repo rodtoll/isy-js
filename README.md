@@ -15,6 +15,11 @@ First, clone the repository:
 3. $ npm install
 ```
 
+Testing
+-------
+
+If you wish to test the library against a simulator I recommend fake-isy-994i project. (Full disclosure, I use it to test this library). For more details see https://github.com/rodtoll/fake-isy-994i/.
+
 Features
 --------
 
@@ -24,6 +29,7 @@ Features
 * Change notifications when device state changes.
 * Support for elk connected alarm.
 * Support for elk sensors. 
+* Support for scenes
 
 Setup
 -----
@@ -33,7 +39,7 @@ First create an instance of the ISY root object:
 ```
 var ISY = require('isy-js');
 
-var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', changeCallback);
+var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', changeCallback, useHttps, scenesInDeviceList);
 ```
 
 Next, initialize the device list and start the websocket listening for updates:
@@ -71,10 +77,12 @@ Properties:
 * `address` - Address of the ISY.
 
 Functions:
-* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps)` - Creates a new instance. address indicates the ip address of your isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two parameters the pointer to the ISY object and the device. The final parameter is optional and if specified and set to true will have the library use https to talk to isy. It uses http by default.
+* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps)` - Creates a new instance. address indicates the ip address of your isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two parameters the pointer to the ISY object and the device. The useHttps parameter is optional and if specified and set to true will have the library use https to talk to isy. It uses http by default. The final parameter scenesInDeviceList specifies if scenes should be included in the list of devices. This defaults to false.
 * `initialize(handleInitialized)` - Connects to the isy, retrieves the list of devices, updates their status and starts the websocket callbacks for updating the local objects.
 * `getDeviceList()` - Gets the array of devices, each represented as an ISYDevice object.
 * `getDevice(address)` - Gets the device identified by the specified isy address.
+* `getSceneList()` - Gets the array of scenes, each represented as an ISYScene object.
+* `getScene(address)` - Gets the scene identified by the specified isy address.
 * `getElkAlarmPanel()` - Returns a device representing the elk alarm panel
 
 Constants:
@@ -89,6 +97,7 @@ Constants:
 * `DEVICE_TYPE_CO_SENSOR` - Indicates an Elk CO sensor device type.
 * `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
 * `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
+* `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
 
 ### All Devices
 
@@ -121,6 +130,20 @@ Functions (Dimmable Lights):
 Constants:
 * `DIM_LEVEL_MINIMUM` - Minimum dim level. (Full off)
 * `DIM_LEVEL_MAXIMUM` - Maximum dim level. (Full on)
+
+### ISYScene
+
+Represents an Inseton Scene. Currently supports only lighting commands against the scene.
+
+Functions (All Lights):
+* `getCurrentLightState()` - Gets the virtual light state for all the lights in the scene. true if any lights are on, false if none are on.
+* `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state for all lights in the scene. true to turn them on, false to turn them off
+
+Functions (Dimmable Lights):
+* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the lights in the scene which support it to the specified value. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
+* `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
+
+Functions 
 
 ### ISYLockDevice
 
@@ -220,7 +243,9 @@ Constants:
 TODO
 ----
 
-* Unit tests.
+* Support for variables.
+* Support for programs.
+* Unit tests. (Working on this now).
 * Better error checking.
 * Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
