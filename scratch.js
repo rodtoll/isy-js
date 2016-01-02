@@ -14,7 +14,19 @@ function handleInitialized() {
 			ISY.debugLog("Device: "+deviceList[index].name+", "+deviceList[index].deviceType+", "+deviceList[index].address+", "+deviceList[index].deviceFriendlyName);
 		}
 	}
-    runBasicSceneTest(deviceList);
+	var fanDevice = isy.getDevice('14 A8 BC 2');
+	var fanSpeed = fanDevice.getCurrentFanState();
+	console.log('Current fan speed '+fanSpeed);
+	fanDevice.sendFanCommand(fanDevice.FAN_LEVEL_MEDIUM, function() {});
+	setTimeout(function() {
+		console.log('Fan state (should be medium): '+fanDevice.getCurrentFanState());
+		fanDevice.sendFanCommand(fanDevice.FAN_LEVEL_HIGH, function() {});
+		setTimeout(function() {
+			console.log('Fan state (should be high): '+fanDevice.getCurrentFanState());
+			fanDevice.sendFanCommand((fanDevice.FAN_OFF), function() {});
+		}, 4000)
+	},4000);
+    //runBasicSceneTest(deviceList);
 }
 
 function handleChanged(isy, device) {
@@ -52,6 +64,8 @@ var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged
 
 isy.initialize(handleInitialized);
 console.log('initialize completed');
+
+
 
 function runBasicSceneTest(devices) {
     for(var index = 0; index < devices.length; index++) {

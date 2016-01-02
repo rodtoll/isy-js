@@ -47,6 +47,7 @@ var sampleMorningLincLock = '29 3D E2 1';
 var sampleIOLincSensor = '17 79 81 1';
 var sampleFanLincFan = '14 A6 C5 2';
 var sampleFanLincLight = '14 A7 12 1';
+var sampleFanLincFanOffState = '14 A8 BC 2';
 var sampleOutletLinc = '19 C0 E4 1';
 var sampleDisabledDevice = '1F 42 F7 1';
 var sampleApplianceLinc = '1F 46 F0 1';
@@ -285,16 +286,30 @@ function runTrueFalseTest(isy, deviceId, stateFunctionToTest, sendFunctionToTest
     deviceToCheck[sendFunctionToTest](stateToExpect, function() {});    
 }
 
+function runFanTest(isy, deviceId, fanSpeed, done) {
+    var deviceToCheck = isy.getDevice(deviceId);
+    isy.changeCallback = function (isy, changedDevice) {
+        if (deviceId == changedDevice.address) {
+            assert.equal(fanSpeed, deviceToCheck.getCurrentFanState(), 'Should have expected fan speed for device: ' + deviceToCheck.address);
+            done();
+        }
+    }
+    deviceToCheck.sendFanCommand(fanSpeed, function () {});
+}
+
+
 function runSensorTest(isy, deviceId, stateFunctionToTest, done) {
     var deviceToCheck = isy.getDevice(deviceId);    
     isy.changeCallback = function (isy, changedDevice) {
         if(changedDevice.address == deviceToCheck.address) {
             assert(deviceToCheck[stateFunctionToTest](), 'Sensor should show true state: '+deviceToCheck.address);
-                done();
+            done();
         }
     }    
     sendServerOnCommand(isy, deviceId, function() {});
 }
+
+
 
 describe('ISY Device change notifications', function() {
     var notifyFunc = null;
@@ -395,7 +410,21 @@ describe('ISY Device change notifications', function() {
             assert.equal(isy.getDevice(sampleApplianceLinc).deviceType, 'Outlet', 'ApplianceLinc Should be an outlet');            
             runTrueFalseTest(isy, sampleApplianceLinc, 'getCurrentOutletState', 'sendOutletCommand', done);
         });        
-    }); 
+    });
+    describe('Fan levels', function() {
+        it('Set fan to low', function(done) {
+            var deviceToCheck = isy.getDevice(sampleFanLincFan);
+            runFanTest(isy, sampleFanLincFan, deviceToCheck.FAN_LEVEL_LOW, done);
+        });
+        it('Set fan to med', function(done) {
+            var deviceToCheck = isy.getDevice(sampleFanLincFan);
+            runFanTest(isy, sampleFanLincFan, deviceToCheck.FAN_LEVEL_MEDIUM, done);
+        });
+        it('Set fan to high', function(done) {
+            var deviceToCheck = isy.getDevice(sampleFanLincFanOffState);
+            runFanTest(isy, sampleFanLincFanOffState, deviceToCheck.FAN_LEVEL_HIGH, done);
+        });
+    });
     describe('Scenes', function() {
         it('Scene with all lights off turns them all on when scene is turned on', function(done) {
             var sceneToCheck = isy.getDevice(sampleSceneWithAllLightsOff);

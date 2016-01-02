@@ -146,12 +146,14 @@ ISYBaseDevice.prototype.getCurrentFanState = function() {
 ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
     if(fanState == this.FAN_OFF) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_OFF, null, resultHandler);
-    } else if(fanState <= this.FAN_LEVEL_LOW) {
+    } else if(fanState == this.FAN_LEVEL_LOW) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_LOW, resultHandler);
-    } else if(fanState <= this.FAN_LEVEL_MEDIUM) {
+    } else if(fanState == this.FAN_LEVEL_MEDIUM) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_MEDIUM, resultHandler);
-    } else if(fanState <= this.FAN_LEVEL_HIGH) {
+    } else if(fanState == this.FAN_LEVEL_HIGH) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_HIGH, resultHandler);
+    } else {
+        assert(false, 'Unexpected fan level: '+fanState);
     }
 }
 
