@@ -69,7 +69,7 @@ ISYLightDevice.prototype.sendLightCommand = function(lightState,resultHandler) {
 }
 
 ISYLightDevice.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
-	var isyDimLevel = Math.floor(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
+	var isyDimLevel = Math.round(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
 	this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);	
 }
 

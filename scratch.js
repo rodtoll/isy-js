@@ -1,8 +1,11 @@
+// File for scratch testing. Will be removed in the future at is for my own internal purposes
+
 var ISY = require('./isy');
 var ISYDevice = require('./isydevice');
 
 function handleInitialized() {
 	var deviceList = isy.getDeviceList();
+    console.log("Device count: "+deviceList.length);
 	if(deviceList == null) {
 		ISY.debugLog("No device list returned!");
 	} else {
@@ -48,6 +51,7 @@ function handleChanged(isy, device) {
 var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true);
 
 isy.initialize(handleInitialized);
+console.log('initialize completed');
 
 function runBasicSceneTest(devices) {
     for(var index = 0; index < devices.length; index++) {

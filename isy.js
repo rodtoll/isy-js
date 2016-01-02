@@ -67,6 +67,127 @@ ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
 
+ISY.prototype.buildDeviceInfoRecord = function(isyType, deviceFamily, deviceType) {
+    return {
+        type: isyType,
+        address: "",
+        name: "Generic Device",
+        deviceType: deviceType,
+        connectionType: deviceFamily,
+        batteryOperated: false
+    };
+}
+
+ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
+    var familyId = 1;
+    if(deviceNode.childNamed('family') != null) {
+        familyId = Number(deviceNode.childNamed('family').val);
+    }
+    var isyType = deviceNode.childNamed('type').val;
+    var addressData = deviceNode.childNamed('address').val
+    var addressElements = addressData.split(' ');
+    var typeElements = isyType.split('.');
+    var mainType = Number(typeElements[0]);
+    var subType = Number(typeElements[1]);
+    var subAddress = Number(addressElements[3]);
+    // ZWave nodes identify themselves with devtype node
+    if(deviceNode.childNamed('devtype') != null) {
+        if(deviceNode.childNamed('devtype').childNamed('cat') != null) {
+            subType = Number(deviceNode.childNamed('devtype').childNamed('cat').val);
+        }
+    }    
+    // Insteon Device Family    
+    if(familyId == 1) {
+
+        // Dimmable Devices
+        if(mainType == 1) {
+            // Special case fanlinc has a fan element
+            if(subType == 46 && subAddress == 2) {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_FAN);
+            } else {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DIMMABLE_LIGHT); 
+            }
+        } else if(mainType == 2) {
+            // Special case appliance Lincs into outlets
+            if(subType == 6 || subType == 9 || subType == 12 || subType == 23) {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET); 
+            // Outlet lincs 
+            } else if(subType == 8 || subType == 33) {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                 
+            // Dual outlets    
+            } else if(subType == 57) {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                 
+            } else {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LIGHT);                 
+            }
+        // Sensors
+        } else if(mainType == 7) {
+            // I/O Lincs
+            if(subType == 0) {
+                if(subAddress == 1) {
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);                     
+                } else {
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                                     
+                }
+            // Other sensors. Not yet supported
+            } else {
+                return null;
+            }
+        // Access controls/doors/locks
+        } else if(mainType == 15) {
+            // MorningLinc
+            if(subType == 6) {
+                if(subAddress == 1) {
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LOCK);
+                // Ignore subdevice which operates opposite for the locks 
+                } else {
+                    return null;
+                }                                   
+            // Other devices, going to guess they are similar to MorningLinc
+            } else {
+                return null;
+            }
+        } else if(mainType == 16) {
+            // Motion sensors
+            if(subType == 1 || subType == 3) {
+                if(subAddress == 1) {
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_MOTION_SENSOR);                                                     
+                // Ignore battery level sensor and daylight sensor
+                } else {
+                    
+                }
+            } else if(subType == 2 || subType == 9 || subType == 17) {
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);                                                                     
+            // Smoke, leak sensors, don't yet know how to support
+            } else {
+                return null;
+            }
+        // No idea how to test or support
+        } else {
+            return null;
+        }
+    // Z-Wave Device Family
+    } else if(familyId == 4) {
+        // Appears to be all ZWave devices seen so far
+        if(mainType == 4) {
+            // Identified by user zwave on/off switch
+            if(subType == 16) {
+                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_LIGHT);                                                                     
+            // Identified by user door lock
+            } else if(subType == 111) {
+                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_SECURE_LOCK);                                                                                     
+            // This is a guess based on the naming in the ISY SDK
+            } else if(subType == 109) {
+                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_DIMMABLE_LIGHT);                                                                                                     
+            // Otherwise we don't know how to handle
+            } else {
+                return null;
+            }
+        }
+    } 
+    return null;
+}
+
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
     if(this.nodesLoaded) {
@@ -118,7 +239,11 @@ ISY.prototype.loadDevices = function(document) {
         var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
         var enabled = nodes[index].childNamed('enabled').val;
         
-        if(enabled !== 'false') {        
+        if(enabled !== 'false') {  
+            // Try fallback to new generic device identification when not specifically identified.  
+            if(deviceTypeInfo == null) {    
+                deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(nodes[index]);
+            }
             if(deviceTypeInfo != null) {
                 if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
                 deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
@@ -362,9 +487,9 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
             if(this.scenesInDeviceList) {
                 // Inefficient, we could build a reverse index (device->scene list)
                 // but device list is relatively small
-                for(var sceneIndex = 0; sceneIndex < this.sceneList.length; sceneIndex++) {
-                    if(this.sceneList[sceneIndex].isDeviceIncluded(deviceToUpdate)) {
-                        this.nodeChangedHandler(this.sceneList[sceneIndex]);
+                for(var index = 0; index < this.sceneList.length; index++) {
+                    if(this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
+                        this.nodeChangedHandler(this.sceneList[index]);
                     }
                 }            
             }

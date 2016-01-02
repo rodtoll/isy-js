@@ -7,12 +7,18 @@
         "name": "Rod Toll",
         "email": "rod_toll@hotmail.com"
     },
+    "scripts" : {
+        "test": "mocha"    
+    },
     "keywords" : [
         "isy",
         "universal devies",
         "insteon"
     ],
     "main": "isy.js",
+    "devDepencies": {
+        "mocha": ""
+    },
     "dependencies": {
         "restler": "",
         "faye-websocket": "",
