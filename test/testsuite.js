@@ -70,7 +70,7 @@ var sampleBaseDeviceList = [
     {address: sampleOnOffLight, type: 'Light'},
     {address: sampleApplianceLinc, type: 'Outlet'},
     {address: sampleLightFromMotionLightKit, type: 'Light'},
-    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'},
+    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'}
     ];
 
 function countDevices(done, elkEnabled, scenesEnabled) {
@@ -175,6 +175,15 @@ function sendServerOnCommand(isy, deviceAddress,done) {
 
 describe('ISY Device and scene Enumeration and Creation', function() {
   describe('Device enumeration (scenes=true,elk=true)', function() {
+      it('Basic startup should work and right number of devices should be enumerated ', function(done) {
+          var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, true, function() {}, false, true);
+          assert.doesNotThrow(function() {
+              isy.initialize(function() {
+                  assert.equal(isy.getDeviceList().length, expectedDeviceCountWithElkWithScenes, 'Device count incorrect');
+                  done();
+              });
+          });
+      });
     it('Right device count and types are present', function(done) {
         countDevices(done,true,true);
     });    
@@ -183,6 +192,15 @@ describe('ISY Device and scene Enumeration and Creation', function() {
     });    
   });
   describe('Device enumeration(scenes=true,elk=false)', function() {
+    it('Basic startup should work and right number of devices should be enumerated ', function(done) {
+        var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, false, function() {}, false, true);
+            assert.doesNotThrow(function() {
+            isy.initialize(function() {
+                assert.equal(isy.getDeviceList().length, expectedDeviceCountWithoutElkWithScenes, 'Device count incorrect');
+                done();
+            });
+        });
+    });
     it('Right device count and types are present', function(done) {
         countDevices(done,true,true);
     });    
@@ -224,7 +242,7 @@ describe('ISY Device and scene Enumeration and Creation', function() {
         checkForExpectedDevices(done,true,true);
     });      
   }); 
-  describe('#check scene indexing', function(done) {
+  describe('#check scene indexing', function() {
     it('Basic scene lookup', function(done) {
       var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, true, function() {}, false, false);        
       assert.doesNotThrow(function() { 
