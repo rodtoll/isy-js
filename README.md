@@ -35,6 +35,7 @@ Features
 * Support for elk connected alarm.
 * Support for elk sensors. 
 * Support for scenes
+* Support for generic devices through ISYBaseDevice
 
 Setup
 -----
@@ -64,17 +65,29 @@ You need to set the environment variable ISYJSDEBUG to a value to enable debug l
 DEVICE TYPES
 ------------
 
-This library uses isydevicetypes.json to map between isy device types and friendly device names and characteristics. Update this file to add more devices.
+### Specific Support
 
-Currently the library only handles Lights, Outlets, MorningLinc Locks, ZWave Locks, Fans, Door/Window Sensors, Elk Panels and Elk Sensors (door/window). More will be added. 
+For devices which are supported specifically a class is available which is specific to that type. To support a device specifically it needs to be defined in the isydevicetypes.json file
+or be appropriately identified with the ISY device class information. If you would like a device to be identified specifically then request it be added to isydevicetypes.json or file a
+bug against the project with device information so the ISY device class algorithm can be updated.
+
+For these devices a ISYXXXXDevice object will be available.
+
+### Generic Support
+
+For devices which are not specifically supported through the isydevicetypes.json file or the ISY device class information a ISYBaseDevice object will be available. It contains all
+support operations that this library supports. It *does not* prevent you from making a command call against a device that makes no sense. For example you could get the current
+lighting status on a device which isn't a light. The results should not be harmful but likely don't make sense.
+
+But if you know what a device is then you can use those functions to send the right commands.
 
 DESIGN
 ------
 
 The ISY object enumerates devices. The set of ISYXXXDevice and ELkXXXX hide all the complexity of sending commands and transating updates into state for callers. The ISY object uses WebSockets to get live updates. Events are raised when state changes (once enumeration is done).
 
-API
----
+API - SPECIFIC DEVICES
+----------------------
 
 ### ISY
 
@@ -252,12 +265,30 @@ Constants:
 * `ALARM_STATE_FORCE_ARMED_VIOLATION` - Current state of the alarm is armed and has a violation.
 * `ALARM_STATE_ARMED_WITH_BYPASS` - Current state of the alarm is armed with a bypass.
 
+API - GENERIC DEVICES
+---------------------
+
+### ISYBaseDevice
+
+For devices which are not specifically supported the following generic object can be used to interact with the device.
+The operations you can use may or may not make sense for the given device. It is recommended that you only use the
+operations which you know what the type of device is but the library doesn't. By it's nature these operations have not
+been tested.
+
+Functions:
+
+All of the device specific operations offered by the specific device types are supported on these objects. See the
+documentation for each of the specific device types ISYXXXDevice. Beyond those the following operations are supported:
+* `getCurrentNonSecureLockState()` - Gets the current locked state of the Insteon lock device. true for locked, false for unlocked.
+* `sendNonSecureLockCommand(state,resultCallback(success))` - Sends the command to set the Insteon Lock state to the specified state. true to lock the door, false to unlock it.
+* `getCurrentSecureLockState()` - Gets the current locked state of the secure lock device (usually zwave locks). true for locked, false for unlocked.
+* `sendSecureLockCommand(state,resultCallback(success))` - Sends the command to set the lock device (usually zwave locks) lock state to the specified state. true to lock the door, false to unlock it.
+
 TODO
 ----
 
 * Support for variables.
 * Support for programs.
-* Unit tests. (Working on this now).
 * Better error checking.
 * Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.

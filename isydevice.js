@@ -1,272 +1,241 @@
 var isy = require('./isy.js');
+var util = require('util');
+var assert = require('assert');
 
 ////////////////////////////////////////////////////////////////////////
-// Support functions
+// ISYBaseDevice
 //
+// Generic base class which can represent any kind of device.
+//
+function ISYBaseDevice(isy, name, address, isyType, deviceType, deviceFamily) {
+	this.isy = isy;
+	this.name = name;
+	this.address = address;
+	this.isyType = isyType;
+	this.deviceType = deviceType;
+	this.batteryOperated = false;
+	this.connectionType = deviceFamily;
+	this.deviceFriendlyName = 'Generic Device';
+    this.currentState = 0;
+}
 
-function ISYDeviceInitialize(isy, name, address, deviceTypeInfo, device) {
-	device.isy = isy;
-	device.name = name;
-	device.address = address;
-	device.isyType = deviceTypeInfo.type;
-	if(deviceTypeInfo != null) {
-		device.deviceFriendlyName = deviceTypeInfo.name;
-		device.deviceType = deviceTypeInfo.deviceType;
-		device.connectionType = deviceTypeInfo.connectionType;
-		device.batteryOperated = deviceTypeInfo.batteryOperated;
-	} else {
-		device.deviceFriendlyName = "Unknown";
-		device.deviceType = isy.DEVICE_TYPE_UNKNOWN;
-		device.connectioNType = "ISY";
-		device.batteryOperated = false;
-	}	
+ISYBaseDevice.prototype.DIM_LEVEL_MINIMUM = 0;
+ISYBaseDevice.prototype.DIM_LEVEL_MAXIMUM = 100;
+ISYBaseDevice.prototype.ISY_DIM_LEVEL_MAXIMUM = 255;
+ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_ON = "DON";
+ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_OFF = "DOF";
+ISYBaseDevice.prototype.ISY_COMMAND_LOCK_LOCK = "DON";
+ISYBaseDevice.prototype.ISY_COMMAND_LOCK_UNLOCK = "DOF";
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_BASE = 'SECMD';
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK = '1';
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK = '0';
+ISYBaseDevice.prototype.ISY_STATE_LOCK_UNLOCKED = 0;
+ISYBaseDevice.prototype.ISY_STATE_DOOR_WINDOW_CLOSED = 0;
+ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
+ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON';
+ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF';
+ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
+ISYBaseDevice.prototype.FAN_OFF = 'Off';
+ISYBaseDevice.prototype.FAN_LEVEL_LOW = 'Low';
+ISYBaseDevice.prototype.FAN_LEVEL_MEDIUM = 'Medium';
+ISYBaseDevice.prototype.FAN_LEVEL_HIGH = 'High';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_BASE = 'DON';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_OFF = 'DOF';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
+
+ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
+    if(actionValue != this.currentState) {
+        this.currentState = Number(actionValue);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// LIGHTS
+
+ISYBaseDevice.prototype.getCurrentLightState = function() {
+    return (this.currentState > 0);
+}
+
+ISYBaseDevice.prototype.getCurrentLightDimState = function() {
+    return Math.floor((this.currentState*this.DIM_LEVEL_MAXIMUM)/this.ISY_DIM_LEVEL_MAXIMUM);
+}
+
+ISYBaseDevice.prototype.sendLightCommand = function(lightState,resultHandler) {
+    this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
+}
+
+ISYBaseDevice.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
+    var isyDimLevel = Math.ceil(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
+    this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);
+}
+
+////////////////////////////////////////////////////////////////////////
+// LOCKS
+
+ISYBaseDevice.prototype.getCurrentNonSecureLockState = function() {
+    return (this.currentState != this.ISY_STATE_LOCK_UNLOCKED);
+}
+
+ISYBaseDevice.prototype.getCurrentSecureLockState = function() {
+    return (this.currentState > 0);
+}
+
+ISYBaseDevice.prototype.sendNonSecureLockCommand = function(lockState, resultHandler) {
+    if (lockState) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LOCK_LOCK, null, resultHandler);
+    } else {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LOCK_UNLOCK, null, resultHandler);
+    }
+}
+
+ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandler) {
+    if(lockState) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);
+    } else {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// DOOR/WINDOW SENSOR
+
+ISYBaseDevice.prototype.getCurrentDoorWindowState = function() {
+    return !(this.currentState == this.ISY_STATE_DOOR_WINDOW_CLOSED);
+}
+
+////////////////////////////////////////////////////////////////////////
+// OUTLETS
+
+ISYBaseDevice.prototype.getCurrentOutletState = function() {
+    return (this.currentState > 0) ? true : false;
+}
+
+ISYBaseDevice.prototype.sendOutletCommand = function(outletState,resultHandler) {
+    this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
+}
+
+////////////////////////////////////////////////////////////////////////
+// MOTION SENSORS
+
+ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
+    return (this.currentState == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FANS MOTORS
+
+ISYBaseDevice.prototype.getCurrentFanState = function() {
+    if(this.currentState == 0) {
+        return this.FAN_OFF;
+    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_LOW) {
+        return this.FAN_LEVEL_LOW;
+    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
+        return this.FAN_LEVEL_MEDIUM;
+    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_HIGH) {
+        return this.FAN_LEVEL_HIGH;
+    } else {
+        assert(false, 'Unexpected fan state: '+this.currentState);
+    }
+}
+
+ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
+    if(fanState == this.FAN_OFF) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_OFF, null, resultHandler);
+    } else if(fanState <= this.FAN_LEVEL_LOW) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_LOW, resultHandler);
+    } else if(fanState <= this.FAN_LEVEL_MEDIUM) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_MEDIUM, resultHandler);
+    } else if(fanState <= this.FAN_LEVEL_HIGH) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_HIGH, resultHandler);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ISYLightDevice
 //
 
-var ISYLightDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentLightState = false;
-	this.dimLevel = this.DIM_LEVEL_MINIMUM;
+function ISYLightDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYLightDevice.prototype.DIM_LEVEL_MINIMUM = 0;
-ISYLightDevice.prototype.DIM_LEVEL_MAXIMUM = 100;
-ISYLightDevice.prototype.ISY_DIM_LEVEL_MAXIMUM = 255;
-ISYLightDevice.prototype.ISY_COMMAND_LIGHT_ON = "DON";
-ISYLightDevice.prototype.ISY_COMMAND_LIGHT_OFF = "DOF";
-
-ISYLightDevice.prototype.handleIsyUpdate = function(actionValue) {
-	if(actionValue > 0) {
-		var translatedDimLevel = Math.floor(actionValue*this.DIM_LEVEL_MAXIMUM/this.ISY_DIM_LEVEL_MAXIMUM);
-		if(!this.currentLightState || this.dimLevel != translatedDimLevel) {
-			this.currentLightState = true;
-			this.dimLevel = translatedDimLevel;
-			return true;
-		}
-	} else {
-		if(this.currentLightState || this.dimLevel != this.DIM_LEVEL_MINIMUM) {
-			this.currentLightState = false;
-			this.dimLevel = this.DIM_LEVEL_MINIMUM;
-			return true;
-		}
-	}
-	return false;
-}
-
-ISYLightDevice.prototype.getCurrentLightState = function() {
-	return this.currentLightState;
-}
-
-ISYLightDevice.prototype.getCurrentLightDimState = function() {
-	return this.dimLevel;
-}
-
-ISYLightDevice.prototype.sendLightCommand = function(lightState,resultHandler) {
-	this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
-}
-
-ISYLightDevice.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
-	var isyDimLevel = Math.round(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
-	this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);	
-}
+util.inherits(ISYLightDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYLockDevice
 //
 
-var ISYLockDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentLockState = false;
+function ISYLockDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYLockDevice.prototype.ISY_COMMAND_LOCK_LOCK = "DON";
-ISYLockDevice.prototype.ISY_COMMAND_LOCK_UNLOCK = "DOF";
-ISYLockDevice.prototype.ISY_COMMAND_SECURE_LOCK_BASE = 'SECMD';
-ISYLockDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK = '1';
-ISYLockDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK = '0';
-ISYLockDevice.prototype.ISY_STATE_LOCK_UNLOCKED = '0';
-
-ISYLockDevice.prototype.getCurrentLockState = function() {
-	return this.currentLockState;
-}
+util.inherits(ISYLockDevice,ISYBaseDevice);
 
 ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
-	if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
-		if(lockState) {
-			this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LOCK_LOCK, null, resultHandler);
-		} else {
-			this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LOCK_UNLOCK, null, resultHandler);
-		}
-	} else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
-		if(lockState) {
-			this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);
-		} else {
-			this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);			
-		}
-	}
+    if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+        this.sendNonSecureLockCommand(lockState, resultHandler);
+    } else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+        this.sendSecureLockCommand(lockState, resultHandler);
+    } else {
+        assert(false, 'Should not ever have lock which is not one of the known lock types');
+    }
 }
 
-ISYLockDevice.prototype.handleIsyUpdate = function(actionValue) {
-	var newLockState = false;
-	if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
-		if(actionValue == this.ISY_STATE_LOCK_UNLOCKED) {
-			newLockState = false;
-		} else {
-			newLockState = true;
-		}
-	} else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
-		if(actionValue > 0) {
-			newLockState = true;
-		} else {
-			newLockState = false;
-		}
-	}
-	if(newLockState != this.currentLockState) {
-		this.currentLockState = newLockState;
-		return true;
-	} else {
-		return false;
-	}
+ISYLockDevice.prototype.getCurrentLockState = function() {
+    if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+        return this.getCurrentNonSecureLockState();
+    } else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+        return this.getCurrentSecureLockState();
+    } else {
+        assert(false, 'Should not ever have lock which is not one of the known lock types');
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ISYDoorWindowDevice
 //
 
-var ISYDoorWindowDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentDoorWindowState = false;
+function ISYDoorWindowDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYDoorWindowDevice.prototype.ISY_STATE_DOOR_WINDOW_CLOSED = '0';
-
-ISYDoorWindowDevice.prototype.getCurrentDoorWindowState = function() {
-	return this.currentDoorWindowState;
-}
-
-ISYDoorWindowDevice.prototype.handleIsyUpdate = function(actionValue) {
-	var newSensorState = (actionValue == this.ISY_STATE_DOOR_WINDOW_CLOSED) ? false : true;
-	if(newSensorState != this.currentDoorWindowState) {
-		this.currentDoorWindowState = newSensorState;
-		return true;
-	} else {
-		return false;
-	}
-}
+util.inherits(ISYDoorWindowDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYMotionSensorDevice
 //
 
-var ISYMotionSensorDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentMotionSensorState = false;
+function ISYMotionSensorDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYMotionSensorDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = '255';
-
-ISYMotionSensorDevice.prototype.getCurrentMotionSensorState = function() {
-	return this.currentMotionSensorState;
-}
-
-ISYMotionSensorDevice.prototype.handleIsyUpdate = function(actionValue) {
-	var newSensorState = (actionValue == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
-	if(newSensorState != this.currentMotionSensorState) {
-		this.currentMotionSensorState = newSensorState;
-		return true;
-	} else {
-		return false;
-	}
-}
+util.inherits(ISYMotionSensorDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYOutletDevice
 //
 
-var ISYOutletDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentOutletState = false;
+function ISYOutletDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYOutletDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON';
-ISYOutletDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF';
-
-ISYOutletDevice.prototype.getCurrentOutletState = function() {
-	return this.currentOutletState;
-}
-
-ISYOutletDevice.prototype.handleIsyUpdate = function(actionValue) {
-	var newOutletState = (actionValue > 0) ? true : false;
-	if(newOutletState != this.currentOutletState) {
-		this.currentOutletState = newOutletState;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-ISYOutletDevice.prototype.sendOutletCommand = function(outletState,resultHandler) {
-	this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
-}
+util.inherits(ISYOutletDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYFanDevice
 //
 
-var ISYFanDevice = function(isy, name, address, deviceTypeInfo) {
-	ISYDeviceInitialize(isy, name, address, deviceTypeInfo, this);
-	this.currentFanState = this.FAN_OFF;
+function ISYFanDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-ISYFanDevice.prototype.FAN_OFF = 'Off';
-ISYFanDevice.prototype.FAN_LEVEL_LOW = 'Low';
-ISYFanDevice.prototype.FAN_LEVEL_MEDIUM = 'Medium';
-ISYFanDevice.prototype.FAN_LEVEL_HIGH = 'High';
-ISYFanDevice.prototype.ISY_COMMAND_FAN_BASE = 'DON';
-ISYFanDevice.prototype.ISY_COMMAND_FAN_OFF = 'DOF';
-ISYFanDevice.prototype.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
-ISYFanDevice.prototype.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
-ISYFanDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
+util.inherits(ISYFanDevice,ISYBaseDevice);
 
-ISYFanDevice.prototype.getCurrentFanState = function(fanState) {
-	return this.currentFanState;
-}
-
-ISYFanDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
-	if(fanState == this.FAN_OFF) {
-		this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_OFF, null, resultHandler);
-	} else if(fanState == this.FAN_LEVEL_LOW) {
-		this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_LOW, resultHandler);		
-	} else if(fanState == this.FAN_LEVEL_MEDIUM) {
-		this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_MEDIUM, resultHandler);				
-	} else if(fanState == this.FAN_LEVEL_HIGH) {
-		this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_HIGH, resultHandler);				
-	}
-}
-
-ISYFanDevice.prototype.handleIsyUpdate = function(actionValue) {
-	var newFanState = this.FAN_OFF;
-	if(actionValue == 0) {
-		newFanState = this.FAN_OFF;
-	} else if(actionValue == this.ISY_COMMAND_FAN_PARAMETER_LOW) {
-		newFanState = this.FAN_LEVEL_LOW;
-	} else if(actionValue == this.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
-		newFanState = this.FAN_LEVEL_MEDIUM;
-	} else if(actionValue == this.ISY_COMMAND_FAN_PARAMETER_HIGH) {
-		newFanState = this.FAN_LEVEL_HIGH;
-	}
-	if(newFanState != this.currentFanState) {
-		this.currentFanState = newFanState;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-
+exports.ISYBaseDevice = ISYBaseDevice;
 exports.ISYOutletDevice = ISYOutletDevice;
 exports.ISYLightDevice = ISYLightDevice;
 exports.ISYLockDevice = ISYLockDevice;

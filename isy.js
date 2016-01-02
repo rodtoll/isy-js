@@ -11,6 +11,7 @@ var ISYDoorWindowDevice = require('./isydevice').ISYDoorWindowDevice;
 var ISYFanDevice = require('./isydevice').ISYFanDevice;
 var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
 var ISYScene = require('./isyscene').ISYScene;
+var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 
 function isyTypeToTypeName(isyType,address) {
 	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
@@ -245,57 +246,68 @@ ISY.prototype.loadDevices = function(document) {
                 deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(nodes[index]);
             }
             if(deviceTypeInfo != null) {
-                if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
-                deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-                newDevice = new ISYLightDevice(
-                    this,
-                    deviceName,
-                    deviceAddress,
-                    deviceTypeInfo
-                )        
-                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
+                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
+                    newDevice = new ISYLightDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    )
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
                     newDevice = new ISYDoorWindowDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
                     newDevice = new ISYMotionSensorDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
-                    );                
-                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
+                    );
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
                     newDevice = new ISYFanDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK || 
-                        deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK ||
+                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
                     newDevice = new ISYLockDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if(deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
                     newDevice = new ISYOutletDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } 
-                if(newDevice != null) {
-                    this.deviceIndex[deviceAddress] = newDevice;
-                    this.deviceList.push(newDevice);
-                    if(nodes[index].childNamed('property') != null) {
-                        this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
-                    }
+                }
+            // Support the device with a base device object
+            } else {
+                debugLog('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
+                newDevice = new ISYBaseDevice(
+                    this,
+                    deviceName,
+                    deviceAddress,
+                    isyDeviceType,
+                    this.DEVICE_TYPE_UNKNOWN,
+                    'Insteon'
+                );
+            }
+            if(newDevice != null) {
+                this.deviceIndex[deviceAddress] = newDevice;
+                this.deviceList.push(newDevice);
+                if(nodes[index].childNamed('property') != null) {
+                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
                 }
             }
         } else {

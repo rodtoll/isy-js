@@ -14,6 +14,7 @@ var ISYMotionSensorDevice = require('../isydevice').ISYMotionSensorDevice;
 var ISYScene = require('../isyscene').ISYScene;
 var ELKAlarmPanelDevice = require('../elkdevice').ELKAlarmPanelDevice;
 var ElkAlarmSensor = require('../elkdevice').ElkAlarmSensor;
+var ISYBaseDevice = require('../isydevice').ISYBaseDevice;
 
 exports.ISYOutletDevice = ISYOutletDevice;
 exports.ISYLightDevice = ISYLightDevice;
@@ -22,10 +23,10 @@ exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
 exports.ISYFanDevice = ISYFanDevice;
 exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
 
-var expectedDeviceCountWithElkWithScenes = 205
-var expectedDeviceCountWithElkNoScenes = 156;
-var expectedDeviceCountWithoutElkWithScenes = 171;
-var expectedDeviceCountWithoutElkNoScenes = 122;
+var expectedDeviceCountWithElkWithScenes = 226;
+var expectedDeviceCountWithElkNoScenes = 177;
+var expectedDeviceCountWithoutElkWithScenes = 192;
+var expectedDeviceCountWithoutElkNoScenes = 143;
 var expectedLightCount = 102;
 var expectedLockCount = 3;
 var expectedDoorWindowCount = 6;
@@ -35,6 +36,7 @@ var expectedOutletCount = 3;
 var expectedSceneCount = 49;
 var expectedElkAlarmCount = 0;
 var expectedElkSensorCount = 34;
+var expectedGenericCount = 21;
 var sampleElkZone = 'ElkZone22';
 var sampleSceneId = '12627';
 var sampleDimmableLight = '33 9B DC 1';
@@ -52,6 +54,7 @@ var sampleOnOffLight = '18 36 B1 1';
 var sampleLightFromMotionLightKit = '17 15 6A 1';
 var sampleDoorWindowSensor = '14 47 41 1';
 var sampleSceneWithAllLightsOff = '27346';
+var sampleGenericDevice = '14 5C B2 2';
 var sampleSceneWithAllLightsOffAllImpacted = ['18 12 18 1', '19 53 90 1', /* My LIghting */ '00:21:b9:02:0a:52', /* All minus bedrooms */ '12627', /* The Scene itself */ '27346'];
 var testServerAddress = '127.0.0.1:3000';
 var testServerUserName = 'admin';
@@ -70,7 +73,8 @@ var sampleBaseDeviceList = [
     {address: sampleOnOffLight, type: 'Light'},
     {address: sampleApplianceLinc, type: 'Outlet'},
     {address: sampleLightFromMotionLightKit, type: 'Light'},
-    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'}
+    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'},
+    {address: sampleGenericDevice, type: 'Unknown'}
     ];
 
 function countDevices(done, elkEnabled, scenesEnabled) {
@@ -87,8 +91,10 @@ function countDevices(done, elkEnabled, scenesEnabled) {
             var sceneCount = 0;
             var elkAlarmCount = 0;
             var elkSensorCount = 0;
+            var genericCount = 0;
             for(var deviceIndex = 0; deviceIndex < deviceList.length; deviceIndex++) {
                 var device = deviceList[deviceIndex];
+                assert(device.address != sampleDisabledDevice, 'Should not enumerate a disabled device');
                 if(device instanceof ISYLightDevice) {
                     lightCount++;
                 } else if(device instanceof ISYLockDevice) {
@@ -107,6 +113,8 @@ function countDevices(done, elkEnabled, scenesEnabled) {
                     elkAlarmCount++;
                 } else if(device instanceof ElkAlarmSensor) {
                     elkSensorCount++;
+                } else if(device instanceof ISYBaseDevice) {
+                    genericCount++;
                 }
             }
             assert.equal(lightCount, expectedLightCount, "Light count is incorrect");
@@ -117,7 +125,8 @@ function countDevices(done, elkEnabled, scenesEnabled) {
             assert.equal(outletCount, expectedOutletCount, "Outlet count is incorrect");
             assert.equal(sceneCount, (scenesEnabled) ? expectedSceneCount : 0, "Scene count is incorrect"); 
             assert.equal(elkAlarmCount, (elkEnabled) ? expectedElkAlarmCount : 0, "Elk alarm panel count is incorrect");
-            assert.equal(elkSensorCount, (elkEnabled) ? expectedElkSensorCount : 0, "Elk sensor count is incorrect");  
+            assert.equal(elkSensorCount, (elkEnabled) ? expectedElkSensorCount : 0, "Elk sensor count is incorrect");
+            assert.equal(genericCount, expectedGenericCount, 'Generic device count is incorrect');
             var panel = isy.getElkAlarmPanel();
             if(elkEnabled) {
                 assert(panel instanceof ELKAlarmPanelDevice, "Should have a panel");
