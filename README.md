@@ -1,5 +1,6 @@
-isy-js
-======
+
+# isy-js [![Build Status](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)
+
 (C) Rod Toll 2015, Licensed under the MIT-LICENSE.
 
 Javascript library for interfacing with the ISY-99i from Universal Devices. (http://www.universal-devices.com).
@@ -20,7 +21,9 @@ Testing
 
 If you wish to test the library against a simulator I recommend fake-isy-994i project. (Full disclosure, I use it to test this library). For more details see https://github.com/rodtoll/fake-isy-994i/.
 
-There is a mocha based set of tests in the tests directory now. Install and run the fake-isy-994i project and then you can use npm test from the root directory of your enlistment to check for issues. I will use them to setup continuous integration to keep regressions out of the code.
+There is a mocha based set of tests in the tests directory now. Install and run the fake-isy-994i project in the background and then you can use npm test from the root directory of your enlistment to check for issues. 
+
+Travis CI is used for CI. You can see the .travis.yml to see the config used to run the tests.
 
 Features
 --------
