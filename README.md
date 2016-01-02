@@ -1,5 +1,6 @@
-isy-js
-======
+
+# isy-js [![Build Status](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)
+
 (C) Rod Toll 2015, Licensed under the MIT-LICENSE.
 
 Javascript library for interfacing with the ISY-99i from Universal Devices. (http://www.universal-devices.com).
