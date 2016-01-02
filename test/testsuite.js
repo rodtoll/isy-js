@@ -51,6 +51,8 @@ var sampleApplianceLinc = '1F 46 F0 1';
 var sampleOnOffLight = '18 36 B1 1';
 var sampleLightFromMotionLightKit = '17 15 6A 1';
 var sampleDoorWindowSensor = '14 47 41 1';
+var sampleSceneWithAllLightsOff = '27346';
+var sampleSceneWithAllLightsOffAllImpacted = ['18 12 18 1', '19 53 90 1', /* My LIghting */ '00:21:b9:02:0a:52', /* All minus bedrooms */ '12627', /* The Scene itself */ '27346'];
 var testServerAddress = '127.0.0.1:3000';
 var testServerUserName = 'admin';
 var testServerPassword = 'password';
@@ -68,7 +70,7 @@ var sampleBaseDeviceList = [
     {address: sampleOnOffLight, type: 'Light'},
     {address: sampleApplianceLinc, type: 'Outlet'},
     {address: sampleLightFromMotionLightKit, type: 'Light'},
-    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'}
+    {address: sampleDoorWindowSensor, type: 'DoorWindowSensor'},
     ];
 
 function countDevices(done, elkEnabled, scenesEnabled) {
@@ -367,18 +369,61 @@ describe('ISY Device change notifications', function() {
             runTrueFalseTest(isy, sampleApplianceLinc, 'getCurrentOutletState', 'sendOutletCommand', done);
         });        
     }); 
-  
+    describe('Scenes', function() {
+        it('Scene with all lights off turns them all on when scene is turned on', function(done) {
+            var sceneToCheck = isy.getDevice(sampleSceneWithAllLightsOff);
+            var devicesToCheck = [];
+            var doneCalled = false;
+            for(var index = 0; index < sampleSceneWithAllLightsOffAllImpacted.length; index++) {
+                devicesToCheck.push(sampleSceneWithAllLightsOffAllImpacted[index]);
+            }
+            notifyFunc = function (changedDevice) {
+                for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
+                    if(devicesToCheck[deviceIndex] == changedDevice.address) {
+                        assert(isy.getDevice(devicesToCheck[deviceIndex]).getCurrentLightState(), 'Light should have turned on when scene turned on');
+                        devicesToCheck.splice(deviceIndex,1);
+                        break;
+                    }
+                }
+                if(devicesToCheck.length == 0) {
+                    if(!doneCalled) {
+                        assert(sceneToCheck.getCurrentLightState(), 'Scene should now be on');
+                        done();
+                        doneCalled = true;
+                    }
+                }
+            }
+            sceneToCheck.sendLightCommand(true, function() {});
+        });
+        it('Scene with all lights off and set to dim 50 all lights get set to dim 50', function(done) {
+            var sceneToCheck = isy.getDevice(sampleSceneWithAllLightsOff);
+            var devicesToCheck = [];
+            var doneCalled = false;
+            for(var index = 0; index < sampleSceneWithAllLightsOffAllImpacted.length; index++) {
+                devicesToCheck.push(sampleSceneWithAllLightsOffAllImpacted[index]);
+            }
+            notifyFunc = function (changedDevice) {
+                for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
+                    if(devicesToCheck[deviceIndex] == changedDevice.address) {
+                        assert(isy.getDevice(devicesToCheck[deviceIndex]).getCurrentLightState(), 'Light should have turned on when scene turned on');
+                        if(changedDevice.deviceType == 'DimmableLight') {
+                            assert.equal(50, changedDevice.getCurrentLightDimState(), 'Light should be at 50%');
+                        }
+                        devicesToCheck.splice(deviceIndex,1);
+                        break;
+                    }
+                }
+                if(devicesToCheck.length == 0) {
+                    if(!doneCalled) {
+                        assert(sceneToCheck.getCurrentLightState(), 'Scene should now be on');
+                        assert.equal(50, sceneToCheck.getCurrentLightDimState(), 'Scene should be at 50%');
+                        done();
+                        doneCalled = true;
+                    }
+                }
+            }
+            sceneToCheck.sendLightDimCommand(50, function() {});
+        });        
+    });
 });
 
-
-/*
-    describe('Sensors', function() {
-        if('Insteon Motion Sensor', function(done) {
-            runSensorTest(isy, sampleMotionSensorSensor, 'getCurrentMotionSensorState', done);            
-        });
-        if('Insteon Door Window Sensor', function(done) {
-            runSensorTest(isy, sampleIOLincSensor, 'getCurrentMotionSensorState', done);            
-        });        
-    }); 
-    
-    */
