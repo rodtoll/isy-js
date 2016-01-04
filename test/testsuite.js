@@ -16,13 +16,6 @@ var ELKAlarmPanelDevice = require('../elkdevice').ELKAlarmPanelDevice;
 var ElkAlarmSensor = require('../elkdevice').ElkAlarmSensor;
 var ISYBaseDevice = require('../isydevice').ISYBaseDevice;
 
-exports.ISYOutletDevice = ISYOutletDevice;
-exports.ISYLightDevice = ISYLightDevice;
-exports.ISYLockDevice = ISYLockDevice;
-exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
-exports.ISYFanDevice = ISYFanDevice;
-exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
-
 var expectedDeviceCountWithElkWithScenes = 226;
 var expectedDeviceCountWithElkNoScenes = 177;
 var expectedDeviceCountWithoutElkWithScenes = 192;
