@@ -166,9 +166,10 @@ Functions (All Lights):
 * `getCurrentLightState()` - Gets the virtual light state for all the lights in the scene. true if any lights are on, false if none are on.
 * `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state for all lights in the scene. true to turn them on, false to turn them off
 
-Functions (Dimmable Lights):
-* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the lights in the scene which support it to the specified value. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
-* `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM. 
+Functions:
+* `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
+
+NOTE: You cannot dim scenes. ISY does not support it.
 
 ### ISYLockDevice
 
