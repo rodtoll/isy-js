@@ -54,11 +54,6 @@ ISYScene.prototype.sendLightCommand = function(lightState,resultHandler) {
 	this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
 }
 
-ISYScene.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
-	var isyDimLevel = Math.round(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
-	this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);	
-}
-
 ISYScene.prototype.isDeviceIncluded = function(device) {
     for(var i = 0; i < this.childDevices.length; i++) {
         if(this.childDevices[i].address == device.address) {

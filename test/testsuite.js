@@ -444,35 +444,6 @@ describe('ISY Device change notifications', function() {
             }
             sceneToCheck.sendLightCommand(true, function() {});
         });
-        it('Scene with all lights off and set to dim 50 all lights get set to dim 50', function(done) {
-            var sceneToCheck = isy.getDevice(sampleSceneWithAllLightsOff);
-            var devicesToCheck = [];
-            var doneCalled = false;
-            for(var index = 0; index < sampleSceneWithAllLightsOffAllImpacted.length; index++) {
-                devicesToCheck.push(sampleSceneWithAllLightsOffAllImpacted[index]);
-            }
-            notifyFunc = function (changedDevice) {
-                for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
-                    if(devicesToCheck[deviceIndex] == changedDevice.address) {
-                        assert(isy.getDevice(devicesToCheck[deviceIndex]).getCurrentLightState(), 'Light should have turned on when scene turned on');
-                        if(changedDevice.deviceType == 'DimmableLight') {
-                            assert.equal(50, changedDevice.getCurrentLightDimState(), 'Light should be at 50%');
-                        }
-                        devicesToCheck.splice(deviceIndex,1);
-                        break;
-                    }
-                }
-                if(devicesToCheck.length == 0) {
-                    if(!doneCalled) {
-                        assert(sceneToCheck.getCurrentLightState(), 'Scene should now be on');
-                        assert.equal(50, sceneToCheck.getCurrentLightDimState(), 'Scene should be at 50%');
-                        done();
-                        doneCalled = true;
-                    }
-                }
-            }
-            sceneToCheck.sendLightDimCommand(50, function() {});
-        });        
     });
 });
 
