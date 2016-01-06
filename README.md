@@ -45,7 +45,7 @@ First create an instance of the ISY root object:
 ```
 var ISY = require('isy-js');
 
-var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', changeCallback, useHttps, scenesInDeviceList);
+var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', elkEnabled, changeCallback, useHttps, scenesInDeviceList);
 ```
 
 Next, initialize the device list and start the websocket listening for updates:
@@ -95,7 +95,7 @@ Properties:
 * `address` - Address of the ISY.
 
 Functions:
-* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps)` - Creates a new instance. address indicates the ip address of your isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two parameters the pointer to the ISY object and the device. The useHttps parameter is optional and if specified and set to true will have the library use https to talk to isy. It uses http by default. The final parameter scenesInDeviceList specifies if scenes should be included in the list of devices. This defaults to false.
+* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps,scenesInDeviceList)` - Creates a new instance. address indicates the ip address of your isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two parameters the pointer to the ISY object and the device. The useHttps parameter is optional and if specified and set to true will have the library use https to talk to isy. It uses http by default. The final parameter scenesInDeviceList specifies if scenes should be included in the list of devices. This defaults to false.
 * `initialize(handleInitialized)` - Connects to the isy, retrieves the list of devices, updates their status and starts the websocket callbacks for updating the local objects.
 * `getDeviceList()` - Gets the array of devices, each represented as an ISYDevice object.
 * `getDevice(address)` - Gets the device identified by the specified isy address.
