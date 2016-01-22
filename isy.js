@@ -29,13 +29,7 @@ function isyTypeToTypeName(isyType,address) {
 	return null;
 } 
 
-function debugLog(message) {
-    if(process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null) {
-        console.log("ISY-JS: "+message);
-    }
-}
-
-var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList) {
+var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging) {
     this.address  = address;
     this.userName = username;
     this.password = password;
@@ -47,6 +41,7 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     this.zoneMap = {};
     this.sceneList = [];
     this.sceneIndex = {};
+    this.debugLogEnabled = (enableDebugLogging == undefined) ? false : enableDebugLogging;
     this.scenesInDeviceList = (scenesInDeviceList==undefined) ? false : scenesInDeviceList;
     if(this.elkEnabled) {
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this,1);
@@ -67,6 +62,12 @@ ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
+
+ISY.prototype.logger = function(msg) {
+    if(this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
+        console.log(msg);
+    }
+}
 
 ISY.prototype.buildDeviceInfoRecord = function(isyType, deviceFamily, deviceType) {
     return {
@@ -192,7 +193,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
     if(this.nodesLoaded) {
-        debugLog('Node: '+node.address+' changed');
+        this.logger('Node: '+node.address+' changed');
         this.changeCallback(that, node);
     }
 }
@@ -293,7 +294,7 @@ ISY.prototype.loadDevices = function(document) {
                 }
             // Support the device with a base device object
             } else {
-                debugLog('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
+                this.logger('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
                 newDevice = new ISYBaseDevice(
                     this,
                     deviceName,
@@ -311,7 +312,7 @@ ISY.prototype.loadDevices = function(document) {
                 }
             }
         } else {
-            debugLog('Ignoring disabled device: '+deviceName);
+            this.logger('Ignoring disabled device: '+deviceName);
         }
     }      
 }
@@ -379,7 +380,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
         options
     ).on('complete', function(result, response) {
         if(response instanceof Error || response.statusCode != 200) {
-            debugLog('Error:'+result.message);
+            this.logger('Error:'+result.message);
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
             that.loadNodes(result);
@@ -389,7 +390,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                     options
                 ).on('complete', function(result, response) {
                     if(response instanceof Error || response.statusCode != 200) {
-                        debugLog('Error loading from elk: '+result.message);
+                        this.logger('Error loading from elk: '+result.message);
                         throw new Error("Unable to contact the ELK to get the topology");
                     } else {
                         that.loadElkNodes(result);
@@ -398,7 +399,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                             options
                         ).on('complete', function(result, response) {
                             if(response instanceof Error || response.statusCode != 200) {
-                                debugLog('Error:'+result.message);
+                                this.logger('Error:'+result.message);
                                 throw new Error("Unable to get the status from the elk");
                             } else {
                                 that.loadElkInitialStatus(result);
@@ -412,16 +413,16 @@ ISY.prototype.initialize = function(initializeCompleted) {
             }
         } 
     }).on('error', function(err,response) {
-        debugLog("Error while contacting ISY"+err);
+        this.logger("Error while contacting ISY"+err);
         throw new Error("Error calling ISY"+err);
     }).on('fail', function(data,response) {
-        debugLog("Error while contacting ISY -- failure");
+        this.logger("Error while contacting ISY -- failure");
         throw new Error("Failed calling ISY");
     }).on('abort', function() {
-        debugLog("Abort while contacting ISY");
+        this.logger("Abort while contacting ISY");
         throw new Error("Call to ISY was aborted");
     }).on('timeout', function(ms) {
-        debugLog("Timed out contacting ISY");
+        this.logger("Timed out contacting ISY");
         throw new Error("Timeout contacting ISY");
     });
 }
@@ -512,7 +513,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/'+path;
-    debugLog("Sending ISY command..."+uriToUse);
+    this.logger("Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -531,7 +532,7 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
     if(parameter != null) {
         uriToUse += '/' + parameter;
     }
-    debugLog("Sending command..."+uriToUse);
+    this.logger("Sending command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -546,4 +547,3 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
 }
 
 exports.ISY = ISY;
-exports.debugLog = debugLog;
