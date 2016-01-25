@@ -428,6 +428,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
 }
 
 ISY.prototype.handleWebSocketMessage = function(event) {
+    //console.log("WEBSOCKET: "+event.data);
     var document = new xmldoc.XmlDocument(event.data);  
     if(document.childNamed('control') != null) {
         var controlElement = document.childNamed('control').val;
