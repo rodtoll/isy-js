@@ -175,6 +175,9 @@ function sendServerOnCommand(isy, deviceAddress,done) {
     isy.sendRestCommand(deviceAddress, 'DON', null, function() { done(); });
 }
 
+function sendServerZoneCommand(isy, zoneId, command, done) {
+    isy.sendRestCommand(zoneId, command, null, function() { done(); });
+}
 
 describe('ISY Device and scene Enumeration and Creation', function() {
   describe('Device enumeration (scenes=true,elk=true)', function() {
@@ -302,6 +305,21 @@ function runSensorTest(isy, deviceId, stateFunctionToTest, done) {
     sendServerOnCommand(isy, deviceId, function() {});
 }
 
+function runElkZoneTest(isy, zoneId, command, expectedCount, expectedResult, stateFunctionToTest, done) {
+    var callbackCount = 0;
+    var deviceId = "ElkZone"+zoneId;
+    var deviceToCheck = isy.getDevice(deviceId);
+    isy.changeCallback = function (isy, changedDevice) {
+        if(changedDevice.address == deviceToCheck.address) {
+            callbackCount++;
+            if(callbackCount == expectedCount) {
+                assert.equal(deviceToCheck[stateFunctionToTest](), expectedResult, 'Elk Sensor should show expected state: '+deviceToCheck.address);
+                done();
+            }
+        }
+    }
+    sendServerZoneCommand(isy, zoneId, command, function() {});
+}
 
 
 describe('ISY Device change notifications', function() {
@@ -443,6 +461,19 @@ describe('ISY Device change notifications', function() {
                 }
             }
             sceneToCheck.sendLightCommand(true, function() {});
+        });
+    });
+    describe('Elk Sensors', function() {
+        it('Logical state change when you open then close', function(done) {
+            runElkZoneTest(isy, "1", "OPEN", 1, 2, 'getLogicalState', function() {
+                runElkZoneTest(isy, "1", "CLOSE", 1, 0,'getLogicalState', done);
+            });
+
+        });
+        it('Physical state change when you open then close', function(done) {
+            runElkZoneTest(isy, "1", "OPEN", 1, 1, 'getPhysicalState', function() {
+                runElkZoneTest(isy, "1", "CLOSE", 1, 2, 'getPhysicalState', done);
+            });
         });
     });
 });

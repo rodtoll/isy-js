@@ -390,7 +390,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                     options
                 ).on('complete', function(result, response) {
                     if(response instanceof Error || response.statusCode != 200) {
-                        this.logger('Error loading from elk: '+result.message);
+                        that.logger('Error loading from elk: '+result.message);
                         throw new Error("Unable to contact the ELK to get the topology");
                     } else {
                         that.loadElkNodes(result);
@@ -399,7 +399,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                             options
                         ).on('complete', function(result, response) {
                             if(response instanceof Error || response.statusCode != 200) {
-                                this.logger('Error:'+result.message);
+                                that.logger('Error:'+result.message);
                                 throw new Error("Unable to get the status from the elk");
                             } else {
                                 that.loadElkInitialStatus(result);
@@ -413,16 +413,16 @@ ISY.prototype.initialize = function(initializeCompleted) {
             }
         } 
     }).on('error', function(err,response) {
-        this.logger("Error while contacting ISY"+err);
+        that.logger("Error while contacting ISY"+err);
         throw new Error("Error calling ISY"+err);
     }).on('fail', function(data,response) {
-        this.logger("Error while contacting ISY -- failure");
+        that.logger("Error while contacting ISY -- failure");
         throw new Error("Failed calling ISY");
     }).on('abort', function() {
-        this.logger("Abort while contacting ISY");
+        that.logger("Abort while contacting ISY");
         throw new Error("Call to ISY was aborted");
     }).on('timeout', function(ms) {
-        this.logger("Timed out contacting ISY");
+        that.logger("Timed out contacting ISY");
         throw new Error("Timeout contacting ISY");
     });
 }
