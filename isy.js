@@ -503,6 +503,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
                 // but device list is relatively small
                 for(var index = 0; index < this.sceneList.length; index++) {
                     if(this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
+                        this.sceneList[index].markAsChanged();
                         this.nodeChangedHandler(this.sceneList[index]);
                     }
                 }            

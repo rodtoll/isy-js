@@ -50,8 +50,24 @@ ISYScene.prototype.getCurrentLightDimState = function() {
     }
 }
 
+ISYScene.prototype.markAsChanged = function() {
+    this.lastChanged = new Date();
+}
+
 ISYScene.prototype.sendLightCommand = function(lightState,resultHandler) {
 	this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
+}
+
+ISYScene.prototype.getAreAllLightsInSpecifiedState = function(state) {
+    for(var i = 0; i < this.childDevices.length; i++) {
+        var device = this.childDevices[i];
+        if(device instanceof ISYLightDevice) {
+            if (device.getCurrentLightState() != state) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 ISYScene.prototype.isDeviceIncluded = function(device) {

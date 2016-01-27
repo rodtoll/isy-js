@@ -17,6 +17,7 @@ function ISYBaseDevice(isy, name, address, isyType, deviceType, deviceFamily) {
 	this.connectionType = deviceFamily;
 	this.deviceFriendlyName = 'Generic Device';
     this.currentState = 0;
+    this.lastChanged = new Date();
 }
 
 ISYBaseDevice.prototype.DIM_LEVEL_MINIMUM = 0;
@@ -48,6 +49,7 @@ ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
 ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
     if(actionValue != this.currentState) {
         this.currentState = Number(actionValue);
+        this.lastChanged = new Date();
         return true;
     } else {
         return false;
@@ -163,6 +165,7 @@ ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
 
 function ISYLightDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    this.isDimmable = (deviceTypeInfo.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT);
 }
 
 util.inherits(ISYLightDevice,ISYBaseDevice);

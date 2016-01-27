@@ -20,6 +20,7 @@ var expectedDeviceCountWithElkWithScenes = 226;
 var expectedDeviceCountWithElkNoScenes = 177;
 var expectedDeviceCountWithoutElkWithScenes = 192;
 var expectedDeviceCountWithoutElkNoScenes = 143;
+var expectedDimmableLightCount = 78;
 var expectedLightCount = 102;
 var expectedLockCount = 3;
 var expectedDoorWindowCount = 6;
@@ -49,7 +50,7 @@ var sampleLightFromMotionLightKit = '17 15 6A 1';
 var sampleDoorWindowSensor = '14 47 41 1';
 var sampleSceneWithAllLightsOff = '27346';
 var sampleGenericDevice = '14 5C B2 2';
-var sampleSceneWithAllLightsOffAllImpacted = ['18 12 18 1', '19 53 90 1', /* My LIghting */ '00:21:b9:02:0a:52', /* All minus bedrooms */ '12627', /* The Scene itself */ '27346'];
+var sampleSceneWithAllLightsOffAllImpacted = ['18 12 18 1', '19 53 90 1', /* The Scene itself */ '27346'];
 var testServerAddress = '127.0.0.1:3000';
 var testServerUserName = 'admin';
 var testServerPassword = 'password';
@@ -86,11 +87,15 @@ function countDevices(done, elkEnabled, scenesEnabled) {
             var elkAlarmCount = 0;
             var elkSensorCount = 0;
             var genericCount = 0;
+            var dimmableLightCount = 0;
             for(var deviceIndex = 0; deviceIndex < deviceList.length; deviceIndex++) {
                 var device = deviceList[deviceIndex];
                 assert(device.address != sampleDisabledDevice, 'Should not enumerate a disabled device');
                 if(device instanceof ISYLightDevice) {
                     lightCount++;
+                    if(device.isDimmable) {
+                        dimmableLightCount++;
+                    }
                 } else if(device instanceof ISYLockDevice) {
                     lockCount++;
                 } else if(device instanceof ISYOutletDevice) {
@@ -121,6 +126,7 @@ function countDevices(done, elkEnabled, scenesEnabled) {
             assert.equal(elkAlarmCount, (elkEnabled) ? expectedElkAlarmCount : 0, "Elk alarm panel count is incorrect");
             assert.equal(elkSensorCount, (elkEnabled) ? expectedElkSensorCount : 0, "Elk sensor count is incorrect");
             assert.equal(genericCount, expectedGenericCount, 'Generic device count is incorrect');
+            assert.equal(dimmableLightCount, expectedDimmableLightCount, 'Dimmable light count is incorrect');
             var panel = isy.getElkAlarmPanel();
             if(elkEnabled) {
                 assert(panel instanceof ELKAlarmPanelDevice, "Should have a panel");
@@ -305,6 +311,34 @@ function runSensorTest(isy, deviceId, stateFunctionToTest, done) {
     sendServerOnCommand(isy, deviceId, function() {});
 }
 
+function runSceneTest(isy, sceneId, lightStateToSet, impactedDeviceList, done) {
+    var sceneToCheck = isy.getDevice(sceneId);
+    var devicesToCheck = [];
+    var doneCalled = false;
+    for(var index = 0; index < impactedDeviceList.length; index++) {
+        devicesToCheck.push(impactedDeviceList[index]);
+    }
+    isy.changeCallback = function (isy,changedDevice) {
+        for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
+            if(devicesToCheck[deviceIndex] == changedDevice.address && changedDevice.getCurrentLightState() == lightStateToSet) {
+                devicesToCheck.splice(deviceIndex,1);
+                break;
+            }
+        }
+        if(devicesToCheck.length == 0) {
+            if(!doneCalled) {
+                assert.equal(sceneToCheck.getCurrentLightState(), lightStateToSet, 'Scene should now be set to the desired state');
+                assert(sceneToCheck.getAreAllLightsInSpecifiedState(lightStateToSet), "Once all lights are accounted for getAreAllLightsInSpecifiedState() should be true" );
+                done();
+                doneCalled = true;
+            }
+        } else if (devicesToCheck.length > 1) {
+            assert(!sceneToCheck.getAreAllLightsInSpecifiedState(lightStateToSet), "Until all lights are accounted for getAreAllLightsInSpecifiedState() should be false" );
+        }
+    }
+    sceneToCheck.sendLightCommand(lightStateToSet, function() {});
+}
+
 function runElkZoneTest(isy, zoneId, command, expectedCount, expectedResult, stateFunctionToTest, done) {
     var callbackCount = 0;
     var deviceId = "ElkZone"+zoneId;
@@ -339,9 +373,11 @@ describe('ISY Device change notifications', function() {
     describe('Dimmable light change notifications', function() {
         it('Light on and off state (non-dimmable)', function(done) {
             runTrueFalseTest(isy, sampleOnOffLight, 'getCurrentLightState', 'sendLightCommand', done);
+            assert(!isy.getDevice(sampleOnOffLight).isDimmable, 'On off light should not be dimmable');
         });
         it('Light on and off state (dimmable)', function(done) {
             runTrueFalseTest(isy, sampleDimmableLight, 'getCurrentLightState', 'sendLightCommand', done);
+            assert(isy.getDevice(sampleDimmableLight).isDimmable, 'On off light should not be dimmable');
         });
         it('Light on and off state (keybad dimmable button)', function(done) {
             runTrueFalseTest(isy, sampleKeypadDimmableButton, 'getCurrentLightState', 'sendLightCommand', done);
@@ -437,30 +473,10 @@ describe('ISY Device change notifications', function() {
         });
     });
     describe('Scenes', function() {
-        it('Scene with all lights off turns them all on when scene is turned on', function(done) {
-            var sceneToCheck = isy.getDevice(sampleSceneWithAllLightsOff);
-            var devicesToCheck = [];
-            var doneCalled = false;
-            for(var index = 0; index < sampleSceneWithAllLightsOffAllImpacted.length; index++) {
-                devicesToCheck.push(sampleSceneWithAllLightsOffAllImpacted[index]);
-            }
-            notifyFunc = function (changedDevice) {
-                for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
-                    if(devicesToCheck[deviceIndex] == changedDevice.address) {
-                        assert(isy.getDevice(devicesToCheck[deviceIndex]).getCurrentLightState(), 'Light should have turned on when scene turned on');
-                        devicesToCheck.splice(deviceIndex,1);
-                        break;
-                    }
-                }
-                if(devicesToCheck.length == 0) {
-                    if(!doneCalled) {
-                        assert(sceneToCheck.getCurrentLightState(), 'Scene should now be on');
-                        done();
-                        doneCalled = true;
-                    }
-                }
-            }
-            sceneToCheck.sendLightCommand(true, function() {});
+        it('Scene with all lights off turns them all on when scene is turned on and then turns them all off', function(done) {
+            runSceneTest(isy, sampleSceneWithAllLightsOff, true, sampleSceneWithAllLightsOffAllImpacted, function() {
+                runSceneTest(isy, sampleSceneWithAllLightsOff, false, sampleSceneWithAllLightsOffAllImpacted, done);
+            });
         });
     });
     describe('Elk Sensors', function() {
