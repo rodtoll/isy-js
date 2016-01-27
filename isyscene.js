@@ -11,6 +11,7 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.childDevices = childDevices;    
     this.deviceType = isy.DEVICE_TYPE_SCENE;
     this.deviceFriendlyName = "Insteon Scene";
+    this.lastChanged = new Date();
 }
 
 ISYScene.prototype.DIM_LEVEL_MINIMUM = 0;

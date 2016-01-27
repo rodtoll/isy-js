@@ -18,6 +18,7 @@ function ELKAlarmPanelDevice(isy,area) {
 	this.connectionType = "Elk Network Module";
 	this.batteryOperated = false;	
 	this.voltage = 71;
+	this.lastChanged = new Date();
 }
 
 // Alarm mode constanrs
@@ -94,7 +95,10 @@ ELKAlarmPanelDevice.prototype.setFromAreaUpdate = function(areaUpdate) {
 				valueChanged = true;
 			}
 		}
-	}	
+	}
+	if(valueChanged) {
+		this.lastChanged = new Date();
+	}
 	return valueChanged;
 }
 
@@ -113,6 +117,7 @@ function ElkAlarmSensor(isy,name,area,zone,deviceType) {
 	this.batteryOperated = false;	
 	this.physicalState = this.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;
 	this.logicalState = this.SENSOR_STATE_LOGICAL_NORMAL;
+	this.lastChanged = new Date();
 }
 
 // Logical Status for sensors
@@ -183,7 +188,10 @@ ElkAlarmSensor.prototype.setFromZoneUpdate = function(zoneUpdate) {
 				valueChanged = true;
 			}
 		}
-	}	
+	}
+	if(valueChanged) {
+		this.lastChanged = new Date();
+	}
 	return valueChanged;
 }
 

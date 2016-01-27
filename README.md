@@ -141,6 +141,7 @@ Properties:
 * `deviceType` - Type of device. See ISY.DEVICE_TYPE_XXXXX for possible values.
 * `connectionType` - Type of connection to the Insteon network. Possible values - "Insteon Wired", "Insteon Wireless", "Insteon MorningLinc", "ZWave". See isydevicetypes.json for the map.
 * `batteryOperated` - true if this is a battery powered device, false otherwise.
+* `lastChanged` - Date/time the last time this library saw that the device characteristics have changed.
 
 The sendXXXCommand are functions which tell the device to move the specified state. The local device will not update it's state until the ISY has acknowledged the change. To get the last acknowledged state call the getXXXXState commands.
 
@@ -148,7 +149,10 @@ The resultCallback parameter specifies a required callback that will specify tru
 
 ### ISYLightDevice
 
-Represents an Insteon SwitchLinc Dimmer, KeypadLinc, KeypadLinc Relay. 
+Represents an Insteon SwitchLinc Dimmer, KeypadLinc, KeypadLinc Relay.
+
+Properties:
+* `isDimmable` - Returns boolean indicating if this light device is dimmable.
 
 Functions (All Lights):
 * `getCurrentLightState()` - Gets the current Light power state. true for on, false for off.
@@ -174,6 +178,7 @@ Properties:
 Functions (All Lights):
 * `getCurrentLightState()` - Gets the virtual light state for all the lights in the scene. true if any lights are on, false if none are on.
 * `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state for all lights in the scene. true to turn them on, false to turn them off
+* `getAreAllLightsInSpecifiedState(state)` - Returns boolean indicating if all the lights in the scene are in the specified state.
 
 Functions:
 * `getCurrentLightDimState()` - Gets the average dim level of all the lights in the scene. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
@@ -293,6 +298,15 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 * `sendNonSecureLockCommand(state,resultCallback(success))` - Sends the command to set the Insteon Lock state to the specified state. true to lock the door, false to unlock it.
 * `getCurrentSecureLockState()` - Gets the current locked state of the secure lock device (usually zwave locks). true for locked, false for unlocked.
 * `sendSecureLockCommand(state,resultCallback(success))` - Sends the command to set the lock device (usually zwave locks) lock state to the specified state. true to lock the door, false to unlock it.
+
+CHANGELOG
+---------
+
+* 0.3.7 - 2016/02/26 - lastModified is now lastChanged and now applied to scenes as well and docs fixed up
+* 0.3.6 - 2016/02/26 - Added lastModified property, added isDimmable property to lights and added new getAreAllLightsInSpecifiedState() function to the ISYScene class.
+
+Older version history was not captured.
+
 
 TODO
 ----

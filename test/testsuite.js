@@ -271,11 +271,13 @@ describe('ISY Device and scene Enumeration and Creation', function() {
 
 function runTrueFalseTest(isy, deviceId, stateFunctionToTest, sendFunctionToTest, done) {
     var deviceToCheck = isy.getDevice(deviceId);
+    var startingChangedTimestamp = deviceToCheck.lastChanged;
     var stateToExpect = !deviceToCheck[stateFunctionToTest]();
     var testRunIndex = 0;
     isy.changeCallback = function (isy, changedDevice) {
         if(changedDevice.address == deviceToCheck.address) {
             assert.equal(stateToExpect, deviceToCheck[stateFunctionToTest](), 'Should have expected state for device: '+deviceToCheck.address);
+            assert(changedDevice.lastChanged > startingChangedTimestamp, 'lastChanged property should have changed.')
             if(testRunIndex == 0) {
                 stateToExpect = !deviceToCheck[stateFunctionToTest]();
                 deviceToCheck[sendFunctionToTest](stateToExpect, function() {});
@@ -290,9 +292,11 @@ function runTrueFalseTest(isy, deviceId, stateFunctionToTest, sendFunctionToTest
 
 function runFanTest(isy, deviceId, fanSpeed, done) {
     var deviceToCheck = isy.getDevice(deviceId);
+    var startingChangedTimestamp = deviceToCheck.lastChanged;
     isy.changeCallback = function (isy, changedDevice) {
         if (deviceId == changedDevice.address) {
             assert.equal(fanSpeed, deviceToCheck.getCurrentFanState(), 'Should have expected fan speed for device: ' + deviceToCheck.address);
+            assert(changedDevice.lastChanged > startingChangedTimestamp, 'lastChanged property should have changed.')
             done();
         }
     }
@@ -301,10 +305,12 @@ function runFanTest(isy, deviceId, fanSpeed, done) {
 
 
 function runSensorTest(isy, deviceId, stateFunctionToTest, done) {
-    var deviceToCheck = isy.getDevice(deviceId);    
+    var deviceToCheck = isy.getDevice(deviceId);
+    var startingChangedDate = deviceToCheck.lastChanged;
     isy.changeCallback = function (isy, changedDevice) {
         if(changedDevice.address == deviceToCheck.address) {
             assert(deviceToCheck[stateFunctionToTest](), 'Sensor should show true state: '+deviceToCheck.address);
+            assert(deviceToCheck.lastChanged > startingChangedDate, 'Sesnor last changed data should have updated');
             done();
         }
     }    
@@ -313,6 +319,7 @@ function runSensorTest(isy, deviceId, stateFunctionToTest, done) {
 
 function runSceneTest(isy, sceneId, lightStateToSet, impactedDeviceList, done) {
     var sceneToCheck = isy.getDevice(sceneId);
+    var startingChangedDate = sceneToCheck.lastChanged;
     var devicesToCheck = [];
     var doneCalled = false;
     for(var index = 0; index < impactedDeviceList.length; index++) {
@@ -329,6 +336,7 @@ function runSceneTest(isy, sceneId, lightStateToSet, impactedDeviceList, done) {
             if(!doneCalled) {
                 assert.equal(sceneToCheck.getCurrentLightState(), lightStateToSet, 'Scene should now be set to the desired state');
                 assert(sceneToCheck.getAreAllLightsInSpecifiedState(lightStateToSet), "Once all lights are accounted for getAreAllLightsInSpecifiedState() should be true" );
+                assert(sceneToCheck.lastChanged > startingChangedDate, 'Scene last changed data should have updated');
                 done();
                 doneCalled = true;
             }
@@ -343,11 +351,13 @@ function runElkZoneTest(isy, zoneId, command, expectedCount, expectedResult, sta
     var callbackCount = 0;
     var deviceId = "ElkZone"+zoneId;
     var deviceToCheck = isy.getDevice(deviceId);
+    var startingChangedTimestamp = new Date();
     isy.changeCallback = function (isy, changedDevice) {
         if(changedDevice.address == deviceToCheck.address) {
             callbackCount++;
             if(callbackCount == expectedCount) {
                 assert.equal(deviceToCheck[stateFunctionToTest](), expectedResult, 'Elk Sensor should show expected state: '+deviceToCheck.address);
+                assert(deviceToCheck.lastChanged > startingChangedTimestamp, 'lastChanged property should have changed.')
                 done();
             }
         }
