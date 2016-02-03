@@ -12,6 +12,7 @@ var ISYFanDevice = require('./isydevice').ISYFanDevice;
 var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
+var ISYVariable = require('./isyvariable').ISYVariable
 
 function isyTypeToTypeName(isyType,address) {
 	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
@@ -29,12 +30,13 @@ function isyTypeToTypeName(isyType,address) {
 	return null;
 } 
 
-var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging) {
+var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback) {
     this.address  = address;
     this.userName = username;
     this.password = password;
     this.deviceIndex = {};
     this.deviceList = [];
+    this.variables = [];
     this.nodesLoaded = false;
     this.protocol = (useHttps == true) ? 'https' : 'http';
     this.elkEnabled = elkEnabled;
@@ -62,6 +64,8 @@ ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
+ISY.prototype.VARIABLE_TYPE_INTEGER = 'Integer';
+ISY.prototype.VARIABLE_TYPE_STATE = 'State';
 
 ISY.prototype.logger = function(msg) {
     if(this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
@@ -198,6 +202,12 @@ ISY.prototype.nodeChangedHandler = function(node) {
     }
 }
 
+ISY.prototype.variableChangedHandler = function(variable) {
+    var that = this;
+    this.logger('Variable:'+variable.id+' ('+variable.type+') changed');
+    this.variableCallback(that, variable);
+}
+
 ISY.prototype.getElkAlarmPanel = function() {
     return this.elkAlarmPanel;
 }
@@ -317,6 +327,22 @@ ISY.prototype.loadDevices = function(document) {
     }      
 }
 
+ISY.prototype.loadVariables = function(result, type) {
+    var document = new xmldoc.XmlDocument(result);
+    var nodes = document.childrenNamed('e');
+    for(var index = 0; index < nodes.length; index++) {
+        var id = nodes[index].attr.id;
+        var name = nodes[index].attr.name;
+        
+        var newVariable = new ISYVariable(
+            this,
+            id,
+            name,
+            type);
+        this.variables.push(newVariable);
+    }
+}
+
 ISY.prototype.loadElkNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
     var nodes = document.childNamed('areas').childNamed('area').childrenNamed('zone');
@@ -384,6 +410,31 @@ ISY.prototype.initialize = function(initializeCompleted) {
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
             that.loadNodes(result);
+            
+            restler.get(
+                    that.protocol+'://'+that.address+'/rest/vars/definitions/1',
+                    options
+                ).on('complete', function(result, response) {
+                    if(response instanceof Error || response.statusCode != 200) {
+                        that.logger('Error loading variables from isy: '+result.message);
+                        throw new Error("Unable to load variables from the ISY");
+                    } else {
+                        that.loadVariables(result, that.VARIABLE_TYPE_INTEGER);
+                    }
+            });
+            
+            restler.get(
+                    that.protocol+'://'+that.address+'/rest/vars/definitions/2',
+                    options
+                ).on('complete', function(result, response) {
+                    if(response instanceof Error || response.statusCode != 200) {
+                        that.logger('Error loading variables from isy: '+result.message);
+                        throw new Error("Unable to load variables from the ISY");
+                    } else {
+                        that.loadVariables(result, that.VARIABLE_TYPE_STATE);
+                    }
+            });
+            
             if(that.elkEnabled) {
                 restler.get(
                     that.protocol+'://'+that.address+'/rest/elk/get/topology',
@@ -454,6 +505,16 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                     }
                 }
             }            
+        } else if(controlElement == '_1') {
+            if(actionValue == 6) {
+                var varNode = document.childNamed('eventInfo').childNamed('var');
+                if(varNode != null) {
+                    var id = varNode.attr.id;
+                    var type = (varNode.attr.type == 1) ? this.VARIABLE_TYPE_INTEGER : this.VARIABLE_TYPE_STATE;
+                    var val = parseInt(varNode.childNamed('val').val);
+                    this.handleISYVariableUpdate(id, type, val);
+                }
+            } 
         }
     }
 }
@@ -510,7 +571,18 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
             }
         }
     }
+}
 
+ISY.prototype.handleISYVariableUpdate = function(id, type, value) {
+    for(var index = 0; index < this.variables.length; index++) {
+        if(this.variables[index].id == id && this.variables[index].type == type) {
+            var variableToUpdate = this.variables[index];
+            variableToUpdate.value == value;
+            variableToUpdate.markAsChanged();
+            this.variableChangedHandler(variableToUpdate);
+            break;
+        }
+    }
 }
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
@@ -540,6 +612,39 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
         password: this.password
     }    
     restler.get(uriToUse, options).on('complete', function(data, response) {
+        if(response.statusCode == 200) {
+            handleResult(true);
+        } else {
+            handleResult(false);
+        }
+    });
+}
+
+ISY.prototype.sendGetVariable = function(id, type, handleResult) {
+    var uriToUse = this.protocol+'://'+this.address+'/rest/vars/get/'+((type==this.VARIABLE_TYPE_INTEGER) ? 1 : 2)+'/'+id;
+    this.logger("Sending ISY command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    }    
+    restler.get(uriToUse, options).on('complete', function(result, response) {
+        if(response.statusCode == 200) {
+            var document = new xmldoc.XmlDocument(result);
+            var val = parseInt(document.childNamed('val').val);
+            var init = parseInt(document.childNamed('init').val);
+            handleResult(val, init);
+        }
+    });
+}
+
+ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
+    var uriToUse = this.protocol+'://'+this.address+'/rest/vars/set/'+((type==this.VARIABLE_TYPE_INTEGER) ? 1 : 2)+'/'+id+'/'+value;
+    this.logger("Sending ISY command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    }    
+    restler.get(uriToUse, options).on('complete', function(result, response) {
         if(response.statusCode == 200) {
             handleResult(true);
         } else {
