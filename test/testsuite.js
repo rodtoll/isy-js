@@ -31,6 +31,12 @@ var expectedSceneCount = 49;
 var expectedElkAlarmCount = 0;
 var expectedElkSensorCount = 34;
 var expectedGenericCount = 21;
+var expectedType1VariablesCount = 25;
+var expectedType2VariablesCount = 32;
+var sampleType1VariableId = '1';
+var sampleType1VariableName = 'OfficeMotionEnabled';
+var sampleType2VariableName = 'AlarmFrontDoorOpen';
+var sampleType2VariableId = '1';
 var sampleElkZone = 'ElkZone22';
 var sampleSceneId = '12627';
 var sampleDimmableLight = '33 9B DC 1';
@@ -504,3 +510,75 @@ describe('ISY Device change notifications', function() {
     });
 });
 
+function runVariableTest(variableType, variableId, variableValue, done) {
+    var initialTimeStamp = new Date();
+    function variableCheckCallback(isy, variable) {
+        if(variable.id == variableId && variable.type == variableType) {
+            assert.equal(variable.value, variableValue, "Variable should have been updated to expected value");
+            assert(variable.lastChanged > initialTimeStamp, "Variable last changed should have changed. Before: "+initialTimeStamp.toString()+" lastChanged: "+variable.lastChanged);
+            done();
+        }
+    }
+    resetServerState(function() {
+        var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, true, function () {
+        }, false, true, false, variableCheckCallback);
+        isy.initialize(function() {
+            var variable = isy.getVariable(variableType, variableId);
+            assert(variable != null, "Should have found expected variable");
+            // Cheat and push back last changed date as this may run quick enough seconds haven't changed.
+            variable.lastChanged.setFullYear(2012);
+            initialTimeStamp = variable.lastChanged;
+            setTimeout(function() {
+                variable.sendSetValue(variableValue, function() {});
+            }, 2);
+
+        });
+    });
+}
+describe('ISY Variables', function() {
+    describe('Variable enumeration', function () {
+        it('Basic startup should work and right number of variables should be enumerated ', function (done) {
+            var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, true, function () {
+            }, false, true);
+            assert.doesNotThrow(function () {
+                var type1Found = false;
+                var type2Found = false;
+                isy.initialize(function () {
+                    var type1Count = 0;
+                    var type2Count = 0;
+                    for(var index = 0; index < isy.getVariableList().length; index++) {
+                        var variable = isy.getVariableList()[index];
+                        if(variable.type == '1' && sampleType1VariableId == variable.id) {
+                            assert.equal(variable.name, sampleType1VariableName, "Type 1 variable should have expected name");
+                            type1Found = true;
+                        }
+                        if(variable.type == '2' && sampleType2VariableId == variable.id) {
+                            assert.equal(variable.name, sampleType2VariableName, "Type 2 variable name should have expected name");
+                            type2Found = true;
+                        }
+                        if(variable.type == '1') {
+                            type1Count++;
+                        } else if(variable.type == '2') {
+                            type2Count++;
+                        } else {
+                            assert(false, "Should not have any non type 1 or type 2 variables" );
+                        }
+                    }
+                    assert(type1Found, "Should have found expected type 1 variable");
+                    assert(type2Found, "Should have found expected type 2 variable");
+                    assert.equal(type1Count, expectedType1VariablesCount, "Variable type 1 count is not correct");
+                    assert.equal(type2Count, expectedType2VariablesCount, "Variable type 2 count is not correct");
+                    done();
+                });
+            });
+        });
+    });
+    describe('Variable roundtrip + notifications', function () {
+        it('Type 1 variable roundtrip + notifications', function (done) {
+            runVariableTest('1', sampleType1VariableId, 5, done);
+        });
+        it('Type 2 variable roundtrip + notifications', function (done) {
+            runVariableTest('2', sampleType1VariableId, 5, done);
+        });
+    });
+});

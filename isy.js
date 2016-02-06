@@ -12,6 +12,7 @@ var ISYFanDevice = require('./isydevice').ISYFanDevice;
 var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
+var ISYVariable = require('./isyvariable').ISYVariable
 
 function isyTypeToTypeName(isyType,address) {
 	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
@@ -29,12 +30,15 @@ function isyTypeToTypeName(isyType,address) {
 	return null;
 } 
 
-var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging) {
+var ISY = function(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback) {
     this.address  = address;
     this.userName = username;
     this.password = password;
     this.deviceIndex = {};
     this.deviceList = [];
+    this.variableList = [];
+    this.variableIndex = {};
+    this.variableCallback = variableCallback;
     this.nodesLoaded = false;
     this.protocol = (useHttps == true) ? 'https' : 'http';
     this.elkEnabled = elkEnabled;
@@ -62,6 +66,8 @@ ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
+ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
+ISY.prototype.VARIABLE_TYPE_STATE = '2';
 
 ISY.prototype.logger = function(msg) {
     if(this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
@@ -366,6 +372,109 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
     }  
 }
 
+ISY.prototype.variableChangedHandler = function(variable) {
+    this.logger('Variable:'+variable.id+' ('+variable.type+') changed');
+    if(this.variableCallback != null && this.variableCallback != undefined) {
+        this.variableCallback(this, variable);
+    }
+}
+
+ISY.prototype.loadVariables = function(type,done) {
+    var that = this;
+    var options = {
+        username: this.userName,
+        password: this.password
+    }
+    // Load definitions
+    restler.get(
+        that.protocol+'://'+that.address+'/rest/vars/definitions/'+type,
+        options
+    ).on('complete', function(result, response) {
+        if (response instanceof Error || response.statusCode != 200) {
+            that.logger('Error loading variables from isy: ' + result.message);
+            throw new Error("Unable to load variables from the ISY");
+        } else {
+            that.createVariables(type, result);
+            // Load initial values
+            restler.get(
+                that.protocol+'://'+that.address+'/rest/vars/get/'+type,
+                options
+            ).on('complete', function(result, response) {
+                if (response instanceof Error || response.statusCode != 200) {
+                    that.logger('Error loading variables from isy: ' + result.message);
+                    throw new Error("Unable to load variables from the ISY");
+                } else {
+                    that.setVariableValues(result);
+                }
+                done()
+            });
+        }
+    });
+}
+
+ISY.prototype.getVariableList = function() {
+    return this.variableList;
+}
+
+ISY.prototype.getVariable = function(type,id) {
+    var key = this.createVariableKey(type,id);
+    if(this.variableIndex[key] != null && this.variableIndex[key] != undefined) {
+        return this.variableIndex[key];
+    }
+    return null;
+}
+
+ISY.prototype.handleISYVariableUpdate = function(id, type, value, ts) {
+    var variableToUpdate = this.getVariable(type,id);
+    if(variableToUpdate != null) {
+        variableToUpdate.value = value;
+        variableToUpdate.lastChanged = ts;
+        this.variableChangedHandler(variableToUpdate);
+    }
+}
+
+ISY.prototype.createVariableKey = function(type,id) {
+    return type+':'+id;
+}
+
+ISY.prototype.createVariables = function(type, result) {
+    var document = new xmldoc.XmlDocument(result);
+    var variables = document.childrenNamed('e');
+    for(var index = 0; index < variables.length; index++) {
+        var id = variables[index].attr.id;
+        var name = variables[index].attr.name;
+
+        var newVariable = new ISYVariable(
+            this,
+            id,
+            name,
+            type);
+        this.variableList.push(newVariable);
+        this.variableIndex[this.createVariableKey(type,id)] = newVariable;
+    }
+}
+
+ISY.prototype.setVariableValues = function(result) {
+    var document = new xmldoc.XmlDocument(result);
+    var variables = document.childrenNamed('var');
+    for(var index = 0; index < variables.length; index++) {
+        var variableNode = variables[index];
+        var id = variableNode.attr.id;
+        var type = variableNode.attr.type;
+        var init = parseInt(variableNode.childNamed('init').val);
+        var value = parseInt(variableNode.childNamed('val').val);
+        var ts = variableNode.childNamed('ts').val;
+
+        var variable = this.getVariable(type,id);
+
+        if(variable != null) {
+            variable.value = value;
+            variable.init = init;
+            variable.lastChanged = new Date(ts);
+        }
+    }
+}
+
 ISY.prototype.initialize = function(initializeCompleted) {
     
     var that = this;
@@ -384,34 +493,39 @@ ISY.prototype.initialize = function(initializeCompleted) {
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
             that.loadNodes(result);
-            if(that.elkEnabled) {
-                restler.get(
-                    that.protocol+'://'+that.address+'/rest/elk/get/topology',
-                    options
-                ).on('complete', function(result, response) {
-                    if(response instanceof Error || response.statusCode != 200) {
-                        that.logger('Error loading from elk: '+result.message);
-                        throw new Error("Unable to contact the ELK to get the topology");
-                    } else {
-                        that.loadElkNodes(result);
+
+            that.loadVariables(that.VARIABLE_TYPE_INTEGER, function() {
+                that.loadVariables(that.VARIABLE_TYPE_STATE, function() {
+                    if (that.elkEnabled) {
                         restler.get(
-                            that.protocol+'://'+that.address+'/rest/elk/get/status',
+                            that.protocol + '://' + that.address + '/rest/elk/get/topology',
                             options
-                        ).on('complete', function(result, response) {
-                            if(response instanceof Error || response.statusCode != 200) {
-                                that.logger('Error:'+result.message);
-                                throw new Error("Unable to get the status from the elk");
+                        ).on('complete', function (result, response) {
+                            if (response instanceof Error || response.statusCode != 200) {
+                                that.logger('Error loading from elk: ' + result.message);
+                                throw new Error("Unable to contact the ELK to get the topology");
                             } else {
-                                that.loadElkInitialStatus(result);
-                                that.finishInitialize(true,initializeCompleted);                                                        
+                                that.loadElkNodes(result);
+                                restler.get(
+                                    that.protocol + '://' + that.address + '/rest/elk/get/status',
+                                    options
+                                ).on('complete', function (result, response) {
+                                    if (response instanceof Error || response.statusCode != 200) {
+                                        that.logger('Error:' + result.message);
+                                        throw new Error("Unable to get the status from the elk");
+                                    } else {
+                                        that.loadElkInitialStatus(result);
+                                        that.finishInitialize(true, initializeCompleted);
+                                    }
+                                });
                             }
                         });
+                    } else {
+                        that.finishInitialize(true, initializeCompleted);
                     }
-                });                 
-            } else {
-                that.finishInitialize(true,initializeCompleted);                    
-            }
-        } 
+                });
+            });
+        }
     }).on('error', function(err,response) {
         that.logger("Error while contacting ISY"+err);
         throw new Error("Error calling ISY"+err);
@@ -454,6 +568,21 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                     }
                 }
             }            
+        } else if(controlElement == '_1') {
+            if(actionValue == 6) {
+                var varNode = document.childNamed('eventInfo').childNamed('var');
+                if(varNode != null) {
+                    var id = varNode.attr.id;
+                    var type = varNode.attr.type;
+                    var val = parseInt(varNode.childNamed('val').val);
+                    var ts = new Date(varNode.childNamed('ts').val);
+                    this.handleISYVariableUpdate(id, type, val, ts);
+                    // <var type="1" id="3">
+                //<val>2</val>
+                    //<ts>20160206 09:34:10</ts>
+                    //</var>
+                }
+            } 
         }
     }
 }
@@ -510,7 +639,6 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
             }
         }
     }
-
 }
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
@@ -540,6 +668,39 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
         password: this.password
     }    
     restler.get(uriToUse, options).on('complete', function(data, response) {
+        if(response.statusCode == 200) {
+            handleResult(true);
+        } else {
+            handleResult(false);
+        }
+    });
+}
+
+ISY.prototype.sendGetVariable = function(id, type, handleResult) {
+    var uriToUse = this.protocol+'://'+this.address+'/rest/vars/get/'+type+'/'+id;
+    this.logger("Sending ISY command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    }    
+    restler.get(uriToUse, options).on('complete', function(result, response) {
+        if(response.statusCode == 200) {
+            var document = new xmldoc.XmlDocument(result);
+            var val = parseInt(document.childNamed('val').val);
+            var init = parseInt(document.childNamed('init').val);
+            handleResult(val, init);
+        }
+    });
+}
+
+ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
+    var uriToUse = this.protocol+'://'+this.address+'/rest/vars/set/'+type+'/'+id+'/'+value;
+    this.logger("Sending ISY command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    }    
+    restler.get(uriToUse, options).on('complete', function(result, response) {
         if(response.statusCode == 200) {
             handleResult(true);
         } else {

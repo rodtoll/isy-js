@@ -36,6 +36,7 @@ Features
 * Support for elk sensors. 
 * Support for scenes
 * Support for generic devices through ISYBaseDevice
+* Support for variables (thanks @bdstark)
 
 Setup
 -----
@@ -45,7 +46,7 @@ First create an instance of the ISY root object:
 ```
 var ISY = require('isy-js');
 
-var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', changeCallback, useHttps, scenesInDeviceList, enableDebugLog);
+var isy = new ISY.ISY('<ADDRESS>', '<AdminUserName>', '<PAssword>', changeCallback, useHttps, scenesInDeviceList, enableDebugLog, variableChangeCallback);
 ```
 
 Next, initialize the device list and start the websocket listening for updates:
@@ -98,19 +99,21 @@ Properties:
 * `address` - Address of the ISY.
 
 Functions:
-* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps,enableDebugLog)` - Creates a new instance. address indicates the ip address of your
+* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps,enableDebugLog,variableCallback)` - Creates a new instance. address indicates the ip address of your
 isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk
 alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two
 parameters the pointer to the ISY object and the device. The useHttps parameter is optional and if specified and set to true will have the library use https to talk to isy.
 It uses http by default. The next parameter scenesInDeviceList specifies if scenes should be included in the list of devices.
-This defaults to false. The final parameter enableDebugLog, which is optional, specifies if debug log should be dumped to the
-console during execution. Useful for debugging problems.
+This defaults to false. The next parameter enableDebugLog, which is optional, specifies if debug log should be dumped to the
+console during execution. Useful for debugging problems. The final parameter is the callback function which should be called when a variable value changes.
 * `initialize(handleInitialized)` - Connects to the isy, retrieves the list of devices, updates their status and starts the websocket callbacks for updating the local objects.
 * `getDeviceList()` - Gets the array of devices, each represented as an ISYDevice object.
 * `getDevice(address)` - Gets the device identified by the specified isy address.
 * `getSceneList()` - Gets the array of scenes, each represented as an ISYScene object.
 * `getScene(address)` - Gets the scene identified by the specified isy address.
 * `getElkAlarmPanel()` - Returns a device representing the elk alarm panel
+* `getVariableList()` - Returns a list of ISYVariable objects, one for each variable the ISY supports.
+* `getVariable(type,id)` - Returns the ISYVariable object representing the ISY variable of the specified type and id. null if not found.
 
 Constants:
 * `DEVICE_TYPE_LOCK` - Indicates a morninglinc lock device.
@@ -125,10 +128,25 @@ Constants:
 * `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
 * `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
 * `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
+* `VARIABLE_TYPE_INTEGER` - Indicates that the variable is of type integer
+* `VARIABLE_TYPE_STATE` - Indicates that the variable is of type state.
 
-### Notifications
+### Notifications - Devices/Scenes
 
-When a device's state changes the function passed into the `changeCallback` parameter in the ISY constructor will be called with the device that changed. When a device changes which impacts a scene a change notification for the scene is also generated for the scene.
+The function `changeCallback` specified in the constructor will be called when a device state changes. It will also be
+called when a scene changes as a result of a device changing. Note that if a scene is changed then each individual
+device in the scene will end up getting change notifications. Also note that for each device change in a scene an
+individual change notification is raised for the scene - so you can track the changes as each device is changed.
+
+Function should be of the form:
+* `changeCallback(isy,device)` - Isy is the isy instance the notification is from and device is the device which changed.
+
+### Notifications - Variables
+
+If a variable changes value then the `variableCallback` specified in the constructor will be called.
+
+Function should be of the form:
+* `variableCallback(isy,variable)` - Isy is the isy instance the notification is from and the variable is the variable which changed.
 
 ### All Devices/Scenes
 
@@ -229,6 +247,7 @@ Represents an Insteon motion sensor.
 Functions:
 * `getCurrentMotionSensorState()` - Gets the current state of the motion sensor.
 
+
 ### ELKAlarmSensor
 
 Represents a door/window sensor connected via wired or wireless to the Elk alarm panel. 
@@ -280,6 +299,28 @@ Constants:
 * `ALARM_STATE_FORCE_ARMED_VIOLATION` - Current state of the alarm is armed and has a violation.
 * `ALARM_STATE_ARMED_WITH_BYPASS` - Current state of the alarm is armed with a bypass.
 
+API - VARIABLES
+---------------
+
+### ISYVariable
+
+Represents an individual ISY variable and it's value. You can retrieve the object representing a variable either
+through the variable change callback, through a call to getVariables() to get a full list or getVariable() to get
+a specific variable.
+
+Properties:
+* `isy` - The ISY instance this variable is from
+* `id` - The Id of the variable
+* `name` - The name of the variable
+* `value` - The current value of the variable
+* `init` - The value the variable is initialized to at startup
+* `type` - The type of variable. This will be set to the value of VARIABLE_TYPE_INTEGER or VARIABLE_TYPE_STATE depending on the variable type.
+* `lastModified` - The date/time that the local isy library last saw a change for this variable.
+
+Functions:
+* `sendSetValue(value,callback)` - Send a command to set the specified variable to the specified value. callback will be called with a true
+on success, false on failure when the call is complete. The local value will be updated when a notification is received.
+
 API - GENERIC DEVICES
 ---------------------
 
@@ -302,16 +343,15 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 CHANGELOG
 ---------
 
-* 0.3.7 - 2016/02/26 - lastModified is now lastChanged and now applied to scenes as well and docs fixed up
-* 0.3.6 - 2016/02/26 - Added lastModified property, added isDimmable property to lights and added new getAreAllLightsInSpecifiedState() function to the ISYScene class.
+* 0.3.8 - 2016/02/05 - Adding support for variables thanks to contribution from bdstark.
+* 0.3.7 - 2016/01/26 - lastModified is now lastChanged and now applied to scenes as well and docs fixed up
+* 0.3.6 - 2016/01/26 - Added lastModified property, added isDimmable property to lights and added new getAreAllLightsInSpecifiedState() function to the ISYScene class.
 
 Older version history was not captured.
-
 
 TODO
 ----
 
-* Support for variables.
 * Support for programs.
 * Better error checking.
 * Recoverability in the websocket connection. These can drop over time.
