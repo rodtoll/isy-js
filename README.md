@@ -99,7 +99,7 @@ Properties:
 * `address` - Address of the ISY.
 
 Functions:
-* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps,enableDebugLog,variableCallback)` - Creates a new instance. address indicates the ip address of your
+* `new ISY(address, username, password, elkEnabled, changeCallback, useHttps,scenesInDeviceList,enableDebugLog,variableCallback)` - Creates a new instance. address indicates the ip address of your
 isy, username the username for the admin user and password the password for the admin user, elkEnabled indicates if an elk
 alarm system is connected or not (boolean) and changeCallback is called when the property of a device changes. Takes two
 parameters the pointer to the ISY object and the device. The useHttps parameter is optional and if specified and set to true will have the library use https to talk to isy.
