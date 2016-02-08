@@ -343,6 +343,7 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 CHANGELOG
 ---------
 
+* 0.3.8 - 2016/02/07 - Minor update to match updated fake-isy and unit tests
 * 0.3.8 - 2016/02/05 - Adding support for variables thanks to contribution from bdstark.
 * 0.3.7 - 2016/01/26 - lastModified is now lastChanged and now applied to scenes as well and docs fixed up
 * 0.3.6 - 2016/01/26 - Added lastModified property, added isDimmable property to lights and added new getAreAllLightsInSpecifiedState() function to the ISYScene class.
