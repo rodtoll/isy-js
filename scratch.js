@@ -7,11 +7,11 @@ function handleInitialized() {
 	var deviceList = isy.getDeviceList();
     console.log("Device count: "+deviceList.length);
 	if(deviceList == null) {
-		ISY.debugLog("No device list returned!");
+		console.log("No device list returned!");
 	} else {
-		ISY.debugLog("Got device list. Device count: "+deviceList.length);
+		console.log("Got device list. Device count: "+deviceList.length);
 		for(var index = 0; index < deviceList.length; index++ ) {
-			ISY.debugLog("Device: "+deviceList[index].name+", "+deviceList[index].deviceType+", "+deviceList[index].address+", "+deviceList[index].deviceFriendlyName);
+			console.log("Device: "+deviceList[index].name+", "+deviceList[index].deviceType+", "+deviceList[index].address+", "+deviceList[index].deviceFriendlyName);
 		}
 	}
 	var fanDevice = isy.getDevice('14 A8 BC 2');
@@ -56,11 +56,10 @@ function handleChanged(isy, device) {
 	}
 
     console.log(logMessage);	
-    ISY.debugLog(logMessage);
 }
 
-//var isy = new ISY.ISY('10.0.1.19', 'admin', 'Password', true, handleChanged, false, true);
-var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true);
+//var isy = new ISY.ISY('10.0.1.19', 'admin', 'password', true, handleChanged, false, true,true);
+var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true,true);
 
 isy.initialize(handleInitialized);
 console.log('initialize completed');

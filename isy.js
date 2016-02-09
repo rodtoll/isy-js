@@ -71,7 +71,8 @@ ISY.prototype.VARIABLE_TYPE_STATE = '2';
 
 ISY.prototype.logger = function(msg) {
     if(this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
-        console.log(msg);
+        var timeStamp = new Date();
+        console.log(timeStamp.getFullYear()+"-"+timeStamp.getMonth()+"-"+timeStamp.getDay()+"#"+timeStamp.getHours()+":"+timeStamp.getMinutes()+":"+timeStamp.getSeconds()+"- "+msg);
     }
 }
 
@@ -373,7 +374,7 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
 }
 
 ISY.prototype.variableChangedHandler = function(variable) {
-    this.logger('Variable:'+variable.id+' ('+variable.type+') changed');
+    this.logger('ISY-JS: Variable:'+variable.id+' ('+variable.type+') changed');
     if(this.variableCallback != null && this.variableCallback != undefined) {
         this.variableCallback(this, variable);
     }
@@ -391,7 +392,7 @@ ISY.prototype.loadVariables = function(type,done) {
         options
     ).on('complete', function(result, response) {
         if (response instanceof Error || response.statusCode != 200) {
-            that.logger('Error loading variables from isy: ' + result.message);
+            that.logger('ISY-JS: Error loading variables from isy: ' + result.message);
             throw new Error("Unable to load variables from the ISY");
         } else {
             that.createVariables(type, result);
@@ -401,7 +402,7 @@ ISY.prototype.loadVariables = function(type,done) {
                 options
             ).on('complete', function(result, response) {
                 if (response instanceof Error || response.statusCode != 200) {
-                    that.logger('Error loading variables from isy: ' + result.message);
+                    that.logger('ISY-JS: Error loading variables from isy: ' + result.message);
                     throw new Error("Unable to load variables from the ISY");
                 } else {
                     that.setVariableValues(result);
@@ -489,7 +490,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
         options
     ).on('complete', function(result, response) {
         if(response instanceof Error || response.statusCode != 200) {
-            this.logger('Error:'+result.message);
+            this.logger('ISY-JS: Error:'+result.message);
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
             that.loadNodes(result);
@@ -502,7 +503,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                             options
                         ).on('complete', function (result, response) {
                             if (response instanceof Error || response.statusCode != 200) {
-                                that.logger('Error loading from elk: ' + result.message);
+                                that.logger('ISY-JS: Error loading from elk: ' + result.message);
                                 throw new Error("Unable to contact the ELK to get the topology");
                             } else {
                                 that.loadElkNodes(result);
@@ -511,7 +512,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                                     options
                                 ).on('complete', function (result, response) {
                                     if (response instanceof Error || response.statusCode != 200) {
-                                        that.logger('Error:' + result.message);
+                                        that.logger('ISY-JS: Error:' + result.message);
                                         throw new Error("Unable to get the status from the elk");
                                     } else {
                                         that.loadElkInitialStatus(result);
@@ -527,16 +528,16 @@ ISY.prototype.initialize = function(initializeCompleted) {
             });
         }
     }).on('error', function(err,response) {
-        that.logger("Error while contacting ISY"+err);
+        that.logger("ISY-JS: Error while contacting ISY"+err);
         throw new Error("Error calling ISY"+err);
     }).on('fail', function(data,response) {
-        that.logger("Error while contacting ISY -- failure");
+        that.logger("ISY-JS: Error while contacting ISY -- failure");
         throw new Error("Failed calling ISY");
     }).on('abort', function() {
-        that.logger("Abort while contacting ISY");
+        that.logger("ISY-JS: Abort while contacting ISY");
         throw new Error("Call to ISY was aborted");
     }).on('timeout', function(ms) {
-        that.logger("Timed out contacting ISY");
+        that.logger("ISY-JS: Timed out contacting ISY");
         throw new Error("Timeout contacting ISY");
     });
 }
@@ -643,7 +644,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/'+path;
-    this.logger("Sending ISY command..."+uriToUse);
+    this.logger("ISY-JS: Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -662,7 +663,7 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
     if(parameter != null) {
         uriToUse += '/' + parameter;
     }
-    this.logger("Sending command..."+uriToUse);
+    this.logger("ISY-JS: Sending command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -678,7 +679,7 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
 
 ISY.prototype.sendGetVariable = function(id, type, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/vars/get/'+type+'/'+id;
-    this.logger("Sending ISY command..."+uriToUse);
+    this.logger("ISY-JS: Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
@@ -695,7 +696,7 @@ ISY.prototype.sendGetVariable = function(id, type, handleResult) {
 
 ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/vars/set/'+type+'/'+id+'/'+value;
-    this.logger("Sending ISY command..."+uriToUse);
+    this.logger("ISY-JS: Sending ISY command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
