@@ -343,11 +343,14 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 CHANGELOG
 ---------
 
-* 0.3.9 - 2016/02/09 - Minor tweaks and adding timestamps to debug output
-* 0.3.8 - 2016/02/07 - Minor update to match updated fake-isy and unit tests
-* 0.3.8 - 2016/02/05 - Adding support for variables thanks to contribution from bdstark.
-* 0.3.7 - 2016/01/26 - lastModified is now lastChanged and now applied to scenes as well and docs fixed up
-* 0.3.6 - 2016/01/26 - Added lastModified property, added isDimmable property to lights and added new getAreAllLightsInSpecifiedState() function to the ISYScene class.
+* 0.4.1 - 2016/02/14 - Added user requested type to the types file.
+* 0.4.0 - 2016/02/09 - Minor tweaks and adding timestamps to debug output
+* 0.3.9 - 2016/02/07 - Minor update to match updated fake-isy and unit tests
+* 0.3.8 - 2016/02/06 - Adding support for variables thanks to contribution from bdstark.
+* 0.3.7 - 2016/01/26 - changed lastModified to lastChanged and added attribute to elk devices and scenes.
+* 0.3.6 - 2016/01/26 - added lastModified attribute, added isDimmable and added function to check to see if all lights in a scene are the same state
+* 0.3.5 - 2016/01/24 - Removed accidental extra debug output
+* 0.3.4 - 2016/01/24 - Added additional tests
 
 Older version history was not captured.
 
