@@ -333,8 +333,11 @@ function runSceneTest(isy, sceneId, lightStateToSet, impactedDeviceList, done) {
     }
     isy.changeCallback = function (isy,changedDevice) {
         for(var deviceIndex = 0; deviceIndex < devicesToCheck.length; deviceIndex++) {
-            if(devicesToCheck[deviceIndex] == changedDevice.address && changedDevice.getCurrentLightState() == lightStateToSet) {
-                devicesToCheck.splice(deviceIndex,1);
+            if(devicesToCheck[deviceIndex] == changedDevice.address) {
+                if(sceneToCheck.address != devicesToCheck[deviceIndex]) {
+                    assert.equal(changedDevice.getCurrentLightState(), lightStateToSet, "Should be setting devices to the state we expect");
+                }
+                devicesToCheck.splice(deviceIndex, 1);
                 break;
             }
         }

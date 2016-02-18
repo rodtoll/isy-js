@@ -12,6 +12,7 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.deviceType = isy.DEVICE_TYPE_SCENE;
     this.deviceFriendlyName = "Insteon Scene";
     this.lastChanged = new Date();
+    this.reclalculateState();
 }
 
 ISYScene.prototype.DIM_LEVEL_MINIMUM = 0;
@@ -49,6 +50,16 @@ ISYScene.prototype.getCurrentLightDimState = function() {
     } else {
         return 0;        
     }
+}
+
+ISYScene.prototype.reclalculateState = function() {
+    var areAllOn = this.getAreAllLightsInSpecifiedState(true);
+    if(areAllOn != this.lastCalculatedState) {
+        this.lastCalculatedState = areAllOn;
+        this.markAsChanged();
+        return true;
+    }
+    return false;
 }
 
 ISYScene.prototype.markAsChanged = function() {

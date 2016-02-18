@@ -47,6 +47,7 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     this.sceneIndex = {};
     this.debugLogEnabled = (enableDebugLogging == undefined) ? false : enableDebugLogging;
     this.scenesInDeviceList = (scenesInDeviceList==undefined) ? false : scenesInDeviceList;
+    this.guardianTimer = null;
     if(this.elkEnabled) {
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this,1);
     }
@@ -369,8 +370,17 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
         if(this.elkEnabled) {
             this.deviceList.push(this.elkAlarmPanel);            
         }
+        this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
         this.initializeWebSocket(); 
     }  
+}
+
+ISY.prototype.guardian = function() {
+    var timeNow = new Date();
+    if((timeNow - this.lastActivity) > 60000) {
+        this.logger('ISY-JS: Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
+        this.initializeWebSocket();
+    }
 }
 
 ISY.prototype.variableChangedHandler = function(variable) {
@@ -544,7 +554,8 @@ ISY.prototype.initialize = function(initializeCompleted) {
 
 ISY.prototype.handleWebSocketMessage = function(event) {
     //console.log("WEBSOCKET: "+event.data);
-    var document = new xmldoc.XmlDocument(event.data);  
+    this.lastActivity = new Date();
+    var document = new xmldoc.XmlDocument(event.data);
     if(document.childNamed('control') != null) {
         var controlElement = document.childNamed('control').val;
         var actionValue = document.childNamed('action').val;
@@ -576,12 +587,16 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                     var id = varNode.attr.id;
                     var type = varNode.attr.type;
                     var val = parseInt(varNode.childNamed('val').val);
-                    var ts = new Date(varNode.childNamed('ts').val);
-                    this.handleISYVariableUpdate(id, type, val, ts);
-                    // <var type="1" id="3">
-                //<val>2</val>
-                    //<ts>20160206 09:34:10</ts>
-                    //</var>
+                    var ts = varNode.childNamed('ts').val;
+                    var year = parseInt(ts.substr(0,4));
+                    var month = parseInt(ts.substr(4,2));
+                    var day = parseInt(ts.substr(6,2));
+                    var hour = parseInt(ts.substr(9,2));
+                    var min = parseInt(ts.substr(12,2));
+                    var sec = parseInt(ts.substr(15,2));
+                    var timeStamp = new Date(year,month,day,hour,min,sec);
+
+                    this.handleISYVariableUpdate(id, type, val, timeStamp);
                 }
             } 
         }
@@ -601,6 +616,8 @@ ISY.prototype.initializeWebSocket = function() {
 			 "Authorization": auth			
 		  }
 	   });
+
+    this.lastActivity = new Date();
 	
     this.webSocket.on('message', function(event) {
         that.handleWebSocketMessage(event);
@@ -633,8 +650,9 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
                 // but device list is relatively small
                 for(var index = 0; index < this.sceneList.length; index++) {
                     if(this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
-                        this.sceneList[index].markAsChanged();
-                        this.nodeChangedHandler(this.sceneList[index]);
+                        if(this.sceneList[index].reclalculateState()) {
+                            this.nodeChangedHandler(this.sceneList[index]);
+                        }
                     }
                 }            
             }
