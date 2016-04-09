@@ -343,6 +343,7 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 CHANGELOG
 ---------
 
+* 0.4.3 - 2016/04/09 - Improved error checking to handle errors better. Now handles ISYs with no variables defined.
 * 0.4.2 - 2016/02/15 - Added check to watch for loss of connection. If no notifications are seen in 60 seconds connection is reestablished. Also
 changed Scene behavior so only raises a change when the state of the scene actually changes (used to raise on any change for any light in the scene).
 * 0.4.1 - 2016/02/14 - Added user requested type to the types file.

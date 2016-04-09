@@ -182,6 +182,10 @@ function resetServerState(done) {
     restler.get('http://'+testServerAddress+'/config/reset').on('complete', function(result, response) { done(); });
 }
 
+function setVariableFailureMode(shouldFail,done) {
+    restler.get('http://'+testServerAddress+'/config/failVariableCalls/'+shouldFail.toString()).on('complete', function(result, response) { done(); });
+}
+
 // Used to send set to on command for sensors. Doesn't work on real ISY.
 function sendServerOnCommand(isy, deviceAddress,done) {
     isy.sendRestCommand(deviceAddress, 'DON', null, function() { done(); });
@@ -574,6 +578,22 @@ describe('ISY Variables', function() {
                     done();
                 });
             });
+        });
+    });
+    describe('Handle no variables', function () {
+        it('Basic startup should still work when no variables defined ', function (done) {
+            setVariableFailureMode(true, function () {
+                var isy = new ISY(testServerAddress, testServerUserName, testServerPassword, true, function () {}, false, true);
+                assert.doesNotThrow(function () {
+                    isy.initialize(function () {
+                        assert(isy.getVariableList().length == 0, "Should have empty variable list");
+                        setVariableFailureMode(false, function () {
+                            done();
+                        });
+                    });
+                });
+            });
+
         });
     });
     describe('Variable roundtrip + notifications', function () {
