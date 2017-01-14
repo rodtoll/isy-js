@@ -342,8 +342,8 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 
 CHANGELOG
 ---------
-
-* 0.4.2 - 2016/02/15 - Added check to watch for loss of connection. If no notifications are seen in 60 seconds connection is reestablished. Also
+* 0.4.3 - 2017/01/14 - Restored chatty scene notifications, logic to quiet them wasn't right. Better chatty and correct then wrong and less chatty.
+* 0.4.2 - 2016/02/17 - Added check to watch for loss of connection. If no notifications are seen in 60 seconds connection is reestablished. Also
 changed Scene behavior so only raises a change when the state of the scene actually changes (used to raise on any change for any light in the scene).
 * 0.4.1 - 2016/02/14 - Added user requested type to the types file.
 * 0.4.0 - 2016/02/09 - Minor tweaks and adding timestamps to debug output

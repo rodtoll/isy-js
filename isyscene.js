@@ -53,13 +53,8 @@ ISYScene.prototype.getCurrentLightDimState = function() {
 }
 
 ISYScene.prototype.reclalculateState = function() {
-    var areAllOn = this.getAreAllLightsInSpecifiedState(true);
-    if(areAllOn != this.lastCalculatedState) {
-        this.lastCalculatedState = areAllOn;
-        this.markAsChanged();
-        return true;
-    }
-    return false;
+    this.markAsChanged();
+    return true;
 }
 
 ISYScene.prototype.markAsChanged = function() {
