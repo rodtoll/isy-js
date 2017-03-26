@@ -75,7 +75,7 @@ ELKAlarmPanelDevice.prototype.getAlarmMode = function() {
 ELKAlarmPanelDevice.prototype.setFromAreaUpdate = function(areaUpdate) {
 	var areaId = areaUpdate.attr.area;
 	var updateType = areaUpdate.attr.type;
-	var valueToSet = areaUpdate.attr.val;
+	var valueToSet = parseInt(areaUpdate.attr.val);
 	var valueChanged = false;
 	
 	if(areaId == this.area) {
