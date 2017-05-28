@@ -11,16 +11,17 @@ var ISYDoorWindowDevice = require('./isydevice').ISYDoorWindowDevice;
 var ISYFanDevice = require('./isydevice').ISYFanDevice;
 var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
 var ISYScene = require('./isyscene').ISYScene;
+var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
-var ISYVariable = require('./isyvariable').ISYVariable
+var ISYVariable = require('./isyvariable').ISYVariable;
 
 function isyTypeToTypeName(isyType,address) {
 	for(var index = 0; index < isyDeviceTypeList.length; index++ ) {
-		if(isyDeviceTypeList[index].type == isyType) {
+		if(isyDeviceTypeList[index].type === isyType) {
 			var addressElementValue = isyDeviceTypeList[index].address;
-			if( addressElementValue != "") {
+			if( addressElementValue !== "") {
 				var lastAddressNumber = address[address.length-1];
-				if(lastAddressNumber != addressElementValue) {
+				if(lastAddressNumber !== addressElementValue) {
 					continue;
 				}
 			}
@@ -40,13 +41,14 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     this.variableIndex = {};
     this.variableCallback = variableCallback;
     this.nodesLoaded = false;
-    this.protocol = (useHttps == true) ? 'https' : 'http';
+    this.protocol = (useHttps === true) ? 'https' : 'http';
+    this.wsprotocol = 'ws'; //(useHttps === true) ? 'wss' : 'ws';
     this.elkEnabled = elkEnabled;
     this.zoneMap = {};
     this.sceneList = [];
     this.sceneIndex = {};
-    this.debugLogEnabled = (enableDebugLogging == undefined) ? false : enableDebugLogging;
-    this.scenesInDeviceList = (scenesInDeviceList==undefined) ? false : scenesInDeviceList;
+    this.debugLogEnabled = (enableDebugLogging === undefined) ? false : enableDebugLogging;
+    this.scenesInDeviceList = (scenesInDeviceList === undefined) ? false : scenesInDeviceList;
     this.guardianTimer = null;
     if(this.elkEnabled) {
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this,1);
@@ -62,20 +64,21 @@ ISY.prototype.DEVICE_TYPE_OUTLET = 'Outlet';
 ISY.prototype.DEVICE_TYPE_FAN = 'Fan';
 ISY.prototype.DEVICE_TYPE_UNKNOWN = 'Unknown';
 ISY.prototype.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
-ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor'
+ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor';
 ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
+ISY.prototype.DEVICE_TYPE_THERMOSTAT = 'Thermostat';
 ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
 ISY.prototype.VARIABLE_TYPE_STATE = '2';
 
 ISY.prototype.logger = function(msg) {
-    if(this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
+    if(this.debugLogEnabled || (process.env.ISYJSDEBUG !== undefined && process.env.ISYJSDEBUG !== null)) {
         var timeStamp = new Date();
         console.log(timeStamp.getFullYear()+"-"+timeStamp.getMonth()+"-"+timeStamp.getDay()+"#"+timeStamp.getHours()+":"+timeStamp.getMinutes()+":"+timeStamp.getSeconds()+"- "+msg);
     }
-}
+};
 
 ISY.prototype.buildDeviceInfoRecord = function(isyType, deviceFamily, deviceType) {
     return {
@@ -86,55 +89,55 @@ ISY.prototype.buildDeviceInfoRecord = function(isyType, deviceFamily, deviceType
         connectionType: deviceFamily,
         batteryOperated: false
     };
-}
+};
 
 ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
     var familyId = 1;
-    if(deviceNode.childNamed('family') != null) {
+    if(typeof deviceNode.childNamed('family') !== "undefined") {
         familyId = Number(deviceNode.childNamed('family').val);
     }
     var isyType = deviceNode.childNamed('type').val;
-    var addressData = deviceNode.childNamed('address').val
+    var addressData = deviceNode.childNamed('address').val;
     var addressElements = addressData.split(' ');
     var typeElements = isyType.split('.');
     var mainType = Number(typeElements[0]);
     var subType = Number(typeElements[1]);
     var subAddress = Number(addressElements[3]);
     // ZWave nodes identify themselves with devtype node
-    if(deviceNode.childNamed('devtype') != null) {
-        if(deviceNode.childNamed('devtype').childNamed('cat') != null) {
+    if(typeof deviceNode.childNamed('devtype') !== "undefined") {
+        if(typeof deviceNode.childNamed('devtype').childNamed('cat') !== "undefined") {
             subType = Number(deviceNode.childNamed('devtype').childNamed('cat').val);
         }
     }    
     // Insteon Device Family    
-    if(familyId == 1) {
+    if(familyId === 1) {
 
         // Dimmable Devices
-        if(mainType == 1) {
+        if(mainType === 1) {
             // Special case fanlinc has a fan element
-            if(subType == 46 && subAddress == 2) {
+            if(subType === 46 && subAddress === 2) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_FAN);
             } else {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DIMMABLE_LIGHT); 
             }
-        } else if(mainType == 2) {
+        } else if(mainType === 2) {
             // Special case appliance Lincs into outlets
-            if(subType == 6 || subType == 9 || subType == 12 || subType == 23) {
+            if(subType === 6 || subType === 9 || subType === 12 || subType === 23) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET); 
             // Outlet lincs 
-            } else if(subType == 8 || subType == 33) {
+            } else if(subType === 8 || subType === 33) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                 
             // Dual outlets    
-            } else if(subType == 57) {
+            } else if(subType === 57) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                 
             } else {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LIGHT);                 
             }
         // Sensors
-        } else if(mainType == 7) {
+        } else if(mainType === 7) {
             // I/O Lincs
-            if(subType == 0) {
-                if(subAddress == 1) {
+            if(subType === 0) {
+                if(subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);                     
                 } else {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);                                     
@@ -144,10 +147,10 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
                 return null;
             }
         // Access controls/doors/locks
-        } else if(mainType == 15) {
+        } else if(mainType === 15) {
             // MorningLinc
-            if(subType == 6) {
-                if(subAddress == 1) {
+            if(subType === 6) {
+                if(subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LOCK);
                 // Ignore subdevice which operates opposite for the locks 
                 } else {
@@ -157,37 +160,40 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             } else {
                 return null;
             }
-        } else if(mainType == 16) {
+        } else if(mainType === 16) {
             // Motion sensors
-            if(subType == 1 || subType == 3) {
-                if(subAddress == 1) {
+            if(subType === 1 || subType === 3) {
+                if(subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_MOTION_SENSOR);                                                     
                 // Ignore battery level sensor and daylight sensor
                 } else {
                     
                 }
-            } else if(subType == 2 || subType == 9 || subType == 17) {
+            } else if(subType === 2 || subType === 9 || subType === 17) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);                                                                     
             // Smoke, leak sensors, don't yet know how to support
             } else {
                 return null;
             }
         // No idea how to test or support
+		} else if (mainType === 5) {
+			// Thermostats
+			return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_THERMOSTAT);
         } else {
             return null;
         }
     // Z-Wave Device Family
-    } else if(familyId == 4) {
+    } else if(familyId === 4) {
         // Appears to be all ZWave devices seen so far
-        if(mainType == 4) {
+        if(mainType === 4) {
             // Identified by user zwave on/off switch
-            if(subType == 16) {
+            if(subType === 16) {
                 return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_LIGHT);                                                                     
             // Identified by user door lock
-            } else if(subType == 111) {
+            } else if(subType === 111) {
                 return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_SECURE_LOCK);                                                                                     
             // This is a guess based on the naming in the ISY SDK
-            } else if(subType == 109) {
+            } else if(subType === 109) {
                 return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_DIMMABLE_LIGHT);                                                                                                     
             // Otherwise we don't know how to handle
             } else {
@@ -196,7 +202,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
         }
     } 
     return null;
-}
+};
 
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
@@ -204,17 +210,17 @@ ISY.prototype.nodeChangedHandler = function(node) {
         this.logger('Node: '+node.address+' changed');
         this.changeCallback(that, node);
     }
-}
+};
 
 ISY.prototype.getElkAlarmPanel = function() {
     return this.elkAlarmPanel;
-}
+};
 
 ISY.prototype.loadNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
     this.loadDevices(document);
     this.loadScenes(document);
-}
+};
 
 ISY.prototype.loadScenes = function(document) {
     var nodes = document.childrenNamed('group');
@@ -225,7 +231,7 @@ ISY.prototype.loadScenes = function(document) {
         var childDevices = [];
         for(var linkIndex = 0; linkIndex < linkNodes.length; linkIndex++) {
             var linkDevice = this.deviceIndex[linkNodes[linkIndex].val];
-            if(linkDevice != null && linkDevice != undefined) {
+            if(linkDevice !== null && linkDevice !== undefined) {
                 childDevices.push(linkDevice);
             }
         }
@@ -237,7 +243,7 @@ ISY.prototype.loadScenes = function(document) {
             this.deviceList.push(newScene);
         }
     }
-}
+};
 
 ISY.prototype.loadDevices = function(document) {
     var nodes = document.childrenNamed('node');
@@ -251,54 +257,71 @@ ISY.prototype.loadDevices = function(document) {
         
         if(enabled !== 'false') {  
             // Try fallback to new generic device identification when not specifically identified.  
-            if(deviceTypeInfo == null) {    
+            if(deviceTypeInfo === null) {    
                 deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(nodes[index]);
             }
-            if(deviceTypeInfo != null) {
-                if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
-                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
+            if(deviceTypeInfo !== null) {
+                if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_DIMMABLE_LIGHT ||
+                    deviceTypeInfo.deviceType === this.DEVICE_TYPE_LIGHT) {
                     newDevice = new ISYLightDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
-                    )
-                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                    );
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
                     newDevice = new ISYDoorWindowDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_MOTION_SENSOR) {
                     newDevice = new ISYMotionSensorDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_FAN) {
                     newDevice = new ISYFanDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK ||
-                    deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_LOCK ||
+                    deviceTypeInfo.deviceType === this.DEVICE_TYPE_SECURE_LOCK) {
                     newDevice = new ISYLockDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
-                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_OUTLET) {
                     newDevice = new ISYOutletDevice(
                         this,
                         deviceName,
                         deviceAddress,
                         deviceTypeInfo
                     );
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_THERMOSTAT) {
+                    var props;
+                    if (deviceAddress.endsWith('1')) {
+						props = nodes[index].childrenNamed('property');
+						status = [];
+						for(var i = 0; i < props.length; i++) {
+							status.push(props[i].attr);
+						}
+					}
+                    newDevice = new ISYThermostatDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo,
+                        status
+                    );
+                    
                 }
             // Support the device with a base device object
             } else {
@@ -312,10 +335,10 @@ ISY.prototype.loadDevices = function(document) {
                     'Insteon'
                 );
             }
-            if(newDevice != null) {
+            if(newDevice !== null) {
                 this.deviceIndex[deviceAddress] = newDevice;
                 this.deviceList.push(newDevice);
-                if(nodes[index].childNamed('property') != null) {
+                if(nodes[index].childNamed('property') !== null) {
                     this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
                 }
             }
@@ -323,7 +346,7 @@ ISY.prototype.loadDevices = function(document) {
             this.logger('Ignoring disabled device: '+deviceName);
         }
     }      
-}
+};
 
 ISY.prototype.loadElkNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
@@ -341,7 +364,7 @@ ISY.prototype.loadElkNodes = function(result) {
             (alarmDef==17) ? this.DEVICE_TYPE_CO_SENSOR : this.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR);
         this.zoneMap[newDevice.zone] = newDevice;
     }     
-}
+};
 
 ISY.prototype.loadElkInitialStatus = function(result) {
     var document = new xmldoc.XmlDocument(result);
@@ -350,18 +373,18 @@ ISY.prototype.loadElkInitialStatus = function(result) {
         this.elkAlarmPanel.setFromAreaUpdate(nodes[index]);
     }        
     nodes = document.childrenNamed('ze');
-    for(var index = 0; index < nodes.length; index++) {
+    for( index = 0; index < nodes.length; index++) {
         var id = nodes[index].attr.zone;
         var zoneDevice = this.zoneMap[id];
-        if(zoneDevice != null) {
+        if(zoneDevice !== null) {
             zoneDevice.setFromZoneUpdate(nodes[index]);
-            if(this.deviceIndex[zoneDevice.address] == null && zoneDevice.isPresent()) {
+            if(this.deviceIndex[zoneDevice.address] === null && zoneDevice.isPresent()) {
                 this.deviceList.push(zoneDevice);        
                 this.deviceIndex[zoneDevice.address] = zoneDevice;
             }
         }
     }
-}
+};
 
 ISY.prototype.finishInitialize = function(success, initializeCompleted) {
     this.nodesLoaded = true;
@@ -373,7 +396,7 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
         this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
         this.initializeWebSocket(); 
     }  
-}
+};
 
 ISY.prototype.guardian = function() {
     var timeNow = new Date();
@@ -381,25 +404,25 @@ ISY.prototype.guardian = function() {
         this.logger('ISY-JS: Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
         this.initializeWebSocket();
     }
-}
+};
 
 ISY.prototype.variableChangedHandler = function(variable) {
     this.logger('ISY-JS: Variable:'+variable.id+' ('+variable.type+') changed');
-    if(this.variableCallback != null && this.variableCallback != undefined) {
+    if(this.variableCallback !== null && this.variableCallback !== undefined) {
         this.variableCallback(this, variable);
     }
-}
+};
 
 ISY.prototype.checkForFailure = function(response) {
-    return (response == null || response instanceof Error || response.statusCode != 200);
-}
+    return (response === null || response instanceof Error || response.statusCode !== 200);
+};
 
 ISY.prototype.loadVariables = function(type,done) {
     var that = this;
     var options = {
         username: this.userName,
         password: this.password
-    }
+    };
     // Load definitions
     restler.get(
         that.protocol+'://'+that.address+'/rest/vars/definitions/'+type,
@@ -407,7 +430,7 @@ ISY.prototype.loadVariables = function(type,done) {
     ).on('complete', function(result, response) {
         if (that.checkForFailure(response)) {
             that.logger("ISY-JS: Error loading variables from isy. Device likely doesn't have any variables defined. Safe to ignore.");
-            done()
+            done();
         } else {
             that.createVariables(type, result);
             // Load initial values
@@ -421,36 +444,36 @@ ISY.prototype.loadVariables = function(type,done) {
                 } else {
                     that.setVariableValues(result);
                 }
-                done()
+                done();
             });
         }
     });
-}
+};
 
 ISY.prototype.getVariableList = function() {
     return this.variableList;
-}
+};
 
 ISY.prototype.getVariable = function(type,id) {
     var key = this.createVariableKey(type,id);
-    if(this.variableIndex[key] != null && this.variableIndex[key] != undefined) {
+    if(this.variableIndex[key] !== null && this.variableIndex[key] !== undefined) {
         return this.variableIndex[key];
     }
     return null;
-}
+};
 
 ISY.prototype.handleISYVariableUpdate = function(id, type, value, ts) {
     var variableToUpdate = this.getVariable(type,id);
-    if(variableToUpdate != null) {
+    if(variableToUpdate !== null) {
         variableToUpdate.value = value;
         variableToUpdate.lastChanged = ts;
         this.variableChangedHandler(variableToUpdate);
     }
-}
+};
 
 ISY.prototype.createVariableKey = function(type,id) {
     return type+':'+id;
-}
+};
 
 ISY.prototype.createVariables = function(type, result) {
     var document = new xmldoc.XmlDocument(result);
@@ -467,7 +490,7 @@ ISY.prototype.createVariables = function(type, result) {
         this.variableList.push(newVariable);
         this.variableIndex[this.createVariableKey(type,id)] = newVariable;
     }
-}
+};
 
 ISY.prototype.setVariableValues = function(result) {
     var document = new xmldoc.XmlDocument(result);
@@ -482,13 +505,13 @@ ISY.prototype.setVariableValues = function(result) {
 
         var variable = this.getVariable(type,id);
 
-        if(variable != null) {
+        if(variable !== null) {
             variable.value = value;
             variable.init = init;
             variable.lastChanged = new Date(ts);
         }
     }
-}
+};
 
 ISY.prototype.initialize = function(initializeCompleted) {
     
@@ -497,7 +520,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
     var options = {
         username: this.userName,
         password: this.password
-    }
+    };
 
     restler.get(
         this.protocol+'://'+this.address+'/rest/nodes',
@@ -554,40 +577,45 @@ ISY.prototype.initialize = function(initializeCompleted) {
         that.logger("ISY-JS: Timed out contacting ISY");
         throw new Error("Timeout contacting ISY");
     });
-}
+};
 
 ISY.prototype.handleWebSocketMessage = function(event) {
     //console.log("WEBSOCKET: "+event.data);
     this.lastActivity = new Date();
     var document = new xmldoc.XmlDocument(event.data);
-    if(document.childNamed('control') != null) {
+    if(document.childNamed('control') !== null) {
         var controlElement = document.childNamed('control').val;
         var actionValue = document.childNamed('action').val;
         var address = document.childNamed('node').val;
         if(controlElement == 'ST') {
             this.handleISYStateUpdate(address, actionValue);
+        } else if (controlElement == 'CLIHCS' || controlElement == 'CLISPH' || 
+					controlElement == "CLISPC" || controlElement == "CLIHUM" ||
+					controlElement == "CLIFS" || controlElement == "CLIMD") {
+			// Thermostat Events
+			this.handleISYTstatUpdate(address, actionValue, controlElement);
         } else if(controlElement == '_19') {
-            if(actionValue == 2) {
+            if(actionValue === 2) {
                 var aeElement = document.childNamed('eventInfo').childNamed('ae');
-                if(aeElement != null) {
+                if(aeElement !== null) {
                     if(this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
                         this.nodeChangedHandler(this.elkAlarmPanel);
                     }
                 }
-            } else if(actionValue == 3) {
+            } else if(actionValue === 3) {
                 var zeElement = document.childNamed('eventInfo').childNamed('ze');
                 var zoneId = zeElement.attr.zone;
                 var zoneDevice = this.zoneMap[zoneId];
-                if(zoneDevice != null) {
+                if(zoneDevice !== null) {
                     if(zoneDevice.setFromZoneUpdate(zeElement)) {
                         this.nodeChangedHandler(zoneDevice);
                     }
                 }
             }            
         } else if(controlElement == '_1') {
-            if(actionValue == 6) {
+            if(actionValue === 6) {
                 var varNode = document.childNamed('eventInfo').childNamed('var');
-                if(varNode != null) {
+                if(varNode !== null) {
                     var id = varNode.attr.id;
                     var type = varNode.attr.type;
                     var val = parseInt(varNode.childNamed('val').val);
@@ -605,14 +633,14 @@ ISY.prototype.handleWebSocketMessage = function(event) {
             } 
         }
     }
-}
+};
 
 ISY.prototype.initializeWebSocket = function() {
     var that = this;
     var auth = 'Basic ' + new Buffer(this.userName + ':' + this.password).toString('base64');
-
+    console.log("Connecting to: "+this.wsprotocol+"://"+this.address+"/rest/subscribe");
     this.webSocket = new WebSocket.Client(
-	   "ws://"+this.address+"/rest/subscribe", 
+	   this.wsprotocol+"://"+this.address+"/rest/subscribe", 
 	   ["ISYSUB"],
 	   {
 		  headers: {
@@ -625,28 +653,40 @@ ISY.prototype.initializeWebSocket = function() {
 	
     this.webSocket.on('message', function(event) {
         that.handleWebSocketMessage(event);
+    }).on('error', function(err,response) {
+        that.logger("ISY-JS: Error while contacting ISY"+err);
+        throw new Error("Error calling ISY"+err);
+    }).on('fail', function(data,response) {
+        that.logger("ISY-JS: Error while contacting ISY -- failure");
+        throw new Error("Failed calling ISY");
+    }).on('abort', function() {
+        that.logger("ISY-JS: Abort while contacting ISY");
+        throw new Error("Call to ISY was aborted");
+    }).on('timeout', function(ms) {
+        that.logger("ISY-JS: Timed out contacting ISY");
+        throw new Error("Timeout contacting ISY");
     });
-}
+};
 
 ISY.prototype.getDeviceList = function() {
     return this.deviceList;
-}
+};
 
 ISY.prototype.getDevice = function(address) {
     return this.deviceIndex[address];
-}
+};
 
 ISY.prototype.getScene = function(address) {
     return this.sceneIndex[address];
-}
+};
 
 ISY.prototype.getSceneList = function() {
     return this.sceneList;
-}
+};
 
 ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
-    if(deviceToUpdate != undefined && deviceToUpdate != null) {
+    if(deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if(deviceToUpdate.handleIsyUpdate(state)) {
             this.nodeChangedHandler(deviceToUpdate);
             if(this.scenesInDeviceList) {
@@ -662,7 +702,17 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
             }
         }
     }
-}
+};
+
+ISY.prototype.handleISYTstatUpdate = function(address, state, prop) {
+    var deviceToUpdate = this.deviceIndex[address];
+    if(deviceToUpdate !== undefined && deviceToUpdate !== null) {
+		console.log("update tstat");
+        if(deviceToUpdate.handleIsyTstatnUpdate(state, prop)) {
+            this.nodeChangedHandler(deviceToUpdate);
+        }
+    }
+};
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/'+path;
@@ -670,34 +720,34 @@ ISY.prototype.sendISYCommand = function(path, handleResult) {
     var options = {
         username: this.userName,
         password: this.password
-    }    
+    };
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if(response.statusCode == 200) {
+        if(response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
         }
     });    
-}
+};
 
 ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/nodes/'+deviceAddress+'/cmd/'+command;
-    if(parameter != null) {
+    if(parameter !== null) {
         uriToUse += '/' + parameter;
     }
     this.logger("ISY-JS: Sending command..."+uriToUse);
     var options = {
         username: this.userName,
         password: this.password
-    }    
+    };   
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if(response.statusCode == 200) {
+        if(response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
         }
     });
-}
+};
 
 ISY.prototype.sendGetVariable = function(id, type, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/vars/get/'+type+'/'+id;
@@ -705,16 +755,16 @@ ISY.prototype.sendGetVariable = function(id, type, handleResult) {
     var options = {
         username: this.userName,
         password: this.password
-    }    
+    };   
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if(response.statusCode == 200) {
+        if(response.statusCode === 200) {
             var document = new xmldoc.XmlDocument(result);
             var val = parseInt(document.childNamed('val').val);
             var init = parseInt(document.childNamed('init').val);
             handleResult(val, init);
         }
     });
-}
+};
 
 ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
     var uriToUse = this.protocol+'://'+this.address+'/rest/vars/set/'+type+'/'+id+'/'+value;
@@ -722,14 +772,14 @@ ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
     var options = {
         username: this.userName,
         password: this.password
-    }    
+    };    
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if(response.statusCode == 200) {
+        if(response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
         }
     });
-}
+};
 
 exports.ISY = ISY;

@@ -1,35 +1,97 @@
 {
+  "_args": [
+    [
+      {
+        "raw": "isy-js",
+        "scope": null,
+        "escapedName": "isy-js",
+        "name": "isy-js",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/home/pi/MagicMirror/modules/MMM-ISY"
+    ]
+  ],
+  "_from": "isy-js@latest",
+  "_id": "isy-js@0.4.4",
+  "_inCache": true,
+  "_location": "/isy-js",
+  "_nodeVersion": "7.3.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/isy-js-0.4.4.tgz_1484430560594_0.8860747637227178"
+  },
+  "_npmUser": {
+    "name": "rodtoll",
+    "email": "rod_toll@hotmail.com"
+  },
+  "_npmVersion": "3.10.10",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "isy-js",
+    "scope": null,
+    "escapedName": "isy-js",
     "name": "isy-js",
-    "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application",
-    "license" : "MIT",
-    "version" : "0.4.4",
-    "author" : {
-        "name": "Rod Toll",
-        "email": "rod_toll@hotmail.com"
-    },
-    "scripts" : {
-        "test": "mocha"    
-    },
-    "keywords" : [
-        "isy",
-        "universal devies",
-        "insteon"
-    ],
-    "main": "isy.js",
-    "devDependencies": {
-        "mocha": "",
-        "fake-isy-994i": ""
-    },
-    "dependencies": {
-        "restler": "",
-        "faye-websocket": "",
-        "xmldoc": ""
-    },
-    "bugs": {
-        "url": "https://github.com/rodtoll/isy-js/issues"
-    },
-    "repository" : {
-         "type" : "git", 
-         "url" : "https://github.com/rodtoll/isy-js.git"
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/isy-js/-/isy-js-0.4.4.tgz",
+  "_shasum": "c07d263e7b3885849626ee5fb47230d7b3b6fbc3",
+  "_shrinkwrap": null,
+  "_spec": "isy-js",
+  "_where": "/home/pi/MagicMirror/modules/MMM-ISY",
+  "author": {
+    "name": "Rod Toll",
+    "email": "rod_toll@hotmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/rodtoll/isy-js/issues"
+  },
+  "dependencies": {
+    "faye-websocket": "",
+    "restler": "",
+    "xmldoc": ""
+  },
+  "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application",
+  "devDependencies": {
+    "fake-isy-994i": "",
+    "mocha": ""
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "c07d263e7b3885849626ee5fb47230d7b3b6fbc3",
+    "tarball": "https://registry.npmjs.org/isy-js/-/isy-js-0.4.4.tgz"
+  },
+  "gitHead": "dc019bc859b793e46b2f16d4964339311de44632",
+  "homepage": "https://github.com/rodtoll/isy-js",
+  "keywords": [
+    "isy",
+    "universal devies",
+    "insteon"
+  ],
+  "license": "MIT",
+  "main": "isy.js",
+  "maintainers": [
+    {
+      "name": "rodtoll",
+      "email": "rod_toll@hotmail.com"
     }
+  ],
+  "name": "isy-js",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodtoll/isy-js.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "version": "0.4.4"
 }

@@ -58,8 +58,8 @@ function handleChanged(isy, device) {
     console.log(logMessage);	
 }
 
-//var isy = new ISY.ISY('10.0.1.19', 'admin', 'password', true, handleChanged, false, true,true);
-var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true,true);
+var isy = new ISY.ISY('10.0.1.19', 'admin', 'ErgoFlat91', true, handleChanged, false, true,true);
+//var isy = new ISY.ISY('127.0.0.1:3000', 'admin', 'password', true, handleChanged, false, true,true);
 
 isy.initialize(handleInitialized);
 console.log('initialize completed');
