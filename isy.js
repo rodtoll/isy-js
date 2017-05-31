@@ -325,7 +325,7 @@ ISY.prototype.loadDevices = function(document) {
                 }
             // Support the device with a base device object
             } else {
-                this.logger('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
+                //this.logger('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
                 newDevice = new ISYBaseDevice(
                     this,
                     deviceName,
@@ -336,11 +336,15 @@ ISY.prototype.loadDevices = function(document) {
                 );
             }
             if(newDevice !== null) {
-                this.deviceIndex[deviceAddress] = newDevice;
-                this.deviceList.push(newDevice);
-                if(nodes[index].childNamed('property') !== null) {
-                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
-                }
+				if (deviceAddress in this.deviceIndex) { 
+					this.logger("Device already exists in index!!");
+				} else {
+					this.deviceIndex[deviceAddress] = newDevice;
+					this.deviceList.push(newDevice);
+					if(nodes[index].childNamed('property') !== null) {
+						this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+					}
+				}
             }
         } else {
             this.logger('Ignoring disabled device: '+deviceName);
@@ -422,32 +426,51 @@ ISY.prototype.loadVariables = function(type,done) {
     var options = {
         username: this.userName,
         password: this.password
-    };
-    // Load definitions
-    restler.get(
-        that.protocol+'://'+that.address+'/rest/vars/definitions/'+type,
-        options
-    ).on('complete', function(result, response) {
+    };  
+    var retryCount = 0;
+
+    // Note: occasionally this fails on the first call and we need to re-call
+    var getInitialValuesCB = function(result, response) {
+		if (that.checkForFailure(response)) {
+			that.logger('ISY-JS: Error loading variables from isy: ' + result.message + "\nRetrying...");
+			retryCount ++;
+			getVariableInitialValues();
+		} else {
+			that.setVariableValues(result);
+		}
+		done();
+	};
+    
+    var getVariableInitialValues = function() {
+		// Check if we've exceeded the retry count.
+		if (retryCount > 2) { 
+			throw new Error("Unable to load variables from the ISY after "+retryCount+" retries.");
+		}
+		
+		// Load initial values
+		restler.get(
+			that.protocol+'://'+that.address+'/rest/vars/get/'+type,
+			options
+		).on('complete', getInitialValuesCB);
+	};
+    
+    // Callback function to get the variable values after getting definitions
+    var loadVariablesCB = function(result, response) {
         if (that.checkForFailure(response)) {
             that.logger("ISY-JS: Error loading variables from isy. Device likely doesn't have any variables defined. Safe to ignore.");
             done();
         } else {
-            that.createVariables(type, result);
-            // Load initial values
-            restler.get(
-                that.protocol+'://'+that.address+'/rest/vars/get/'+type,
-                options
-            ).on('complete', function(result, response) {
-                if (that.checkForFailure(response)) {
-                    that.logger('ISY-JS: Error loading variables from isy: ' + result.message);
-                    throw new Error("Unable to load variables from the ISY");
-                } else {
-                    that.setVariableValues(result);
-                }
-                done();
-            });
+			that.createVariables(type, result);
+			getVariableInitialValues();
         }
-    });
+    };
+        	
+	// Load definitions
+	restler.get(
+		that.protocol+'://'+that.address+'/rest/vars/definitions/'+type,
+		options
+	).on('complete', loadVariablesCB);
+
 };
 
 ISY.prototype.getVariableList = function() {
@@ -487,8 +510,13 @@ ISY.prototype.createVariables = function(type, result) {
             id,
             name,
             type);
-        this.variableList.push(newVariable);
-        this.variableIndex[this.createVariableKey(type,id)] = newVariable;
+            
+        // Don't push duplicate variables.
+        if (this.variableList.indexOf(newVariable) !== -1) { return; }
+        if (this.createVariableKey(type,id) in this.variableIndex) { return; }
+        
+		this.variableList.push(newVariable);
+		this.variableIndex[this.createVariableKey(type,id)] = newVariable;
     }
 };
 
@@ -583,7 +611,7 @@ ISY.prototype.handleWebSocketMessage = function(event) {
     //console.log("WEBSOCKET: "+event.data);
     this.lastActivity = new Date();
     var document = new xmldoc.XmlDocument(event.data);
-    if(document.childNamed('control') !== null) {
+    if(typeof document.childNamed('control') !== "undefined") {
         var controlElement = document.childNamed('control').val;
         var actionValue = document.childNamed('action').val;
         var address = document.childNamed('node').val;
@@ -638,13 +666,13 @@ ISY.prototype.handleWebSocketMessage = function(event) {
 ISY.prototype.initializeWebSocket = function() {
     var that = this;
     var auth = 'Basic ' + new Buffer(this.userName + ':' + this.password).toString('base64');
-    console.log("Connecting to: "+this.wsprotocol+"://"+this.address+"/rest/subscribe");
+    that.logger("Connecting to: "+this.wsprotocol+"://"+this.address+"/rest/subscribe");
     this.webSocket = new WebSocket.Client(
 	   this.wsprotocol+"://"+this.address+"/rest/subscribe", 
 	   ["ISYSUB"],
 	   {
 		  headers: {
-		  	   "Origin": "com.universal-devices.websockets.isy",
+		  	 "Origin": "com.universal-devices.websockets.isy",
 			 "Authorization": auth			
 		  }
 	   });
@@ -707,8 +735,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
 ISY.prototype.handleISYTstatUpdate = function(address, state, prop) {
     var deviceToUpdate = this.deviceIndex[address];
     if(deviceToUpdate !== undefined && deviceToUpdate !== null) {
-		console.log("update tstat");
-        if(deviceToUpdate.handleIsyTstatnUpdate(state, prop)) {
+		if(deviceToUpdate.handleIsyTstatUpdate(state, prop)) {
             this.nodeChangedHandler(deviceToUpdate);
         }
     }

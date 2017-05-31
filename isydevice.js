@@ -272,17 +272,20 @@ ISYThermostatDevice.prototype.getFormattedStatus = function() {
 	response.currTemp = Math.round(this.currentState / 2.0);
 	if ("CLIHCS" in this) {
 		switch (this.CLIHCS) {
-			case '0':
+			case 0:
+			case "0":
 				response.currentStatus = "off";
 				break;
-			case '1':
+			case 1:
+			case "1":
 				response.currentStatus = "heating";
 				break;
-			case '2':
+			case 2:
+			case "2":
 				response.currentStatus = "cooling";
 				break;
 			default:
-				resposne.currentStatus = this.CLIHCS;
+				response.currentStatus = this.CLIHCS;
 		}
 	}
 	if ("CLIHUM" in this) {
