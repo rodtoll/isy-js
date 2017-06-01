@@ -487,8 +487,7 @@ ISY.prototype.getVariable = function(type,id) {
 
 ISY.prototype.handleISYVariableUpdate = function(id, type, value, ts) {
 	var variableToUpdate = this.getVariable(type,id);
-	this.logger(variableToUpdate);
-    if(variableToUpdate !== null) {
+	if(variableToUpdate !== null) {
         variableToUpdate.value = value;
         variableToUpdate.lastChanged = ts;
         this.variableChangedHandler(variableToUpdate);
