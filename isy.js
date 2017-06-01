@@ -486,7 +486,8 @@ ISY.prototype.getVariable = function(type,id) {
 };
 
 ISY.prototype.handleISYVariableUpdate = function(id, type, value, ts) {
-    var variableToUpdate = this.getVariable(type,id);
+	var variableToUpdate = this.getVariable(type,id);
+	this.logger(variableToUpdate);
     if(variableToUpdate !== null) {
         variableToUpdate.value = value;
         variableToUpdate.lastChanged = ts;
@@ -623,14 +624,14 @@ ISY.prototype.handleWebSocketMessage = function(event) {
 			// Thermostat Events
 			this.handleISYTstatUpdate(address, actionValue, controlElement);
         } else if(controlElement == '_19') {
-            if(actionValue === 2) {
+            if(actionValue === 2 || actionValue === "2") {
                 var aeElement = document.childNamed('eventInfo').childNamed('ae');
                 if(aeElement !== null) {
                     if(this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
                         this.nodeChangedHandler(this.elkAlarmPanel);
                     }
                 }
-            } else if(actionValue === 3) {
+            } else if(actionValue === 3 || actionValue === "3") {
                 var zeElement = document.childNamed('eventInfo').childNamed('ze');
                 var zoneId = zeElement.attr.zone;
                 var zoneDevice = this.zoneMap[zoneId];
@@ -641,7 +642,7 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                 }
             }            
         } else if(controlElement == '_1') {
-            if(actionValue === 6) {
+			if(actionValue === 6 || actionValue === "6") {
                 var varNode = document.childNamed('eventInfo').childNamed('var');
                 if(varNode !== null) {
                     var id = varNode.attr.id;
