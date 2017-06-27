@@ -32,6 +32,7 @@ ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK = '1';
 ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK = '0';
 ISYBaseDevice.prototype.ISY_STATE_LOCK_UNLOCKED = 0;
 ISYBaseDevice.prototype.ISY_STATE_DOOR_WINDOW_CLOSED = 0;
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_DRY = 0;
 ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
 ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON';
 ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF';
@@ -108,6 +109,13 @@ ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandle
 
 ISYBaseDevice.prototype.getCurrentDoorWindowState = function() {
     return !(this.currentState == this.ISY_STATE_DOOR_WINDOW_CLOSED);
+}
+
+////////////////////////////////////////////////////////////////////////
+// LEAK SENSOR
+
+ISYBaseDevice.prototype.getCurrentLeakState = function() {
+    return !(this.currentState == this.ISY_STATE_LEAK_SENSOR_DRY);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -211,6 +219,16 @@ function ISYDoorWindowDevice(isy, name, address, deviceTypeInfo) {
 util.inherits(ISYDoorWindowDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
+// ISYLeakDevice
+//
+
+function ISYLeakDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+}
+
+util.inherits(ISYLeakDevice,ISYBaseDevice);
+
+////////////////////////////////////////////////////////////////////////
 // ISYMotionSensorDevice
 //
 
@@ -245,5 +263,6 @@ exports.ISYOutletDevice = ISYOutletDevice;
 exports.ISYLightDevice = ISYLightDevice;
 exports.ISYLockDevice = ISYLockDevice;
 exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
+exports.ISYLeakDevice = ISYLeakDevice
 exports.ISYFanDevice = ISYFanDevice;
 exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
