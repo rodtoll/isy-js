@@ -135,6 +135,7 @@ Constants:
 * `DEVICE_TYPE_OUTLET` - Indicates a outlet device type. 
 * `DEVICE_TYPE_FAN` - Indicates a fan device type. 
 * `DEVICE_TYPE_DOOR_WINDOW_SENSOR` - Indicates a door/window sensor device type.
+* `DEVICE_TYPE_LEAK_SENSOR` - Indicates a leak sensor device type.
 * `DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR` - Indicates an elk door/window sensor device type.
 * `DEVICE_TYPE_CO_SENSOR` - Indicates an Elk CO sensor device type.
 * `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
@@ -251,6 +252,13 @@ Represents an Insteon door/window sensor like I/O Linc, TriggerLinc.
 
 Functions:
 * `getCurrentDoorWindowState()` - Gets the current state of the door window sensor. true is open, false is closed. 
+
+### ISYLeakDevice
+
+Represents an Insteon leak sensor. 
+
+Functions:
+* `getCurrentLeakState()` - Gets the current state of the leak sensor. true is leak detected, false is no leak detected. 
 
 ### ISYMotionSensorDevice
 

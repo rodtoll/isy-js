@@ -8,6 +8,7 @@ var ISYOutletDevice = require('./isydevice').ISYOutletDevice;
 var ISYLightDevice = require('./isydevice').ISYLightDevice;
 var ISYLockDevice = require('./isydevice').ISYLockDevice;
 var ISYDoorWindowDevice = require('./isydevice').ISYDoorWindowDevice;
+var ISYLeakDevice = require('./isydevice').ISYLeakDevice;
 var ISYFanDevice = require('./isydevice').ISYFanDevice;
 var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice;
 var ISYScene = require('./isyscene').ISYScene;
@@ -62,6 +63,7 @@ ISY.prototype.DEVICE_TYPE_OUTLET = 'Outlet';
 ISY.prototype.DEVICE_TYPE_FAN = 'Fan';
 ISY.prototype.DEVICE_TYPE_UNKNOWN = 'Unknown';
 ISY.prototype.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
+ISY.prototype.DEVICE_TYPE_LEAK_SENSOR = "LeakSensor";
 ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor'
 ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
@@ -168,7 +170,12 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
                 }
             } else if(subType == 2 || subType == 9 || subType == 17) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);                                                                     
-            // Smoke, leak sensors, don't yet know how to support
+            } else if(subType == 8 || subType == 13 || subType == 14) {
+                if(subAddress == 2) {
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LEAK_SENSOR);
+                    // Ignore dry state
+                }
+                // Smoke sensors, don't yet know how to support
             } else {
                 return null;
             }
@@ -265,6 +272,13 @@ ISY.prototype.loadDevices = function(document) {
                     )
                 } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
                     newDevice = new ISYDoorWindowDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_LEAK_SENSOR) {
+                    newDevice = new ISYLeakDevice(
                         this,
                         deviceName,
                         deviceAddress,
