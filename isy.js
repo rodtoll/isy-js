@@ -809,4 +809,21 @@ ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
     });
 };
 
+ISY.prototype.runProgram = function(id, command, handleResult) {
+    // Possible Commands: run|runThen|runElse|stop|enable|disable|enableRunAtStartup|disableRunAtStartup
+    var uriToUse = this.protocol+'://'+this.address+'/rest/programs/'+id+'/'+command;
+    this.logger("ISY-JS: Sending program command..."+uriToUse);
+    var options = {
+        username: this.userName,
+        password: this.password
+    };   
+    restler.get(uriToUse, options).on('complete', function(data, response) {
+        if(response.statusCode === 200) {
+            handleResult(true);
+        } else {
+            handleResult(false);
+        }
+    });
+};
+
 exports.ISY = ISY;
