@@ -493,16 +493,6 @@ ISY.prototype.setVariableValues = function(result) {
 }
 
 ISY.prototype.initialize = function(initializeCompleted) {
-
-    this.deviceIndex = {};
-    this.deviceList = [];
-    this.variableList = [];
-    this.variableIndex = {};
-    this.nodesLoaded = false;
-    this.zoneMap = {};
-    this.sceneList = [];
-    this.sceneIndex = {};
-
     var that = this;
 
     var options = {
@@ -518,6 +508,15 @@ ISY.prototype.initialize = function(initializeCompleted) {
             this.logger('ISY-JS: Error:'+result.message);
             throw new Error("Unable to contact the ISY to get the list of nodes");
         } else {
+            this.nodesLoaded = false;
+            this.deviceIndex = {};
+            this.deviceList = [];
+            this.sceneList = [];
+            this.sceneIndex = {};
+            this.variableList = [];
+            this.variableIndex = {};
+            this.zoneMap = {};
+
             that.loadNodes(result);
 
             that.loadVariables(that.VARIABLE_TYPE_INTEGER, function() {
