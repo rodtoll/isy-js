@@ -621,6 +621,8 @@ ISY.prototype.initializeWebSocket = function() {
     var that = this;
     var auth = 'Basic ' + new Buffer(this.userName + ':' + this.password).toString('base64');
 
+    this.logger('Initializing web socket');
+
     this.webSocket = new WebSocket.Client(
 	   "ws://"+this.address+"/rest/subscribe",
 	   ["ISYSUB"],
