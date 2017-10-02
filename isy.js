@@ -315,9 +315,9 @@ ISY.prototype.loadDevices = function(document) {
             if(newDevice != null) {
                 this.deviceIndex[deviceAddress] = newDevice;
                 this.deviceList.push(newDevice);
-                if(nodes[index].childNamed('property') != null) {
-                    this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
-                }
+                // if(nodes[index].childNamed('property') != null) {
+                //     this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
+                // }
             }
         } else {
             this.logger('Ignoring disabled device: '+deviceName);
