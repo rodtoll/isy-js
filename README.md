@@ -1,7 +1,7 @@
 
-# isy-js [![Build Status](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)
-
-(C) Rod Toll 2015, Licensed under the MIT-LICENSE.
+# isy-js
+(C) Rod Toll 2015-2017, Licensed under the MIT-LICENSE.
+Continued development by shbatm, 2017-
 
 Javascript library for interfacing with the ISY-99i from Universal Devices. (http://www.universal-devices.com).
 
@@ -342,6 +342,9 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 
 CHANGELOG
 ---------
+
+* 0.5.0 - 2017/10/25 - Limited support resumed. Changes from shbatm/isy-js and tenstartups/isy-js have been incorportated. Changes include: removal of guardian timer, limited support for programs (executing), read-only support for Insteon Thermostats, bug fixes to support ISY v5 Firmware and Node Servers.
+* 0.4.5 - 2017/07/04 - Support suspended. Active development ended. 
 * 0.4.4 - 2017/01/14 - Restored chatty scene notifications, logic to quiet them wasn't right. Better chatty and correct then wrong and less chatty.
 * 0.4.3 - 2016/04/09 - Improved error checking to handle errors better. Now handles ISYs with no variables defined.
 * 0.4.2 - 2016/02/15 - Added check to watch for loss of connection. If no notifications are seen in 60 seconds connection is reestablished. Also
@@ -365,3 +368,17 @@ TODO
 * Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
 * ELk > 1 areas
+
+## From original author: ACTIVE DEVELOPMENT & SUPPORT DISCONTINUED
+I am sad to announce that I am discontinuing support for this library. This means I will no longer be addressing any open bugs, responding to feature requests or 
+releasing new versions. Between work and my home life there simply isn't the time. I will leave the repository online and the 
+package on npm but that is it. As this code is licensed under the MIT license you are of course welcome to branch this code and make it your own and use it in your 
+own projects -- but you do so, as always, with no warranty or support from me. 
+
+I want to thank everyone who helped along the way through questions and issues and code contributions -- your assistance was very much appreciated. And it made the 
+late nights and testing worth it. 
+
+If you find a good alternative and want others to know about it then open a new issue and provide a pointer. I might post a link here.
+
+## From Contributor SHBATM:
+I will provide limited continued development of this module. Please direct any pull requests to the shbatm/isy-js fork for now to include any changes.
