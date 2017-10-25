@@ -325,7 +325,7 @@ ISY.prototype.loadDevices = function(document) {
                 }
             // Support the device with a base device object
             } else {
-                //this.logger('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
+                this.logger('Device: '+deviceName+' type: '+isyDeviceType+' is not specifically supported, returning generic device object. ');
                 newDevice = new ISYBaseDevice(
                     this,
                     deviceName,
@@ -341,7 +341,7 @@ ISY.prototype.loadDevices = function(document) {
 				} else {
 					this.deviceIndex[deviceAddress] = newDevice;
 					this.deviceList.push(newDevice);
-					if(nodes[index].childNamed('property') !== null) {
+					if(nodes[index].childNamed('property') !== undefined) {
 						this.handleISYStateUpdate(deviceAddress, nodes[index].childNamed('property').attr.value);
 					}
 				}
