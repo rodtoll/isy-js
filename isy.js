@@ -49,7 +49,7 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     this.sceneIndex = {};
     this.debugLogEnabled = (enableDebugLogging === undefined) ? false : enableDebugLogging;
     this.scenesInDeviceList = (scenesInDeviceList === undefined) ? false : scenesInDeviceList;
-    // this.guardianTimer = null;
+    this.guardianTimer = null;
     if (this.elkEnabled) {
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this, 1);
     }
@@ -393,18 +393,18 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
         if (this.elkEnabled) {
             this.deviceList.push(this.elkAlarmPanel);
         }
-        // this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
+        this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
         this.initializeWebSocket();
     }
 };
 
-// ISY.prototype.guardian = function() {
-//     var timeNow = new Date();
-//     if((timeNow - this.lastActivity) > 60000) {
-//         this.logger('ISY-JS: Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
-//         this.initializeWebSocket();
-//     }
-// }
+ISY.prototype.guardian = function() {
+    var timeNow = new Date();
+    if((timeNow - this.lastActivity) > 60000) {
+        this.logger('ISY-JS: Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
+        this.initializeWebSocket();
+    }
+};
 
 ISY.prototype.variableChangedHandler = function(variable) {
     this.logger('ISY-JS: Variable:' + variable.id + ' (' + variable.type + ') changed');
@@ -678,7 +678,7 @@ ISY.prototype.initializeWebSocket = function() {
                 "Origin": "com.universal-devices.websockets.isy",
                 "Authorization": auth
             },
-            "ping": 10
+            ping: 10
         });
 
     this.lastActivity = new Date();
