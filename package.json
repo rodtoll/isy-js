@@ -13,9 +13,9 @@
             "email" : "18057952+shbatm@users.noreply.github.com"
         },
         {
-            "name" : "10Startups"
+            "name" : "TenStartups"
         }
-    ]
+    ],
     "scripts" : {
         "test": "mocha"    
     },
