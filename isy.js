@@ -207,7 +207,6 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this
     if (this.nodesLoaded) {
-        this.logger('Node: ' + node.address + ' changed')
         this.changeCallback(that, node)
     }
 }
