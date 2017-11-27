@@ -1,6 +1,5 @@
 var restler = require('restler')
 var xmldoc = require('xmldoc')
-var isyDevice = require('./isydevice')
 var WebSocket = require('faye-websocket')
 var elkDevice = require('./elkdevice.js')
 var isyDeviceTypeList = require('./isydevicetypes.json')
@@ -166,8 +165,6 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
                 if (subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_MOTION_SENSOR)
                         // Ignore battery level sensor and daylight sensor
-                } else {
-
                 }
             } else if (subType === 2 || subType === 9 || subType === 17) {
                 return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR)
@@ -612,7 +609,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
 }
 
 ISY.prototype.handleWebSocketMessage = function(event) {
-    // console.log('WEBSOCKET: ' + event.data)
+    console.log('WEBSOCKET: ' + event.data)
     this.lastActivity = new Date()
     var document = new xmldoc.XmlDocument(event.data)
     if (typeof document.childNamed('control') !== 'undefined') {
