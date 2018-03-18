@@ -763,7 +763,7 @@ ISY.prototype.sendISYCommand = function(path, handleResult) {
         password: this.password
     }
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true)
         } else {
             handleResult(false)
@@ -782,7 +782,7 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
         password: this.password
     }
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true)
         } else {
             handleResult(false)
@@ -798,7 +798,7 @@ ISY.prototype.sendGetVariable = function(id, type, handleResult) {
         password: this.password
     }
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             var document = new xmldoc.XmlDocument(result)
             var val = parseInt(document.childNamed('val').val)
             var init = parseInt(document.childNamed('init').val)
@@ -815,7 +815,7 @@ ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
         password: this.password
     }
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true)
         } else {
             handleResult(false)
@@ -832,7 +832,7 @@ ISY.prototype.runProgram = function(id, command, handleResult) {
         password: this.password
     }
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true)
         } else {
             handleResult(false)
