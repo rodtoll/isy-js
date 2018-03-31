@@ -7,19 +7,19 @@
         "name": "Rod Toll",
         "email": "rod_toll@hotmail.com"
     },
-    "contributors" : [
+    "contributors": [
         {
-            "name" : "shbatm",
-            "email" : "18057952+shbatm@users.noreply.github.com"
+            "name": "shbatm",
+            "email": "18057952+shbatm@users.noreply.github.com"
         },
         {
-            "name" : "TenStartups"
+            "name": "TenStartups"
         }
     ],
-    "scripts" : {
-        "test": "mocha"    
+    "scripts": {
+        "test": "mocha"
     },
-    "keywords" : [
+    "keywords": [
         "isy",
         "universal devices",
         "insteon"
@@ -30,15 +30,15 @@
         "fake-isy-994i": ""
     },
     "dependencies": {
-        "restler": "",
         "faye-websocket": "",
+        "restler": "",
         "xmldoc": ""
     },
     "bugs": {
         "url": "https://github.com/shbatm/isy-js/issues"
     },
-    "repository" : {
-         "type" : "git", 
-         "url" : "https://github.com/shbatm/isy-js.git"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shbatm/isy-js.git"
     }
 }

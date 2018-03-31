@@ -55,6 +55,8 @@
     { "type": "5.11.13.0", "address": "1", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Main", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
     { "type": "5.11.13.0", "address": "2", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Cool", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
     { "type": "5.11.13.0", "address": "3", "name": "(ZW0123_1) Insteon Remote Control Wall Thermostat - Heat", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
+    { "type": "5.10.14.0", "address": "1", "name": "(2441TH) Insteon Remote Thermostat - Main", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": true },
+    { "type": "5.10.14.0", "address": "2", "name": "(2441TH) Insteon Remote Thermostat - Cool", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": true },
+    { "type": "5.10.14.0", "address": "3", "name": "(ZW0123_1) Insteon Remote Thermostat - Heat", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": true },
     { "type": "4.33.1.0", "address": "", "name": "(2441TH) ZWave Thermostat", "deviceType": "Thermostat", "connectionType": "Zwave", "batteryOperated": true }
-
 ]

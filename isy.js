@@ -3,16 +3,22 @@ var xmldoc = require('xmldoc')
 var WebSocket = require('faye-websocket')
 var elkDevice = require('./elkdevice.js')
 var isyDeviceTypeList = require('./isydevicetypes.json')
-var ISYOutletDevice = require('./isydevice').ISYOutletDevice
-var ISYLightDevice = require('./isydevice').ISYLightDevice
-var ISYLockDevice = require('./isydevice').ISYLockDevice
-var ISYDoorWindowDevice = require('./isydevice').ISYDoorWindowDevice
-var ISYFanDevice = require('./isydevice').ISYFanDevice
-var ISYMotionSensorDevice = require('./isydevice').ISYMotionSensorDevice
+const isydevice = require('./isydevice')
+var ISYOutletDevice = isydevice.ISYOutletDevice
+var ISYLightDevice = isydevice.ISYLightDevice
+var ISYLockDevice = isydevice.ISYLockDevice
+var ISYDoorWindowDevice = isydevice.ISYDoorWindowDevice
+var ISYFanDevice = isydevice.ISYFanDevice
+var ISYMotionSensorDevice = isydevice.ISYMotionSensorDevice
 var ISYScene = require('./isyscene').ISYScene
-var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice
-var ISYBaseDevice = require('./isydevice').ISYBaseDevice
+var ISYThermostatDevice = isydevice.ISYThermostatDevice
+var ISYBaseDevice = isydevice.ISYBaseDevice
 var ISYVariable = require('./isyvariable').ISYVariable
+
+function convertToCelsius(value) {
+    const celsius = (5 / 9 * (value - 32)).toFixed(1)
+    return celsius
+}
 
 function isyTypeToTypeName(isyType, address) {
     for (var index = 0; index < isyDeviceTypeList.length; index++) {
@@ -54,6 +60,11 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
     }
     this.changeCallback = changeCallback
 }
+
+exports.DEVICE_UPDATE_TYPE_ELK = 'ELK_UPDATE'
+exports.DEVICE_UPDATE_TYPE_ZONE = 'ZONE_UPDATE'
+exports.DEVICE_UPDATE_TYPE_PROPERTY = 'PROPERTY_UPDATE'
+exports.DEVICE_UPDATE_TYPE_GENERIC = 'GENERIC_UPDATE'
 
 ISY.prototype.DEVICE_TYPE_LOCK = 'DoorLock'
 ISY.prototype.DEVICE_TYPE_SECURE_LOCK = 'SecureLock'
@@ -102,7 +113,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
     var mainType = Number(typeElements[0])
     var subType = Number(typeElements[1])
     var subAddress = Number(addressElements[3])
-        // ZWave nodes identify themselves with devtype node
+    // ZWave nodes identify themselves with devtype node
     if (typeof deviceNode.childNamed('devtype') !== 'undefined') {
         if (typeof deviceNode.childNamed('devtype').childNamed('cat') !== 'undefined') {
             subType = Number(deviceNode.childNamed('devtype').childNamed('cat').val)
@@ -123,10 +134,10 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // Special case appliance Lincs into outlets
             if (subType === 6 || subType === 9 || subType === 12 || subType === 23) {
                 return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET)
-                    // Outlet lincs
+                // Outlet lincs
             } else if (subType === 8 || subType === 33) {
                 return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET)
-                    // Dual outlets
+                // Dual outlets
             } else if (subType === 57) {
                 return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET)
             } else {
@@ -151,7 +162,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             if (subType === 6) {
                 if (subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_LOCK)
-                        // Ignore subdevice which operates opposite for the locks
+                    // Ignore subdevice which operates opposite for the locks
                 } else {
                     return null
                 }
@@ -164,11 +175,11 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             if (subType === 1 || subType === 3) {
                 if (subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_MOTION_SENSOR)
-                        // Ignore battery level sensor and daylight sensor
+                    // Ignore battery level sensor and daylight sensor
                 }
             } else if (subType === 2 || subType === 9 || subType === 17) {
                 return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR)
-                    // Smoke, leak sensors, don't yet know how to support
+                // Smoke, leak sensors, don't yet know how to support
             } else {
                 return null
             }
@@ -186,13 +197,13 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // Identified by user zwave on/off switch
             if (subType === 16) {
                 return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_LIGHT)
-                    // Identified by user door lock
+                // Identified by user door lock
             } else if (subType === 111) {
                 return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_SECURE_LOCK)
-                    // This is a guess based on the naming in the ISY SDK
+                // This is a guess based on the naming in the ISY SDK
             } else if (subType === 109) {
                 return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_DIMMABLE_LIGHT)
-                    // Otherwise we don't know how to handle
+                // Otherwise we don't know how to handle
             } else {
                 return null
             }
@@ -609,62 +620,116 @@ ISY.prototype.initialize = function(initializeCompleted) {
 }
 
 ISY.prototype.handleWebSocketMessage = function(event) {
-    console.log('WEBSOCKET: ' + event.data)
+    //console.log('WEBSOCKET: ' + event.data)
     this.lastActivity = new Date()
     var document = new xmldoc.XmlDocument(event.data)
     if (typeof document.childNamed('control') !== 'undefined') {
         var controlElement = document.childNamed('control').val
         var actionValue = document.childNamed('action').val
         var address = document.childNamed('node').val
-        if (controlElement == 'ST') {
-            this.handleISYStateUpdate(address, actionValue)
-        } else if (controlElement == 'CLIHCS' || controlElement == 'CLISPH' ||
-            controlElement == 'CLISPC' || controlElement == 'CLIHUM' ||
-            controlElement == 'CLIFS' || controlElement == 'CLIMD') {
-            // Thermostat Events
-            this.handleISYTstatUpdate(address, actionValue, controlElement)
-        } else if (controlElement == 'TPW' || controlElement == 'PF' || // power events
-            controlElement == 'CC' || controlElement == 'PPW' ||
-            controlElement == 'CV') {
-            // Generic Events
-            this.handleISYGenericPropertyUpdate(address, actionValue, controlElement)
-        } else if (controlElement == '_19') {
-            if (actionValue === 2 || actionValue === '2') {
-                var aeElement = document.childNamed('eventInfo').childNamed('ae')
-                if (aeElement !== null) {
-                    if (this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
-                        this.nodeChangedHandler(this.elkAlarmPanel)
-                    }
-                }
-            } else if (actionValue === 3 || actionValue === '3') {
-                var zeElement = document.childNamed('eventInfo').childNamed('ze')
-                var zoneId = zeElement.attr.zone
-                var zoneDevice = this.zoneMap[zoneId]
-                if (zoneDevice !== null) {
-                    if (zoneDevice.setFromZoneUpdate(zeElement)) {
-                        this.nodeChangedHandler(zoneDevice)
-                    }
-                }
-            }
-        } else if (controlElement == '_1') {
-            if (actionValue === 6 || actionValue === '6') {
-                var varNode = document.childNamed('eventInfo').childNamed('var')
-                if (varNode !== null) {
-                    var id = varNode.attr.id
-                    var type = varNode.attr.type
-                    var val = parseInt(varNode.childNamed('val').val)
-                    var ts = varNode.childNamed('ts').val
-                    var year = parseInt(ts.substr(0, 4))
-                    var month = parseInt(ts.substr(4, 2))
-                    var day = parseInt(ts.substr(6, 2))
-                    var hour = parseInt(ts.substr(9, 2))
-                    var min = parseInt(ts.substr(12, 2))
-                    var sec = parseInt(ts.substr(15, 2))
-                    var timeStamp = new Date(year, month, day, hour, min, sec)
 
-                    this.handleISYVariableUpdate(id, type, val, timeStamp)
+        switch (controlElement) {
+            case 'ST':
+                this.handleISYStateUpdate(address, actionValue)
+                break
+
+            case isydevice.ISY_PROPERTY_ZWAVE_CLIMATE_TEMPERATURE:
+                var uom = document.childNamed('action').attr.uom
+                var precision = document.childNamed('action').attr.prec
+                actionValue = Number(actionValue)
+
+                var i = 0
+
+                if (precision == 1)
+                    actionValue = actionValue / 10.0
+                else if (precision == 2)
+                    actionValue = actionValue / 100.0
+
+                if (uom == 4) {
+                    // we are good, it is celsius
+                } else if (uom == 17) {
+                    // farenheit
+                    actionValue = convertToCelsius(actionValue)
                 }
-            }
+
+            case isydevice.ISY_PROPERTY_CLIMATE_HUMIDITY:
+            case isydevice.ISY_PROPERTY_CLIMATE_OPERATING_MODE:
+            case isydevice.ISY_PROPERTY_CLIMATE_MODE:
+            case isydevice.ISY_PROPERTY_CLIMATE_FAN:
+            case isydevice.ISY_PROPERTY_CLIMATE_COOL_SET_POINT:
+            case isydevice.ISY_PROPERTY_CLIMATE_HEAT_SET_POINT:
+                this.handleISYGenericPropertyUpdate(address, actionValue, controlElement)
+                break;
+
+            case isydevice.ISY_PROPERTY_ZWAVE_BATTERY_LEVEL:
+            case isydevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_FACTOR:
+            case isydevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_POLARIZED_POWER:
+            case isydevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_CURRENT:
+            case isydevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_TOTAL_POWER:
+            case isydevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_VOLTAGE:
+                this.handleISYGenericPropertyUpdate(address, actionValue, controlElement)
+                break;
+
+            case '_19':
+                if (actionValue === 2 || actionValue === '2') {
+                    var aeElement = document.childNamed('eventInfo').childNamed('ae')
+                    if (aeElement !== null) {
+                        if (this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
+                            this.elkAlarmPanel.updateType = exports.DEVICE_UPDATE_TYPE_ELK
+                            this.nodeChangedHandler(this.elkAlarmPanel)
+                        }
+                    }
+                } else if (actionValue === 3 || actionValue === '3') {
+                    var zeElement = document.childNamed('eventInfo').childNamed('ze')
+                    var zoneId = zeElement.attr.zone
+                    var zoneDevice = this.zoneMap[zoneId]
+                    if (zoneDevice !== null) {
+                        if (zoneDevice.setFromZoneUpdate(zeElement)) {
+                            this.elkAlarmPanel.updateType = exports.DEVICE_UPDATE_TYPE_ZONE
+                            this.nodeChangedHandler(zoneDevice)
+                        }
+                    }
+                }
+                break
+
+            case '_1':
+                if (actionValue === 6 || actionValue === '6') {
+                    var varNode = document.childNamed('eventInfo').childNamed('var')
+                    if (varNode !== null) {
+                        var id = varNode.attr.id
+                        var type = varNode.attr.type
+                        var val = parseInt(varNode.childNamed('val').val)
+                        var ts = varNode.childNamed('ts').val
+                        var year = parseInt(ts.substr(0, 4))
+                        var month = parseInt(ts.substr(4, 2))
+                        var day = parseInt(ts.substr(6, 2))
+                        var hour = parseInt(ts.substr(9, 2))
+                        var min = parseInt(ts.substr(12, 2))
+                        var sec = parseInt(ts.substr(15, 2))
+                        var timeStamp = new Date(year, month, day, hour, min, sec)
+
+                        this.handleISYVariableUpdate(id, type, val, timeStamp)
+                    }
+                } else if (actionValue === 3 || actionValue === '3') {
+                    const eventInfo = document.childNamed('eventInfo')
+                    const value = eventInfo.val
+                    // [     ZW029_1]   USRNUM   1 (uom=70 prec=0)
+                    // [     ZW029_1]       ST   0 (uom=11 prec=0)
+                    // [     ZW029_1]       ST   0 (uom=11 prec=0)
+                    // [     ZW029_1]    ALARM  24 (uom=15 prec=0)
+                    // var inputString = "[     ZW029_1]   USRNUM   1 (uom=70 prec=0)"
+                    var inputString = value
+                    inputString = inputString.replace(/\s\s+/g, ' ');
+                    const nodeName = inputString.split(']')[0].split('[')[1].trim()
+                    const nodeValueString = inputString.split(']')[1].split('(')[0].trim()
+                    const nodeEvent = nodeValueString.split(' ')[0]
+                    const eventValue = nodeValueString.split(' ')[1]
+                    // console.log('nodeName: ' + nodeName + '   event: ' + nodeEvent + '  value:' + eventValue)
+                    this.handleISYGenericPropertyUpdate(nodeName, eventValue, nodeEvent)
+                }
+                break;
+            default:
+                break
         }
     }
 }
@@ -687,7 +752,7 @@ ISY.prototype.initializeWebSocket = function() {
     this.webSocket.on('message', function(event) {
         that.handleWebSocketMessage(event)
     }).on('error', function(err, response) {
-        that.logger('ISY-JS: Error while contacting ISY' + err)
+        that.logger('ISY-JS: Error while contacting ISY: ' + err)
         throw new Error('Error calling ISY' + err)
     }).on('fail', function(data, response) {
         that.logger('ISY-JS: Error while contacting ISY -- failure')
@@ -721,6 +786,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address]
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if (deviceToUpdate.handleIsyUpdate(state)) {
+            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC
             this.nodeChangedHandler(deviceToUpdate)
             if (this.scenesInDeviceList) {
                 // Inefficient, we could build a reverse index (device->scene list)
@@ -728,6 +794,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
                 for (var index = 0; index < this.sceneList.length; index++) {
                     if (this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
                         if (this.sceneList[index].reclalculateState()) {
+                            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC
                             this.nodeChangedHandler(this.sceneList[index])
                         }
                     }
@@ -737,19 +804,11 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     }
 }
 
-ISY.prototype.handleISYTstatUpdate = function(address, state, prop) {
-    var deviceToUpdate = this.deviceIndex[address]
-    if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
-        if (deviceToUpdate.handleIsyTstatUpdate(state, prop)) {
-            this.nodeChangedHandler(deviceToUpdate)
-        }
-    }
-}
-
 ISY.prototype.handleISYGenericPropertyUpdate = function(address, state, prop) {
     var deviceToUpdate = this.deviceIndex[address]
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if (deviceToUpdate.handleIsyGenericPropertyUpdate(state, prop)) {
+            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_PROPERTY
             this.nodeChangedHandler(deviceToUpdate)
         }
     }
