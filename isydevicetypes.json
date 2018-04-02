@@ -48,10 +48,21 @@
   { "type": "16.1.0.0", "address": "1", "name": "(2842-2) Insteon Motion Sensor", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.1.36.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor v.24", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.1.38.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor v.24", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "16.1.65.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.1.65.0", "address": "1", "name": "(2842-222) Insteon Motion Sensor - Motion", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.1.65.0", "address": "2", "name": "(2842-222) Insteon Motion Sensor - DuskDawn", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.1.65.0", "address": "3", "name": "(2842-222) Insteon Motion Sensor - LowBatt", "deviceType": "MotionSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.2.0.0", "address": "", "name": "(2421) TriggerLinc v.00", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "16.2.40.0", "address": "", "name": "(2421) TriggerLinc v.28", "deviceType": "DoorWindowSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "5.11.13.0", "address": "1", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Main", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
   { "type": "5.11.13.0", "address": "2", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Cool", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
-  { "type": "5.11.13.0", "address": "3", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Heat", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false }
+  { "type": "5.11.13.0", "address": "3", "name": "(2441TH) Insteon Remote Control Wall Thermostat - Heat", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": false },
+  { "type": "1.1.0.0", "address": "3", "name": "ISYv5 Node Server Node", "deviceType": "NodeServerNode", "connectionType": "Node Server", "batteryOperated": false },
+  { "type": "6.8.65.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "6.8.65.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "6.8.65.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "6.8.67.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "6.8.67.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "6.8.67.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },   
+  { "type": "0.6.55.0", "address": "", "name": "(2342-232) Insteon Remote Control Keypad, 4 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "0.8.55.0", "address": "", "name": "(2342-222) Insteon Remote Control Keypad, 8 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true }
 ]

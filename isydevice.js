@@ -36,6 +36,9 @@ ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
 ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON';
 ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF';
 ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_DRY = "Dry";
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_WET = "Wet";
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_HB = "Heartbeat";
 ISYBaseDevice.prototype.FAN_OFF = 'Off';
 ISYBaseDevice.prototype.FAN_LEVEL_LOW = 'Low';
 ISYBaseDevice.prototype.FAN_LEVEL_MEDIUM = 'Medium';
@@ -129,6 +132,11 @@ ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
 };
 
 ////////////////////////////////////////////////////////////////////////
+// LEAK Sensor
+
+// TODO: Implement Status Check for Leak Detection Device
+
+////////////////////////////////////////////////////////////////////////
 // FANS MOTORS
 
 ISYBaseDevice.prototype.getCurrentFanState = function() {
@@ -219,6 +227,27 @@ function ISYMotionSensorDevice(isy, name, address, deviceTypeInfo) {
 }
 
 util.inherits(ISYMotionSensorDevice,ISYBaseDevice);
+
+
+////////////////////////////////////////////////////////////////////////
+// ISYLeakSensorDevice
+//
+
+function ISYLeakSensorDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+}
+
+util.inherits(ISYLeakSensorDevice,ISYBaseDevice);
+
+////////////////////////////////////////////////////////////////////////
+// ISYRemoteDevice
+//
+
+function ISYRemoteDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+}
+
+util.inherits(ISYRemoteDevice,ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYOutletDevice
@@ -353,3 +382,5 @@ exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
 exports.ISYFanDevice = ISYFanDevice;
 exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
 exports.ISYThermostatDevice = ISYThermostatDevice;
+exports.ISYLeakSensorDevice = ISYLeakSensorDevice;
+exports.ISYRemoteDevice = ISYRemoteDevice;

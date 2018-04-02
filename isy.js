@@ -1,5 +1,6 @@
 var restler = require('restler');
 var xmldoc = require('xmldoc');
+var x2j = require('xml2js');
 var isyDevice = require('./isydevice');
 var WebSocket = require("faye-websocket");
 var elkDevice = require('./elkdevice.js');
@@ -14,6 +15,7 @@ var ISYScene = require('./isyscene').ISYScene;
 var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
+var ISYNodeServerNode = require('./isynodeserver').ISYNodeServerNode;
 
 function isyTypeToTypeName(isyType, address) {
     for (var index = 0; index < isyDeviceTypeList.length; index++) {
@@ -68,8 +70,11 @@ ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor';
 ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
 ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
 ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
+ISY.prototype.DEVICE_TYPE_LEAK_SENSOR = 'LeakSensor';
+ISY.prototype.DEVICE_TYPE_REMOTE = "Remote";
 ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
 ISY.prototype.DEVICE_TYPE_THERMOSTAT = 'Thermostat';
+ISY.prototype.DEVICE_TYPE_NODE_SERVER_NODE = 'NodeServerNode';
 ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
 ISY.prototype.VARIABLE_TYPE_STATE = '2';
 
@@ -165,9 +170,8 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             if (subType === 1 || subType === 3) {
                 if (subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_MOTION_SENSOR);
-                    // Ignore battery level sensor and daylight sensor
                 } else {
-
+                    // Ignore battery level sensor and daylight sensor
                 }
             } else if (subType === 2 || subType === 9 || subType === 17) {
                 return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
@@ -179,6 +183,16 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
         } else if (mainType === 5) {
             // Thermostats
             return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_THERMOSTAT);
+        } else if (mainType === 6) {
+            // Leak Sensors
+            return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LEAK_SENSOR);
+        } else if (mainType === 0) {
+            if (subType === 6 || subType === 8) {
+                // Insteon Remote
+                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_REMOTE);
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -200,6 +214,11 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
                 return null;
             }
         }
+    } else if (familyId === 10) {
+        // Node Server Node
+        if (mainType === 1 && subType === 1) { // Node Server Devices are reported as 1.1.0.0.
+            return this.buildDeviceInfoRecord(isyType, "NodeServer", this.DEVICE_TYPE_NODE_SERVER_NODE);
+        }
     }
     return null;
 };
@@ -218,6 +237,8 @@ ISY.prototype.getElkAlarmPanel = function() {
 
 ISY.prototype.loadNodes = function(result) {
     var document = new xmldoc.XmlDocument(result);
+
+
     this.loadDevices(document);
     this.loadScenes(document);
 };
@@ -283,6 +304,20 @@ ISY.prototype.loadDevices = function(document) {
                         deviceAddress,
                         deviceTypeInfo
                     );
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_LEAK_SENSOR) {
+                    newDevice = new ISYLeakSensorDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_REMOTE) {
+                    newDevice = new ISYRemoteDevice(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        deviceTypeInfo
+                    );
                 } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_FAN) {
                     newDevice = new ISYFanDevice(
                         this,
@@ -321,7 +356,16 @@ ISY.prototype.loadDevices = function(document) {
                         deviceTypeInfo,
                         status
                     );
-
+                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_NODE_SERVER_NODE) {
+                    newDevice = new ISYNodeServerNode(
+                        this,
+                        deviceName,
+                        deviceAddress,
+                        this.DEVICE_TYPE_NODE_SERVER_NODE,
+                        nodes[index].childNamed('family').attr.instance, // Node Server Number
+                        nodes[index].childNamed('pnode').val, // Parent Node Address
+                        nodes[index].attr.nodeDefId // Node Type
+                    );
                 }
                 // Support the device with a base device object
             } else {
@@ -400,7 +444,7 @@ ISY.prototype.finishInitialize = function(success, initializeCompleted) {
 
 ISY.prototype.guardian = function() {
     var timeNow = new Date();
-    if((timeNow - this.lastActivity) > 60000) {
+    if ((timeNow - this.lastActivity) > 60000) {
         this.logger('ISY-JS: Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
         this.initializeWebSocket();
     }
@@ -564,6 +608,13 @@ ISY.prototype.initialize = function(initializeCompleted) {
             this.zoneMap = {};
 
             that.loadNodes(result);
+
+            // TODO: Future migration to JSON from XML
+            // var p = new x2j.Parser();
+            // p.parseString(result, function(err, res) {
+            //     var s = JSON.stringify(res, undefined, 3);
+            //     that.logger(s);
+            // });
 
             that.loadVariables(that.VARIABLE_TYPE_INTEGER, function() {
                 that.loadVariables(that.VARIABLE_TYPE_STATE, function() {
