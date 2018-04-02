@@ -12,7 +12,7 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.deviceFriendlyName = "Insteon Scene";
     this.lastChanged = new Date();
     this.reclalculateState();
-}
+};
 
 ISYScene.prototype.DIM_LEVEL_MINIMUM = 0;
 ISYScene.prototype.DIM_LEVEL_MAXIMUM = 100;
@@ -30,8 +30,8 @@ ISYScene.prototype.getCurrentLightState = function() {
             }
         }
     }
-    return false;
-}
+	return false;
+};
 
 // Current light dim state is always calculated
 ISYScene.prototype.getCurrentLightDimState = function() {
@@ -49,20 +49,20 @@ ISYScene.prototype.getCurrentLightDimState = function() {
     } else {
         return 0;
     }
-}
+};
 
 ISYScene.prototype.reclalculateState = function() {
     this.markAsChanged();
     return true;
-}
+};
 
 ISYScene.prototype.markAsChanged = function() {
     this.lastChanged = new Date();
-}
+};
 
 ISYScene.prototype.sendLightCommand = function(lightState, resultHandler) {
     this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
-}
+};
 
 ISYScene.prototype.getAreAllLightsInSpecifiedState = function(state) {
     for (var i = 0; i < this.childDevices.length; i++) {
@@ -74,7 +74,7 @@ ISYScene.prototype.getAreAllLightsInSpecifiedState = function(state) {
         }
     }
     return true;
-}
+};
 
 ISYScene.prototype.isDeviceIncluded = function(device) {
     for (var i = 0; i < this.childDevices.length; i++) {
@@ -83,6 +83,6 @@ ISYScene.prototype.isDeviceIncluded = function(device) {
         }
     }
     return false;
-}
+};
 
 exports.ISYScene = ISYScene;

@@ -21,31 +21,34 @@ function ISYBaseDevice(isy, name, address, isyType, deviceType, deviceFamily) {
     this.updatedProperty = null
 }
 
-ISYBaseDevice.prototype.DIM_LEVEL_MINIMUM = 0
-ISYBaseDevice.prototype.DIM_LEVEL_MAXIMUM = 100
-ISYBaseDevice.prototype.ISY_DIM_LEVEL_MAXIMUM = 255
-ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_ON = 'DON'
-ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_OFF = 'DOF'
-ISYBaseDevice.prototype.ISY_COMMAND_LOCK_LOCK = 'DON'
-ISYBaseDevice.prototype.ISY_COMMAND_LOCK_UNLOCK = 'DOF'
-ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_BASE = 'SECMD'
-ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK = '1'
-ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK = '0'
-ISYBaseDevice.prototype.ISY_STATE_LOCK_UNLOCKED = 0
-ISYBaseDevice.prototype.ISY_STATE_DOOR_WINDOW_CLOSED = 0
-ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255
-ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON'
-ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF'
-ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255
-ISYBaseDevice.prototype.FAN_OFF = 'Off'
-ISYBaseDevice.prototype.FAN_LEVEL_LOW = 'Low'
-ISYBaseDevice.prototype.FAN_LEVEL_MEDIUM = 'Medium'
-ISYBaseDevice.prototype.FAN_LEVEL_HIGH = 'High'
-ISYBaseDevice.prototype.ISY_COMMAND_FAN_BASE = 'DON'
-ISYBaseDevice.prototype.ISY_COMMAND_FAN_OFF = 'DOF'
-ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_LOW = 63
-ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191
-ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255
+ISYBaseDevice.prototype.DIM_LEVEL_MINIMUM = 0;
+ISYBaseDevice.prototype.DIM_LEVEL_MAXIMUM = 100;
+ISYBaseDevice.prototype.ISY_DIM_LEVEL_MAXIMUM = 255;
+ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_ON = "DON";
+ISYBaseDevice.prototype.ISY_COMMAND_LIGHT_OFF = "DOF";
+ISYBaseDevice.prototype.ISY_COMMAND_LOCK_LOCK = "DON";
+ISYBaseDevice.prototype.ISY_COMMAND_LOCK_UNLOCK = "DOF";
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_BASE = 'SECMD';
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK = '1';
+ISYBaseDevice.prototype.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK = '0';
+ISYBaseDevice.prototype.ISY_STATE_LOCK_UNLOCKED = 0;
+ISYBaseDevice.prototype.ISY_STATE_DOOR_WINDOW_CLOSED = 0;
+ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
+ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_ON = 'DON';
+ISYBaseDevice.prototype.ISY_COMMAND_OUTLET_OFF = 'DOF';
+ISYBaseDevice.prototype.ISY_STATE_MOTION_SENSOR_ON = 255;
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_DRY = "Dry";
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_WET = "Wet";
+ISYBaseDevice.prototype.ISY_STATE_LEAK_SENSOR_HB = "Heartbeat";
+ISYBaseDevice.prototype.FAN_OFF = 'Off';
+ISYBaseDevice.prototype.FAN_LEVEL_LOW = 'Low';
+ISYBaseDevice.prototype.FAN_LEVEL_MEDIUM = 'Medium';
+ISYBaseDevice.prototype.FAN_LEVEL_HIGH = 'High';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_BASE = 'DON';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_OFF = 'DOF';
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
+ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
 
 ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_LOCK_ALARM = 'ALARM'
 ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_LOCK_ACCESS = 'USRNUM'
@@ -165,6 +168,11 @@ ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// LEAK Sensor
+
+// TODO: Implement Status Check for Leak Detection Device
+
+////////////////////////////////////////////////////////////////////////
 // FANS MOTORS
 
 ISYBaseDevice.prototype.getCurrentFanState = function() {
@@ -256,6 +264,27 @@ function ISYMotionSensorDevice(isy, name, address, deviceTypeInfo) {
 
 util.inherits(ISYMotionSensorDevice, ISYBaseDevice)
 
+
+////////////////////////////////////////////////////////////////////////
+// ISYLeakSensorDevice
+//
+
+function ISYLeakSensorDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+}
+
+util.inherits(ISYLeakSensorDevice,ISYBaseDevice);
+
+////////////////////////////////////////////////////////////////////////
+// ISYRemoteDevice
+//
+
+function ISYRemoteDevice(isy, name, address, deviceTypeInfo) {
+    ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+}
+
+util.inherits(ISYRemoteDevice,ISYBaseDevice);
+
 ////////////////////////////////////////////////////////////////////////
 // ISYOutletDevice
 //
@@ -294,7 +323,7 @@ function ISYThermostatDevice(isy, name, address, deviceTypeInfo, status) {
 util.inherits(ISYThermostatDevice, ISYBaseDevice)
 
 ISYThermostatDevice.prototype.getFormattedStatus = function() {
-    response = {}
+    response = {};
     response.currTemp = Math.round(this.currentState / 2.0)
     if ('CLIHCS' in this) {
         switch (this.CLIHCS) {
@@ -371,11 +400,13 @@ ISYThermostatDevice.prototype.getFormattedTemp = function(prop) {
     }
 }
 
-exports.ISYBaseDevice = ISYBaseDevice
-exports.ISYOutletDevice = ISYOutletDevice
-exports.ISYLightDevice = ISYLightDevice
-exports.ISYLockDevice = ISYLockDevice
-exports.ISYDoorWindowDevice = ISYDoorWindowDevice
-exports.ISYFanDevice = ISYFanDevice
-exports.ISYMotionSensorDevice = ISYMotionSensorDevice
-exports.ISYThermostatDevice = ISYThermostatDevice
+exports.ISYBaseDevice = ISYBaseDevice;
+exports.ISYOutletDevice = ISYOutletDevice;
+exports.ISYLightDevice = ISYLightDevice;
+exports.ISYLockDevice = ISYLockDevice;
+exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
+exports.ISYFanDevice = ISYFanDevice;
+exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
+exports.ISYThermostatDevice = ISYThermostatDevice;
+exports.ISYLeakSensorDevice = ISYLeakSensorDevice;
+exports.ISYRemoteDevice = ISYRemoteDevice;

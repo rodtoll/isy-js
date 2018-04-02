@@ -1,44 +1,45 @@
 {
-    "name": "isy-js",
-    "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application. No longer under active development by original author. Limited development by contributors: shbatm",
-    "license" : "MIT",
-    "version" : "0.5.0a",
-    "author" : {
-        "name": "Rod Toll",
-        "email": "rod_toll@hotmail.com"
+  "name": "isy-js",
+  "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application. No longer under active development by original author. Limited development by contributors: shbatm",
+  "license": "MIT",
+  "version": "0.5.2",
+  "author": {
+    "name": "Rod Toll",
+    "email": "rod_toll@hotmail.com"
+  },
+  "contributors": [
+    {
+      "name": "shbatm",
+      "email": "18057952+shbatm@users.noreply.github.com"
     },
-    "contributors": [
-        {
-            "name": "shbatm",
-            "email": "18057952+shbatm@users.noreply.github.com"
-        },
-        {
-            "name": "TenStartups"
-        }
-    ],
-    "scripts": {
-        "test": "mocha"
-    },
-    "keywords": [
-        "isy",
-        "universal devices",
-        "insteon"
-    ],
-    "main": "isy.js",
-    "devDependencies": {
-        "mocha": "",
-        "fake-isy-994i": ""
-    },
-    "dependencies": {
-        "faye-websocket": "",
-        "restler": "",
-        "xmldoc": ""
-    },
-    "bugs": {
-        "url": "https://github.com/shbatm/isy-js/issues"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/shbatm/isy-js.git"
+    {
+      "name": "TenStartups"
     }
+  ],
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "isy",
+    "universal devices",
+    "insteon"
+  ],
+  "main": "isy.js",
+  "devDependencies": {
+    "mocha": "",
+    "fake-isy-994i": ""
+  },
+  "dependencies": {
+    "faye-websocket": "",
+    "restler": "",
+    "xml2js": "^0.4.19",
+    "xmldoc": ""
+  },
+  "bugs": {
+    "url": "https://github.com/shbatm/isy-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shbatm/isy-js.git"
+  }
 }
