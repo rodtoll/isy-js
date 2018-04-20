@@ -915,3 +915,6 @@ node_modules/yaml/examples/list.nested.yml
 node_modules/yaml/examples/null.yaml
 node_modules/yaml/examples/run.js
 node_modules/yaml/lib/yaml.js
+ISYNodeInfo.xml
+ISYNodes.json
+ISYNodes.xml
