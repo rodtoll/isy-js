@@ -43,7 +43,7 @@ class ISYBaseDevice {
         this.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
         this.ISY_PROPERTY_STATE = 'ST';
         this.ISY_PROPERTY_COOL_SETPOINT = 'CLISPC';
-        this.ISY_PROPERTY_HOT_SETPOINT = 'CLISPH';
+        this.ISY_PROPERTY_HEAT_SETPOINT = 'CLISPH';
         this.ISY_PROPERTY_MODE = 'CLIMD';
         this.ISY_PROPERTY_HUMIDITY = 'CLIHUM';
         this.ISY_PROPERTY_HEATING_COOLING_STATE = 'CLIHCS';
@@ -312,10 +312,20 @@ class ISYThermostatDevice extends ISYBaseDevice {
     }
     sendUpdateCoolSetPointCommand(value, resultHandler) {
         
-            this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_COOL_SETPOINT, value * 2, resultHandler);
+       this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_COOL_SETPOINT, value * 2, resultHandler);
         
     }
+
+    sendUpdateHeatSetPointCommand(value, resultHandler) {
+        
+        this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_HEAT_SETPOINT, value * 2, resultHandler);
     
+    }
+    sendUpdateHeatingCoolingModeCommand(value, resultHandler) {
+        
+        this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_MODE, value * 2, resultHandler);
+    
+    }
 }
 
 

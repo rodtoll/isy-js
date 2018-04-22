@@ -17,11 +17,11 @@ var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
-var Parser = require('xml2js').Parser;
+var xmlbuilder = require('xmlbuilder');
 
 
 function isyTypeToTypeName(isyType, address) {
-var ISYVariable = require('./isyvariable').ISYVariable
+
     for (var index = 0; index < isyDeviceTypeList.length; index++) {
         if (isyDeviceTypeList[index].type == isyType) {
             var addressElementValue = isyDeviceTypeList[index].address;
@@ -310,7 +310,8 @@ class ISY {
     }
 
     loadDevices2(result) {
-        let doc = new Parser();
+        let doc = new xmlbuilder();
+    
         doc.parseString(result,(err,obj) => {
             console.dir(obj.nodes.node);
            
