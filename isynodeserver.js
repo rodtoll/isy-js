@@ -25,8 +25,29 @@ ISYNodeServerNode.prototype.handleIsyUpdate = function(actionValue) {
     }
 };
 
+ISYNodeServerNode.prototype.handleIsyGenericPropertyUpdate = function(actionValue, prop) {
+    if (actionValue !== this[prop]) {
+        this[prop] = actionValue;
+        this.lastChanged = new Date();
+        this.updatedProperty = prop;
+        return true;
+    } else {
+        return false;
+    }
+};
+
+ISYNodeServerNode.prototype.getGenericProperty = function(prop) {
+    return (this[prop]);
+};
+
 ISYNodeServerNode.prototype.markAsChanged = function() {
     this.lastChanged = new Date();
+};
+
+ISYNodeServerNode.prototype.getFormattedStatus = function() {
+    responseRaw = this;
+    delete responseRaw.isy;
+    return JSON.stringify(responseRaw, undefined, 3);
 };
 
 exports.ISYNodeServerNode = ISYNodeServerNode;

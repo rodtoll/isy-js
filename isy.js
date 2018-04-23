@@ -21,6 +21,11 @@ var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
 var ISYNodeServerNode = require('./isynodeserver').ISYNodeServerNode;
 
+function convertToCelsius(value) {
+    const celsius = (5 / 9 * (value - 32)).toFixed(1);
+    return celsius;
+}
+
 function isyTypeToTypeName(isyType, address) {
     for (var index = 0; index < isyDeviceTypeList.length; index++) {
         if (isyDeviceTypeList[index].type === isyType) {
@@ -239,12 +244,12 @@ ISY.prototype.getElkAlarmPanel = function() {
     return this.elkAlarmPanel;
 };
 
-ISY.prototype.loadNodesJS = function(result) {
-    this.loadDevicesJS(result);
-    this.loadScenesJS(result);
+ISY.prototype.loadNodes = function(result) {
+    this.loadDevices(result);
+    this.loadScenes(result);
 };
 
-ISY.prototype.loadScenesJS = function(result) {
+ISY.prototype.loadScenes = function(result) {
     for (let scene of result.nodes.group) {
         var sceneAddress = scene.address;
         var sceneName = scene.name;
@@ -272,7 +277,7 @@ ISY.prototype.loadScenesJS = function(result) {
     }
 };
 
-ISY.prototype.loadDevicesJS = function(result) {
+ISY.prototype.loadDevices = function(result) {
     for (let node of result.nodes.node) {
         var deviceAddress = ("address" in node) ? node.address : "00 00 00 1";
         var isyDeviceType = ("type" in node) ? node.type : "Unknown Type";
@@ -348,41 +353,47 @@ ISY.prototype.loadDevicesJS = function(result) {
 };
 
 ISY.prototype.loadElkNodes = function(result) {
-    var document = new xmldoc.XmlDocument(result);
-    var nodes = document.childNamed('areas').childNamed('area').childrenNamed('zone');
-    for (var index = 0; index < nodes.length; index++) {
-        var id = nodes[index].attr.id;
-        var name = nodes[index].attr.name;
-        var alarmDef = nodes[index].attr.alarmDef;
+    var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
+    p.parseString(result, (err, res) => {
+        if (err) throw err;
 
-        var newDevice = new elkDevice.ElkAlarmSensor(
-            this,
-            name,
-            1,
-            id,
-            (alarmDef == 17) ? this.DEVICE_TYPE_CO_SENSOR : this.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR);
-        this.zoneMap[newDevice.zone] = newDevice;
-    }
+        for (let nodes of res.areas.area.zone) {
+            var id = nodes.id;
+            var name = nodes.name;
+            var alarmDef = nodes.alarmDef;
+
+            var newDevice = new elkDevice.ElkAlarmSensor(
+                this,
+                name,
+                1,
+                id,
+                (alarmDef == 17) ? this.DEVICE_TYPE_CO_SENSOR : this.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR);
+            this.zoneMap[newDevice.zone] = newDevice;
+        }
+    });
 };
 
 ISY.prototype.loadElkInitialStatus = function(result) {
-    var document = new xmldoc.XmlDocument(result);
-    var nodes = document.childrenNamed('ae');
-    for (var index = 0; index < nodes.length; index++) {
-        this.elkAlarmPanel.setFromAreaUpdate(nodes[index]);
-    }
-    nodes = document.childrenNamed('ze');
-    for (index = 0; index < nodes.length; index++) {
-        var id = nodes[index].attr.zone;
-        var zoneDevice = this.zoneMap[id];
-        if (zoneDevice !== null) {
-            zoneDevice.setFromZoneUpdate(nodes[index]);
-            if (this.deviceIndex[zoneDevice.address] === null && zoneDevice.isPresent()) {
-                this.deviceList.push(zoneDevice);
-                this.deviceIndex[zoneDevice.address] = zoneDevice;
+    var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
+    p.parseString(result, (err, res) => {
+        if (err) throw err;
+
+        var document = new xmldoc.XmlDocument(result);
+        for (let nodes of res.ae) {
+            this.elkAlarmPanel.setFromAreaUpdate(nodes);
+        }
+        for (let nodes of res.ze) {
+            var id = nodes.zone;
+            var zoneDevice = this.zoneMap[id];
+            if (zoneDevice !== null) {
+                zoneDevice.setFromZoneUpdate(nodes);
+                if (this.deviceIndex[zoneDevice.address] === null && zoneDevice.isPresent()) {
+                    this.deviceList.push(zoneDevice);
+                    this.deviceIndex[zoneDevice.address] = zoneDevice;
+                }
             }
         }
-    }
+    });
 };
 
 ISY.prototype.finishInitialize = function(success, initializeCompleted) {
@@ -560,12 +571,12 @@ ISY.prototype.initialize = function(initializeCompleted) {
             this.variableIndex = {};
             this.zoneMap = {};
 
-            // TODO: Finish migration to JSON from XML
+            // Parse XML response into native JS object.
             var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
             p.parseString(result, function(err, res) {
                 if (err) throw err;
                 //this.logger(JSON.stringify(res, undefined, 3));
-                that.loadNodesJS(res);
+                that.loadNodes(res);
             });
 
             that.loadVariables(that.VARIABLE_TYPE_INTEGER, function() {
@@ -618,57 +629,139 @@ ISY.prototype.initialize = function(initializeCompleted) {
 ISY.prototype.handleWebSocketMessage = function(event) {
     //console.log("WEBSOCKET: "+event.data);
     this.lastActivity = new Date();
-    var document = new xmldoc.XmlDocument(event.data);
-    if (typeof document.childNamed('control') !== "undefined") {
-        var controlElement = document.childNamed('control').val;
-        var actionValue = document.childNamed('action').val;
-        var address = document.childNamed('node').val;
-        if (controlElement == 'ST') {
-            this.handleISYStateUpdate(address, actionValue);
-        } else if (controlElement == 'CLIHCS' || controlElement == 'CLISPH' ||
-            controlElement == "CLISPC" || controlElement == "CLIHUM" ||
-            controlElement == "CLIFS" || controlElement == "CLIMD") {
-            // Thermostat Events
-            this.handleISYTstatUpdate(address, actionValue, controlElement);
-        } else if (controlElement == '_19') {
-            if (actionValue === 2 || actionValue === "2") {
-                var aeElement = document.childNamed('eventInfo').childNamed('ae');
-                if (aeElement !== null) {
-                    if (this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
-                        this.nodeChangedHandler(this.elkAlarmPanel);
-                    }
-                }
-            } else if (actionValue === 3 || actionValue === "3") {
-                var zeElement = document.childNamed('eventInfo').childNamed('ze');
-                var zoneId = zeElement.attr.zone;
-                var zoneDevice = this.zoneMap[zoneId];
-                if (zoneDevice !== null) {
-                    if (zoneDevice.setFromZoneUpdate(zeElement)) {
-                        this.nodeChangedHandler(zoneDevice);
-                    }
-                }
-            }
-        } else if (controlElement == '_1') {
-            if (actionValue === 6 || actionValue === "6") {
-                var varNode = document.childNamed('eventInfo').childNamed('var');
-                if (varNode !== null) {
-                    var id = varNode.attr.id;
-                    var type = varNode.attr.type;
-                    var val = parseInt(varNode.childNamed('val').val);
-                    var ts = varNode.childNamed('ts').val;
-                    var year = parseInt(ts.substr(0, 4));
-                    var month = parseInt(ts.substr(4, 2));
-                    var day = parseInt(ts.substr(6, 2));
-                    var hour = parseInt(ts.substr(9, 2));
-                    var min = parseInt(ts.substr(12, 2));
-                    var sec = parseInt(ts.substr(15, 2));
-                    var timeStamp = new Date(year, month, day, hour, min, sec);
+    var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
+    p.parseString(event.data, (err, res) => {
+        if (err) throw err;
 
-                    this.handleISYVariableUpdate(id, type, val, timeStamp);
-                }
-            }
+        // Uncomment to print JSON to log for every event received.
+        // this.logger(JSON.stringify(res, undefined, 3));
+
+        var evt = res.Event;
+        if (typeof evt === "undefined" || typeof evt.control === "undefined") {
+            return;
         }
-    }
+
+        var eventControl = evt.control;
+        if (eventControl.startsWith("GV")) { eventControl = "GV"; } // Catch Generic Values ( GV##, Usually Node Servers)
+
+        var actionValue = 0;
+        if (typeof evt.action === "object") {
+            actionValue = evt.action._;
+        } else if (typeof evt.action === "number" || typeof evt.action === "string") {
+            actionValue = Number(evt.action);
+        }
+
+        switch (eventControl) {
+            case 'ST':
+                this.handleISYStateUpdate(evt.node, actionValue);
+                break;
+
+            case isyDevice.ISY_PROPERTY_CLIMATE_TEMPERATURE:
+            case isyDevice.ISY_PROPERTY_CLIMATE_COOL_SET_POINT:
+            case isyDevice.ISY_PROPERTY_CLIMATE_HEAT_SET_POINT:
+                this.logger(JSON.stringify(res, undefined, 3));
+                var uom = Number(evt.action.uom);
+                var precision = evt.action.prec;
+                actionValue = Number(actionValue);
+
+                if (precision == 1)
+                    actionValue = actionValue / 10.0;
+                else if (precision == 2)
+                    actionValue = actionValue / 100.0;
+
+                if (uom == 17) {
+                    // UOM 17 = farenheit, UOM 4 = celcius, UOM 26 = Kelvin (probabaly a Hue bulb Color Temp)
+                    actionValue = convertToCelsius(actionValue);
+                } else if (uom == 101) {
+                    // Insteon Thermostat == Precision is 0.5deg but reported as 2x the actual value
+                    actionValue = Math.round(actionValue / 2.0);
+                }
+                this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
+                break;
+
+            case isyDevice.ISY_PROPERTY_CLIMATE_HUMIDITY:
+            case isyDevice.ISY_PROPERTY_CLIMATE_OPERATING_MODE:
+            case isyDevice.ISY_PROPERTY_CLIMATE_MODE:
+            case isyDevice.ISY_PROPERTY_CLIMATE_FAN:
+                this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
+                break;
+
+            case isyDevice.ISY_PROPERTY_ZWAVE_BATTERY_LEVEL:
+            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_FACTOR:
+            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_POLARIZED_POWER:
+            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_CURRENT:
+            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_TOTAL_POWER:
+            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_VOLTAGE:
+                this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
+                break;
+
+            case '_19':
+                if (actionValue === 2) {
+                    var aeElement = evt.eventInfo.ae;
+                    if (aeElement !== null) {
+                        if (this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
+                            this.nodeChangedHandler(this.elkAlarmPanel);
+                        }
+                    }
+                } else if (actionValue === 3) {
+                    var zeElement = evt.eventInfo.ze;
+                    var zoneId = zeElement.zone;
+                    var zoneDevice = this.zoneMap[zoneId];
+                    if (zoneDevice !== null) {
+                        if (zoneDevice.setFromZoneUpdate(zeElement)) {
+                            this.nodeChangedHandler(zoneDevice);
+                        }
+                    }
+                }
+                break;
+
+            case '_1':
+                if (actionValue === 6) {
+                    var varNode = evt.eventInfo.var;
+                    if (varNode !== null) {
+                        var id = varNode.id;
+                        var type = varNode.type;
+                        var val = parseInt(varNode.val);
+                        var year = parseInt(varNode.ts.substr(0, 4));
+                        var month = parseInt(varNode.ts.substr(4, 2));
+                        var day = parseInt(varNode.ts.substr(6, 2));
+                        var hour = parseInt(varNode.ts.substr(9, 2));
+                        var min = parseInt(varNode.ts.substr(12, 2));
+                        var sec = parseInt(varNode.ts.substr(15, 2));
+                        var timeStamp = new Date(year, month, day, hour, min, sec);
+
+                        this.handleISYVariableUpdate(id, type, val, timeStamp);
+                    }
+                }
+                // Uncomment the following if you are missing events. Excluded by default because "_1:3" events
+                //   are usually duplicates of events already fired. You may want to check for dupes if you 
+                //   decide to uncomment this.
+                // 
+                // else if (actionValue === 3 || actionValue === '3') {
+                //     // [     ZW029_1]   USRNUM   1 (uom=70 prec=0)
+                //     // [     ZW029_1]       ST   0 (uom=11 prec=0)
+                //     // [     ZW029_1]       ST   0 (uom=11 prec=0)
+                //     // [     ZW029_1]    ALARM  24 (uom=15 prec=0)
+                //     // var inputString = "[     ZW029_1]   USRNUM   1 (uom=70 prec=0)"
+                //     var inputString = evt.eventInfo.replace(/\s\s+/g, ' ');
+                //     const nodeName = inputString.split(']')[0].split('[')[1].trim();
+                //     const nodeValueString = inputString.split(']')[1].split('(')[0].trim();
+                //     const nodeEvent = nodeValueString.split(' ')[0];
+                //     const eventValue = nodeValueString.split(' ')[1];
+                //     this.handleISYGenericPropertyUpdate(nodeName, eventValue, nodeEvent);
+                // }
+                break;
+            case 'GV':
+                // this.logger(JSON.stringify(res, undefined, 3));
+                this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
+                if ("fmtName" in evt && "fmtAct" in evt) {
+                    this.handleISYGenericPropertyUpdate(evt.node, evt.fmtAct, evt.fmtName);
+                }
+                break;
+            default:
+                break;
+        }
+    });
 };
 
 ISY.prototype.initializeWebSocket = function() {
@@ -739,10 +832,11 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     }
 };
 
-ISY.prototype.handleISYTstatUpdate = function(address, state, prop) {
+ISY.prototype.handleISYGenericPropertyUpdate = function(address, state, prop) {
     var deviceToUpdate = this.deviceIndex[address];
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
-        if (deviceToUpdate.handleIsyTstatUpdate(state, prop)) {
+        if (deviceToUpdate.handleIsyGenericPropertyUpdate(state, prop)) {
+            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_PROPERTY;
             this.nodeChangedHandler(deviceToUpdate);
         }
     }

@@ -49,6 +49,25 @@ ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
 ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
 ISYBaseDevice.prototype.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
 
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_LOCK_ALARM = 'ALARM';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_LOCK_ACCESS = 'USRNUM';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_LOCK_STATUS = 'ST';
+
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_ENERGY_POWER_FACTOR = 'PF';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_ENERGY_POWER_POLARIZED_POWER = 'PPW';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_ENERGY_POWER_CURRENT = 'CC';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_ENERGY_POWER_TOTAL_POWER = 'TPW';
+ISYBaseDevice.prototype.ISY_PROPERTY_ZWAVE_ENERGY_POWER_VOLTAGE = 'CV';
+
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_TEMPERATURE = 'CLITEMP';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_HUMIDITY = 'CLIHUM';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_OPERATING_MODE = 'CLIHCS';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_MODE = 'CLIMD';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_FAN = 'CLIFS';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_COOL_SET_POINT = 'CLISPC';
+ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_HEAT_SET_POINT = 'CLISPH';
+ISYBaseDevice.prototype.ISY_PROPERTY_BATTERY_LEVEL = 'BATLVL';
+
 ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
 	if(actionValue != this.currentState) {
         this.currentState = Number(actionValue);
@@ -58,6 +77,22 @@ ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
         return false;
     }
 };
+
+ISYBaseDevice.prototype.handleIsyGenericPropertyUpdate = function(actionValue, prop) {
+    if (Number(actionValue) != this[prop]) {
+        this[prop] = Number(actionValue);
+        this.lastChanged = new Date();
+        this.updatedProperty = prop;
+        return true;
+    } else {
+        return false;
+    }
+};
+
+ISYBaseDevice.prototype.getGenericProperty = function(prop) {
+    return (this[prop]);
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 // LIGHTS
@@ -110,7 +145,7 @@ ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandle
 // DOOR/WINDOW SENSOR
 
 ISYBaseDevice.prototype.getCurrentDoorWindowState = function() {
-    return (!(this.currentState == this.ISY_STATE_DOOR_WINDOW_CLOSED));
+    return (this.currentState !== this.ISY_STATE_DOOR_WINDOW_CLOSED);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,7 +163,7 @@ ISYBaseDevice.prototype.sendOutletCommand = function(outletState,resultHandler) 
 // MOTION SENSORS
 
 ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
-    return (this.currentState == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
+    return (this.currentState === this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,16 +320,6 @@ function ISYThermostatDevice(isy, name, address, deviceTypeInfo, status) {
 }
 
 util.inherits(ISYThermostatDevice,ISYBaseDevice);
-
-ISYThermostatDevice.prototype.handleIsyTstatUpdate = function(actionValue, prop) {
-    if(actionValue !== this[prop]) {
-		this[prop] = Number(actionValue);
-        this.lastChanged = new Date();
-        return true;
-    } else {
-        return false;
-    }
-};
 
 ISYThermostatDevice.prototype.getFormattedStatus = function() {
 	response = {};
