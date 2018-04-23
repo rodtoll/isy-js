@@ -37,6 +37,7 @@ Features
 * Support for scenes
 * Support for generic devices through ISYBaseDevice
 * Support for variables (thanks @bdstark)
+* Support for Node Servers
 
 Setup
 -----
@@ -340,9 +341,17 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 * `getCurrentSecureLockState()` - Gets the current locked state of the secure lock device (usually zwave locks). true for locked, false for unlocked.
 * `sendSecureLockCommand(state,resultCallback(success))` - Sends the command to set the lock device (usually zwave locks) lock state to the specified state. true to lock the door, false to unlock it.
 
+API - NODE SERVER DEVICES
+-------------------------
+
+### ISYNodeServerNode
+
+Added in v0.6.0 to support ISYv5+ node servers. For node server device nodes, a generic object will be built during initialization. After initial loading, the ISY will send a status update for node server nodes and additional properties will be populated. For "Generic Value" changes (e.g. GV11), if a formatted value and name is returned, it will be added to the device object.  For example, the ISY Data Node Server returns the current year as GV9, you can access this via device.GV9 = 2018, or device.Year = "2018". From your program call `device.getFormattedStatus()` to return a JSON dump of all of a node server device's properties.
+
 CHANGELOG
 ---------
 
+* 0.6.0 - 2018/04/23 - Update to use XML2JS to parse XML responses into native JS objects. Added support for Node Server nodes and advanced properties.
 * 0.5.0 - 2017/10/25 - Limited support resumed. Changes from shbatm/isy-js and tenstartups/isy-js have been incorportated. Changes include: removal of guardian timer, limited support for programs (executing), read-only support for Insteon Thermostats, bug fixes to support ISY v5 Firmware and Node Servers.
 * 0.4.5 - 2017/07/04 - Support suspended. Active development ended. 
 * 0.4.4 - 2017/01/14 - Restored chatty scene notifications, logic to quiet them wasn't right. Better chatty and correct then wrong and less chatty.

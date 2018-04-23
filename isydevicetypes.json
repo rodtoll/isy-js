@@ -62,12 +62,12 @@
   { "type": "5.10.14.0", "address": "3", "name": "(ZW0123_1) Insteon Remote Thermostat - Heat", "deviceType": "Thermostat", "connectionType": "Insteon Wireless", "batteryOperated": true },
   { "type": "4.33.1.0", "address": "", "name": "(2441TH) ZWave Thermostat", "deviceType": "Thermostat", "connectionType": "Zwave", "batteryOperated": true },
   { "type": "1.1.0.0", "address": "3", "name": "ISYv5 Node Server Node", "deviceType": "NodeServerNode", "connectionType": "Node Server", "batteryOperated": false },
-  { "type": "6.8.65.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "6.8.65.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "6.8.65.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "6.8.67.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "6.8.67.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "6.8.67.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },   
-  { "type": "0.6.55.0", "address": "", "name": "(2342-232) Insteon Remote Control Keypad, 4 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true },
-  { "type": "0.8.55.0", "address": "", "name": "(2342-222) Insteon Remote Control Keypad, 8 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true }
+  { "type": "16.8.65.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.8.65.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.8.65.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.8.67.0", "address": "1", "name": "(2852-222) Insteon Leak Sensor - Dry", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.8.67.0", "address": "2", "name": "(2852-222) Insteon Leak Sensor - Wet", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "16.8.67.0", "address": "4", "name": "(2852-222) Insteon Leak Sensor - Heartbeat", "deviceType": "LeakSensor", "connectionType": "Insteon Wireless", "batteryOperated": true },   
+  { "type": "0.16.55.0", "address": "", "name": "(2342-232) Insteon Remote Control Keypad, 4 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true },
+  { "type": "0.18.55.0", "address": "", "name": "(2342-222) Insteon Remote Control Keypad, 8 Scene", "deviceType": "Remote", "connectionType": "Insteon Wireless", "batteryOperated": true }
 ]
