@@ -13,10 +13,6 @@ var ISYNodeServerNode = function(isy, name, address, deviceType, nodeSlot, paren
     this.deviceFriendlyName = 'ISYv5 Node Server Device';
     this.currentState = 0;
     this.lastChanged = new Date();
-
-    var that = this;
-    delete that.isy;
-    console.log(JSON.stringify(that, undefined, 3));
 };
 
 ISYNodeServerNode.prototype.handleIsyUpdate = function(actionValue) {
