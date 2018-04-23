@@ -26,8 +26,8 @@ ISYNodeServerNode.prototype.handleIsyUpdate = function(actionValue) {
 };
 
 ISYNodeServerNode.prototype.handleIsyGenericPropertyUpdate = function(actionValue, prop) {
-    if (actionValue !== this[prop]) {
-        this[prop] = actionValue;
+    if (actionValue != this[prop]) {
+        this[prop] = isNaN(actionValue) ? actionValue : Number(actionValue);
         this.lastChanged = new Date();
         this.updatedProperty = prop;
         return true;
