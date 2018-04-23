@@ -1,4 +1,3 @@
-var isy = require('./isy.js');
 var util = require('util');
 var assert = require('assert');
 
@@ -8,16 +7,18 @@ var assert = require('assert');
 // Generic base class which can represent any kind of device.
 //
 function ISYBaseDevice(isy, name, address, isyType, deviceType, deviceFamily) {
-	this.isy = isy;
-	this.name = name;
-	this.address = address;
-	this.isyType = isyType;
-	this.deviceType = deviceType;
-	this.batteryOperated = false;
-	this.connectionType = deviceFamily;
-	this.deviceFriendlyName = 'Generic Device';
+    this.isy = isy;
+    this.name = name;
+    this.address = address;
+    this.isyType = isyType;
+    this.deviceType = deviceType;
+    this.batteryOperated = false;
+    this.connectionType = deviceFamily;
+    this.deviceFriendlyName = 'Generic Device';
     this.currentState = 0;
     this.lastChanged = new Date();
+    this.updateType = null;
+    this.updatedProperty = null;
 }
 
 ISYBaseDevice.prototype.DIM_LEVEL_MINIMUM = 0;
@@ -69,7 +70,7 @@ ISYBaseDevice.prototype.ISY_PROPERTY_CLIMATE_HEAT_SET_POINT = 'CLISPH';
 ISYBaseDevice.prototype.ISY_PROPERTY_BATTERY_LEVEL = 'BATLVL';
 
 ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
-	if(actionValue != this.currentState) {
+    if (Number(actionValue) != this.currentState) {
         this.currentState = Number(actionValue);
         this.lastChanged = new Date();
         return true;
@@ -102,15 +103,15 @@ ISYBaseDevice.prototype.getCurrentLightState = function() {
 };
 
 ISYBaseDevice.prototype.getCurrentLightDimState = function() {
-    return Math.floor((this.currentState*this.DIM_LEVEL_MAXIMUM)/this.ISY_DIM_LEVEL_MAXIMUM);
+    return Math.floor((this.currentState * this.DIM_LEVEL_MAXIMUM) / this.ISY_DIM_LEVEL_MAXIMUM);
 };
 
-ISYBaseDevice.prototype.sendLightCommand = function(lightState,resultHandler) {
+ISYBaseDevice.prototype.sendLightCommand = function(lightState, resultHandler) {
     this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
 };
 
-ISYBaseDevice.prototype.sendLightDimCommand = function(dimLevel,resultHandler) {
-    var isyDimLevel = Math.ceil(dimLevel*this.ISY_DIM_LEVEL_MAXIMUM/this.DIM_LEVEL_MAXIMUM);
+ISYBaseDevice.prototype.sendLightDimCommand = function(dimLevel, resultHandler) {
+    var isyDimLevel = Math.ceil(dimLevel * this.ISY_DIM_LEVEL_MAXIMUM / this.DIM_LEVEL_MAXIMUM);
     this.isy.sendRestCommand(this.address, this.ISY_COMMAND_LIGHT_ON, isyDimLevel, resultHandler);
 };
 
@@ -134,10 +135,10 @@ ISYBaseDevice.prototype.sendNonSecureLockCommand = function(lockState, resultHan
 };
 
 ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandler) {
-    if(lockState) {
-        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK,resultHandler);
+    if (lockState) {
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE, this.ISY_COMMAND_SECURE_LOCK_PARAMETER_LOCK, resultHandler);
     } else {
-        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE,this.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK,resultHandler);
+        this.isy.sendRestCommand(this.address, this.ISY_COMMAND_SECURE_LOCK_BASE, this.ISY_COMMAND_SECURE_LOCK_PARAMETER_UNLOCK, resultHandler);
     }
 };
 
@@ -155,7 +156,7 @@ ISYBaseDevice.prototype.getCurrentOutletState = function() {
     return (this.currentState > 0) ? true : false;
 };
 
-ISYBaseDevice.prototype.sendOutletCommand = function(outletState,resultHandler) {
+ISYBaseDevice.prototype.sendOutletCommand = function(outletState, resultHandler) {
     this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
 };
 
@@ -175,30 +176,30 @@ ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
 // FANS MOTORS
 
 ISYBaseDevice.prototype.getCurrentFanState = function() {
-    if(this.currentState === 0) {
+    if (this.currentState === 0) {
         return this.FAN_OFF;
-    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_LOW) {
+    } else if (this.currentState == this.ISY_COMMAND_FAN_PARAMETER_LOW) {
         return this.FAN_LEVEL_LOW;
-    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
+    } else if (this.currentState == this.ISY_COMMAND_FAN_PARAMETER_MEDIUM) {
         return this.FAN_LEVEL_MEDIUM;
-    } else if(this.currentState == this.ISY_COMMAND_FAN_PARAMETER_HIGH) {
+    } else if (this.currentState == this.ISY_COMMAND_FAN_PARAMETER_HIGH) {
         return this.FAN_LEVEL_HIGH;
     } else {
-        assert(false, 'Unexpected fan state: '+this.currentState);
+        assert(false, 'Unexpected fan state: ' + this.currentState);
     }
 };
 
 ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
-    if(fanState == this.FAN_OFF) {
+    if (fanState == this.FAN_OFF) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_OFF, null, resultHandler);
-    } else if(fanState == this.FAN_LEVEL_LOW) {
+    } else if (fanState == this.FAN_LEVEL_LOW) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_LOW, resultHandler);
-    } else if(fanState == this.FAN_LEVEL_MEDIUM) {
+    } else if (fanState == this.FAN_LEVEL_MEDIUM) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_MEDIUM, resultHandler);
-    } else if(fanState == this.FAN_LEVEL_HIGH) {
+    } else if (fanState == this.FAN_LEVEL_HIGH) {
         this.isy.sendRestCommand(this.address, this.ISY_COMMAND_FAN_BASE, this.ISY_COMMAND_FAN_PARAMETER_HIGH, resultHandler);
     } else {
-        assert(false, 'Unexpected fan level: '+fanState);
+        assert(false, 'Unexpected fan level: ' + fanState);
     }
 };
 
@@ -211,7 +212,7 @@ function ISYLightDevice(isy, name, address, deviceTypeInfo) {
     this.isDimmable = (deviceTypeInfo.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT);
 }
 
-util.inherits(ISYLightDevice,ISYBaseDevice);
+util.inherits(ISYLightDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYLockDevice
@@ -221,12 +222,12 @@ function ISYLockDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYLockDevice,ISYBaseDevice);
+util.inherits(ISYLockDevice, ISYBaseDevice);
 
 ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
-    if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+    if (this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
         this.sendNonSecureLockCommand(lockState, resultHandler);
-    } else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+    } else if (this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
         this.sendSecureLockCommand(lockState, resultHandler);
     } else {
         assert(false, 'Should not ever have lock which is not one of the known lock types');
@@ -234,9 +235,9 @@ ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
 };
 
 ISYLockDevice.prototype.getCurrentLockState = function() {
-    if(this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+    if (this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
         return this.getCurrentNonSecureLockState();
-    } else if(this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+    } else if (this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
         return this.getCurrentSecureLockState();
     } else {
         assert(false, 'Should not ever have lock which is not one of the known lock types');
@@ -251,7 +252,7 @@ function ISYDoorWindowDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYDoorWindowDevice,ISYBaseDevice);
+util.inherits(ISYDoorWindowDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYMotionSensorDevice
@@ -261,7 +262,7 @@ function ISYMotionSensorDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYMotionSensorDevice,ISYBaseDevice);
+util.inherits(ISYMotionSensorDevice, ISYBaseDevice);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,7 +293,7 @@ function ISYOutletDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYOutletDevice,ISYBaseDevice);
+util.inherits(ISYOutletDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYFanDevice
@@ -302,7 +303,7 @@ function ISYFanDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYFanDevice,ISYBaseDevice);
+util.inherits(ISYFanDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYThermostatDevice
@@ -311,92 +312,92 @@ util.inherits(ISYFanDevice,ISYBaseDevice);
 function ISYThermostatDevice(isy, name, address, deviceTypeInfo, status) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
     for (var i = 0; i < status.length; i++) {
-		if (status[i].id === "ST") {
-			this.currentValue = status[i].value;
-		} else {
-			this[status[i].id] = status[i].value;
-		}
-	}
+        if (status[i].id === 'ST') {
+            this.currentValue = status[i].value;
+        } else {
+            this[status[i].id] = status[i].value;
+        }
+    }
 }
 
 util.inherits(ISYThermostatDevice,ISYBaseDevice);
 
 ISYThermostatDevice.prototype.getFormattedStatus = function() {
-	response = {};
-	response.currTemp = Math.round(this.currentState / 2.0);
-	if ("CLIHCS" in this) {
-		switch (this.CLIHCS) {
-			case 0:
-			case "0":
-				response.currentStatus = "off";
-				break;
-			case 1:
-			case "1":
-				response.currentStatus = "heating";
-				break;
-			case 2:
-			case "2":
-				response.currentStatus = "cooling";
-				break;
-			default:
-				response.currentStatus = this.CLIHCS;
-		}
-	}
-	if ("CLIHUM" in this) {
-		response.humidity = Number(this.CLIHUM);
-	}
-	if ("CLISPC" in this) {
-		response.coolSetPoint = Math.round(this.CLISPC / 2.0);
-	}
-	if ("CLISPH" in this) {
-		response.heatSetPoint = Math.round(this.CLISPH / 2.0);
-	}
-	if ("CLIFS" in this) {
-		if (this.CLIFS === '7') {
-			response.fanSetting = "on";
-		} else if (this.CLIFS === '8') {
-			response.fanSetting = "auto";
-		} else { response.fanSetting = this.CLIFS; }
-	}
-	if ("CLIMD" in this) {
-		switch (this.CLIMD) {
-			case '0':
-				response.mode = "off";
-				break;
-			case '1':
-				response.mode = "heat";
-				break;
-			case '2':
-				response.mode = "cool";
-				break;
-			case '3':
-				response.mode = "auto";
-				break;
-			case '4':
-				response.mode = "fan";
-				break;
-			case '5':
-				response.mode = "program auto";
-				break;
-			case '6':
-				response.mode = "program heat";
-				break;
-			case '7':
-				response.mode = "program cool";
-				break;
-			default:
-				response.mode = this.CLIMD;
-		}
-	}
-	return response;
+    response = {};
+    response.currTemp = Math.round(this.currentState / 2.0);
+    if ('CLIHCS' in this) {
+        switch (this.CLIHCS) {
+            case 0:
+            case '0':
+                response.currentStatus = 'off';
+                break;
+            case 1:
+            case '1':
+                response.currentStatus = 'heating';
+                break;
+            case 2:
+            case '2':
+                response.currentStatus = 'cooling';
+                break;
+            default:
+                response.currentStatus = this.CLIHCS;
+        }
+    }
+    if ('CLIHUM' in this) {
+        response.humidity = Number(this.CLIHUM);
+    }
+    if ('CLISPC' in this) {
+        response.coolSetPoint = Math.round(this.CLISPC / 2.0);
+    }
+    if ('CLISPH' in this) {
+        response.heatSetPoint = Math.round(this.CLISPH / 2.0);
+    }
+    if ('CLIFS' in this) {
+        if (this.CLIFS === '7') {
+            response.fanSetting = 'on';
+        } else if (this.CLIFS === '8') {
+            response.fanSetting = 'auto';
+        } else { response.fanSetting = this.CLIFS; }
+    }
+    if ('CLIMD' in this) {
+        switch (this.CLIMD) {
+            case '0':
+                response.mode = 'off';
+                break;
+            case '1':
+                response.mode = 'heat';
+                break;
+            case '2':
+                response.mode = 'cool';
+                break;
+            case '3':
+                response.mode = 'auto';
+                break;
+            case '4':
+                response.mode = 'fan';
+                break;
+            case '5':
+                response.mode = 'program auto';
+                break;
+            case '6':
+                response.mode = 'program heat';
+                break;
+            case '7':
+                response.mode = 'program cool';
+                break;
+            default:
+                response.mode = this.CLIMD;
+        }
+    }
+    return response;
 };
 
 ISYThermostatDevice.prototype.getFormattedTemp = function(prop) {
-	if (prop in this && typeof this[prop] === "number") {
-		return (Math.round(this[prop] / 2.0));
-	} else {
-		return 0;
-	}
+    if (prop in this && typeof this[prop] === 'number') {
+        return (Math.round(this[prop] / 2.0));
+    } else {
+        return 0;
+    }
 };
 
 exports.ISYBaseDevice = ISYBaseDevice;

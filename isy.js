@@ -1,4 +1,5 @@
-/* jshint esversion: 6 */
+/* jshint esversion:6 */
+
 var restler = require('restler');
 var xmldoc = require('xmldoc');
 var x2j = require('xml2js');
@@ -30,7 +31,7 @@ function isyTypeToTypeName(isyType, address) {
     for (var index = 0; index < isyDeviceTypeList.length; index++) {
         if (isyDeviceTypeList[index].type === isyType) {
             var addressElementValue = isyDeviceTypeList[index].address;
-            if (addressElementValue !== "") {
+            if (addressElementValue !== '') {
                 var lastAddressNumber = address[address.length - 1];
                 if (lastAddressNumber !== addressElementValue) {
                     continue;
@@ -86,19 +87,23 @@ ISY.prototype.DEVICE_TYPE_THERMOSTAT = 'Thermostat';
 ISY.prototype.DEVICE_TYPE_NODE_SERVER_NODE = 'NodeServerNode';
 ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
 ISY.prototype.VARIABLE_TYPE_STATE = '2';
+ISY.prototype.DEVICE_UPDATE_TYPE_ELK = 'ELK_UPDATE';
+ISY.prototype.DEVICE_UPDATE_TYPE_ZONE = 'ZONE_UPDATE';
+ISY.prototype.DEVICE_UPDATE_TYPE_PROPERTY = 'PROPERTY_UPDATE';
+ISY.prototype.DEVICE_UPDATE_TYPE_GENERIC = 'GENERIC_UPDATE';
 
 ISY.prototype.logger = function(msg) {
     if (this.debugLogEnabled || (process.env.ISYJSDEBUG !== undefined && process.env.ISYJSDEBUG !== null)) {
         var timeStamp = new Date();
-        console.log(timeStamp.getFullYear() + "-" + timeStamp.getMonth() + "-" + timeStamp.getDay() + "#" + timeStamp.getHours() + ":" + timeStamp.getMinutes() + ":" + timeStamp.getSeconds() + "- " + msg);
+        console.log(timeStamp.getFullYear() + '-' + timeStamp.getMonth() + '-' + timeStamp.getDay() + '#' + timeStamp.getHours() + ':' + timeStamp.getMinutes() + ':' + timeStamp.getSeconds() + '- ' + msg);
     }
 };
 
 ISY.prototype.buildDeviceInfoRecord = function(isyType, deviceFamily, deviceType) {
     return {
         type: isyType,
-        address: "",
-        name: "Generic Device",
+        address: '',
+        name: 'Generic Device',
         deviceType: deviceType,
         connectionType: deviceFamily,
         batteryOperated: false
@@ -123,38 +128,38 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             subType = Number(deviceNode.devtype.cat);
         }
     }
-    // Insteon Device Family    
+    // Insteon Device Family
     if (familyId === 1) {
 
         // Dimmable Devices
         if (mainType === 1) {
             // Special case fanlinc has a fan element
             if (subType === 46 && subAddress === 2) {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_FAN);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_FAN);
             } else {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DIMMABLE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DIMMABLE_LIGHT);
             }
         } else if (mainType === 2) {
             // Special case appliance Lincs into outlets
             if (subType === 6 || subType === 9 || subType === 12 || subType === 23) {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);
-                // Outlet lincs 
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                // Outlet lincs
             } else if (subType === 8 || subType === 33) {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);
-                // Dual outlets    
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                // Dual outlets
             } else if (subType === 57) {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
             } else {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_LIGHT);
             }
             // Sensors
         } else if (mainType === 7) {
             // I/O Lincs
             if (subType === 0) {
                 if (subAddress === 1) {
-                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
                 } else {
-                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_OUTLET);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
                 }
                 // Other sensors. Not yet supported
             } else {
@@ -165,7 +170,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // MorningLinc
             if (subType === 6) {
                 if (subAddress === 1) {
-                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LOCK);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_LOCK);
                     // Ignore subdevice which operates opposite for the locks
                 } else {
                     return null;
@@ -179,11 +184,10 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             if (subType === 1 || subType === 3) {
                 if (subAddress === 1) {
                     return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_MOTION_SENSOR);
-                } else {
                     // Ignore battery level sensor and daylight sensor
                 }
             } else if (subType === 2 || subType === 9 || subType === 17) {
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
                 // Smoke, leak sensors, don't yet know how to support
             } else {
                 return null;
@@ -211,13 +215,13 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
         if (mainType === 4) {
             // Identified by user zwave on/off switch
             if (subType === 16) {
-                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_LIGHT);
                 // Identified by user door lock
             } else if (subType === 111) {
-                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_SECURE_LOCK);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_SECURE_LOCK);
                 // This is a guess based on the naming in the ISY SDK
             } else if (subType === 109) {
-                return this.buildDeviceInfoRecord(isyType, "ZWave", this.DEVICE_TYPE_DIMMABLE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_DIMMABLE_LIGHT);
                 // Otherwise we don't know how to handle
             } else {
                 return null;
@@ -235,7 +239,6 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
 ISY.prototype.nodeChangedHandler = function(node) {
     var that = this;
     if (this.nodesLoaded) {
-        this.logger('Node: ' + node.address + ' changed');
         this.changeCallback(that, node);
     }
 };
@@ -287,7 +290,7 @@ ISY.prototype.loadDevices = function(result) {
         var enabled = ("enabled" in node) ? node.enabled : false;
 
         if (enabled !== 'false') {
-            // Try fallback to new generic device identification when not specifically identified.  
+            // Try fallback to new generic device identification when not specifically identified.
             if (deviceTypeInfo === null) {
                 deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(node);
             }
@@ -438,7 +441,7 @@ ISY.prototype.loadVariables = function(type, done) {
     // Note: occasionally this fails on the first call and we need to re-call
     var getInitialValuesCB = function(result, response) {
         if (that.checkForFailure(response)) {
-            that.logger('ISY-JS: Error loading variables from isy: ' + result.message + "\nRetrying...");
+            that.logger('ISY-JS: Error loading variables from isy: ' + result.message + '\nRetrying...');
             retryCount++;
             getVariableInitialValues();
         } else {
@@ -450,7 +453,7 @@ ISY.prototype.loadVariables = function(type, done) {
     var getVariableInitialValues = function() {
         // Check if we've exceeded the retry count.
         if (retryCount > 2) {
-            throw new Error("Unable to load variables from the ISY after " + retryCount + " retries.");
+            throw new Error('Unable to load variables from the ISY after ' + retryCount + ' retries.');
         }
 
         // Load initial values
@@ -463,7 +466,7 @@ ISY.prototype.loadVariables = function(type, done) {
     // Callback function to get the variable values after getting definitions
     var loadVariablesCB = function(result, response) {
         if (that.checkForFailure(response)) {
-            that.logger("ISY-JS: Error loading variables from isy. Device likely doesn't have any variables defined. Safe to ignore.");
+            that.logger('ISY-JS: Error loading variables from isy. Device likely doesn\'t have any variables defined. Safe to ignore.');
             done();
         } else {
             that.createVariables(type, result);
@@ -559,7 +562,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
     ).on('complete', function(result, response) {
         if (that.checkForFailure(response)) {
             this.logger('ISY-JS: Error:' + result.message);
-            throw new Error("Unable to contact the ISY to get the list of nodes");
+            throw new Error('Unable to contact the ISY to get the list of nodes');
         } else {
             this.webSocket = null;
             this.nodesLoaded = false;
@@ -588,7 +591,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                         ).on('complete', function(result, response) {
                             if (that.checkForFailure(response)) {
                                 that.logger('ISY-JS: Error loading from elk: ' + result.message);
-                                throw new Error("Unable to contact the ELK to get the topology");
+                                throw new Error('Unable to contact the ELK to get the topology');
                             } else {
                                 that.loadElkNodes(result);
                                 restler.get(
@@ -597,7 +600,7 @@ ISY.prototype.initialize = function(initializeCompleted) {
                                 ).on('complete', function(result, response) {
                                     if (that.checkForFailure(response)) {
                                         that.logger('ISY-JS: Error:' + result.message);
-                                        throw new Error("Unable to get the status from the elk");
+                                        throw new Error('Unable to get the status from the elk');
                                     } else {
                                         that.loadElkInitialStatus(result);
                                         that.finishInitialize(true, initializeCompleted);
@@ -612,22 +615,22 @@ ISY.prototype.initialize = function(initializeCompleted) {
             });
         }
     }).on('error', function(err, response) {
-        that.logger("ISY-JS: Error while contacting ISY" + err);
-        throw new Error("Error calling ISY" + err);
+        that.logger('ISY-JS: Error while contacting ISY' + err);
+        throw new Error('Error calling ISY' + err);
     }).on('fail', function(data, response) {
-        that.logger("ISY-JS: Error while contacting ISY -- failure");
-        throw new Error("Failed calling ISY");
+        that.logger('ISY-JS: Error while contacting ISY -- failure');
+        throw new Error('Failed calling ISY');
     }).on('abort', function() {
-        that.logger("ISY-JS: Abort while contacting ISY");
-        throw new Error("Call to ISY was aborted");
+        that.logger('ISY-JS: Abort while contacting ISY');
+        throw new Error('Call to ISY was aborted');
     }).on('timeout', function(ms) {
-        that.logger("ISY-JS: Timed out contacting ISY");
-        throw new Error("Timeout contacting ISY");
+        that.logger('ISY-JS: Timed out contacting ISY');
+        throw new Error('Timeout contacting ISY');
     });
 };
 
 ISY.prototype.handleWebSocketMessage = function(event) {
-    //console.log("WEBSOCKET: "+event.data);
+    //console.log('WEBSOCKET: ' + event.data)
     this.lastActivity = new Date();
     var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
     p.parseString(event.data, (err, res) => {
@@ -767,12 +770,12 @@ ISY.prototype.handleWebSocketMessage = function(event) {
 ISY.prototype.initializeWebSocket = function() {
     var that = this;
     var auth = 'Basic ' + new Buffer(this.userName + ':' + this.password).toString('base64');
-    that.logger("Connecting to: " + this.wsprotocol + "://" + this.address + "/rest/subscribe");
+    that.logger('Connecting to: ' + this.wsprotocol + '://' + this.address + '/rest/subscribe');
     this.webSocket = new WebSocket.Client(
-        this.wsprotocol + "://" + this.address + "/rest/subscribe", ["ISYSUB"], {
+        this.wsprotocol + '://' + this.address + '/rest/subscribe', ['ISYSUB'], {
             headers: {
-                "Origin": "com.universal-devices.websockets.isy",
-                "Authorization": auth
+                'Origin': 'com.universal-devices.websockets.isy',
+                'Authorization': auth
             },
             ping: 10
         });
@@ -782,17 +785,17 @@ ISY.prototype.initializeWebSocket = function() {
     this.webSocket.on('message', function(event) {
         that.handleWebSocketMessage(event);
     }).on('error', function(err, response) {
-        that.logger("ISY-JS: Error while contacting ISY" + err);
-        throw new Error("Error calling ISY" + err);
+        that.logger('ISY-JS: Error while contacting ISY: ' + err);
+        throw new Error('Error calling ISY' + err);
     }).on('fail', function(data, response) {
-        that.logger("ISY-JS: Error while contacting ISY -- failure");
-        throw new Error("Failed calling ISY");
+        that.logger('ISY-JS: Error while contacting ISY -- failure');
+        throw new Error('Failed calling ISY');
     }).on('abort', function() {
-        that.logger("ISY-JS: Abort while contacting ISY");
-        throw new Error("Call to ISY was aborted");
+        that.logger('ISY-JS: Abort while contacting ISY');
+        throw new Error('Call to ISY was aborted');
     }).on('timeout', function(ms) {
-        that.logger("ISY-JS: Timed out contacting ISY");
-        throw new Error("Timeout contacting ISY");
+        that.logger('ISY-JS: Timed out contacting ISY');
+        throw new Error('Timeout contacting ISY');
     });
 };
 
@@ -816,6 +819,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if (deviceToUpdate.handleIsyUpdate(state)) {
+            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC;
             this.nodeChangedHandler(deviceToUpdate);
             if (this.scenesInDeviceList) {
                 // Inefficient, we could build a reverse index (device->scene list)
@@ -823,6 +827,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
                 for (var index = 0; index < this.sceneList.length; index++) {
                     if (this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
                         if (this.sceneList[index].reclalculateState()) {
+                            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC;
                             this.nodeChangedHandler(this.sceneList[index]);
                         }
                     }
@@ -844,13 +849,13 @@ ISY.prototype.handleISYGenericPropertyUpdate = function(address, state, prop) {
 
 ISY.prototype.sendISYCommand = function(path, handleResult) {
     var uriToUse = this.protocol + '://' + this.address + '/rest/' + path;
-    this.logger("ISY-JS: Sending ISY command..." + uriToUse);
+    this.logger('ISY-JS: Sending ISY command...' + uriToUse);
     var options = {
         username: this.userName,
         password: this.password
     };
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
@@ -863,13 +868,13 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
     if (parameter !== null) {
         uriToUse += '/' + parameter;
     }
-    this.logger("ISY-JS: Sending command..." + uriToUse);
+    this.logger('ISY-JS: Sending command...' + uriToUse);
     var options = {
         username: this.userName,
         password: this.password
     };
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
@@ -879,13 +884,13 @@ ISY.prototype.sendRestCommand = function(deviceAddress, command, parameter, hand
 
 ISY.prototype.sendGetVariable = function(id, type, handleResult) {
     var uriToUse = this.protocol + '://' + this.address + '/rest/vars/get/' + type + '/' + id;
-    this.logger("ISY-JS: Sending ISY command..." + uriToUse);
+    this.logger('ISY-JS: Sending ISY command...' + uriToUse);
     var options = {
         username: this.userName,
         password: this.password
     };
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             var document = new xmldoc.XmlDocument(result);
             var val = parseInt(document.childNamed('val').val);
             var init = parseInt(document.childNamed('init').val);
@@ -896,13 +901,13 @@ ISY.prototype.sendGetVariable = function(id, type, handleResult) {
 
 ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
     var uriToUse = this.protocol + '://' + this.address + '/rest/vars/set/' + type + '/' + id + '/' + value;
-    this.logger("ISY-JS: Sending ISY command..." + uriToUse);
+    this.logger('ISY-JS: Sending ISY command...' + uriToUse);
     var options = {
         username: this.userName,
         password: this.password
     };
     restler.get(uriToUse, options).on('complete', function(result, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
@@ -913,13 +918,13 @@ ISY.prototype.sendSetVariable = function(id, type, value, handleResult) {
 ISY.prototype.runProgram = function(id, command, handleResult) {
     // Possible Commands: run|runThen|runElse|stop|enable|disable|enableRunAtStartup|disableRunAtStartup
     var uriToUse = this.protocol + '://' + this.address + '/rest/programs/' + id + '/' + command;
-    this.logger("ISY-JS: Sending program command..." + uriToUse);
+    this.logger('ISY-JS: Sending program command...' + uriToUse);
     var options = {
         username: this.userName,
         password: this.password
     };
     restler.get(uriToUse, options).on('complete', function(data, response) {
-        if (response.statusCode === 200) {
+        if (response && response.statusCode === 200) {
             handleResult(true);
         } else {
             handleResult(false);
