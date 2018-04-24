@@ -116,22 +116,6 @@ console during execution. Useful for debugging problems. The final parameter is 
 * `getVariableList()` - Returns a list of ISYVariable objects, one for each variable the ISY supports.
 * `getVariable(type,id)` - Returns the ISYVariable object representing the ISY variable of the specified type and id. null if not found.
 
-Constants:
-* `DEVICE_TYPE_LOCK` - Indicates a morninglinc lock device.
-* `DEVICE_TYPE_SECURE_LOCK` - Indicates a zwave lock device.
-* `DEVICE_TYPE_LIGHT` - Indicates a light, non-dimmable device type.
-* `DEVICE_TYPE_DIMMABLE_LIGHT` - Indicates a dimmable light device type.
-* `DEVICE_TYPE_OUTLET` - Indicates a outlet device type. 
-* `DEVICE_TYPE_FAN` - Indicates a fan device type. 
-* `DEVICE_TYPE_DOOR_WINDOW_SENSOR` - Indicates a door/window sensor device type.
-* `DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR` - Indicates an elk door/window sensor device type.
-* `DEVICE_TYPE_CO_SENSOR` - Indicates an Elk CO sensor device type.
-* `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
-* `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
-* `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
-* `VARIABLE_TYPE_INTEGER` - Indicates that the variable is of type integer
-* `VARIABLE_TYPE_STATE` - Indicates that the variable is of type state.
-
 ### Notifications - Devices/Scenes
 
 The function `changeCallback` specified in the constructor will be called when a device state changes. It will also be
@@ -351,6 +335,7 @@ Added in v0.6.0 to support ISYv5+ node servers. For node server device nodes, a 
 CHANGELOG
 ---------
 
+* 0.6.1 - 2018/04/24 - Offloaded all constants (except Elk) to `isydefs.json` file. Available in code by using `ISYDefs` object or with a reference to the ISY object using `isy.defs` object.
 * 0.6.0 - 2018/04/23 - Update to use XML2JS to parse XML responses into native JS objects. Added support for Node Server nodes and advanced properties.
 * 0.5.0 - 2017/10/25 - Limited support resumed. Changes from shbatm/isy-js and tenstartups/isy-js have been incorportated. Changes include: removal of guardian timer, limited support for programs (executing), read-only support for Insteon Thermostats, bug fixes to support ISY v5 Firmware and Node Servers.
 * 0.4.5 - 2017/07/04 - Support suspended. Active development ended. 

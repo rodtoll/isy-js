@@ -1,4 +1,5 @@
 var ISYLightDevice = require('./isydevice.js').ISYLightDevice;
+var ISYDefs = require("./isydefs.json");
 
 var ISYScene = function(isy, name, address, childDevices) {
     this.isy = isy;
@@ -8,17 +9,11 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.connectionType = 'Insteon Wired';
     this.batteryOperated = false;
     this.childDevices = childDevices;
-    this.deviceType = isy.DEVICE_TYPE_SCENE;
+    this.deviceType = ISYDefs.deviceType.SCENE;
     this.deviceFriendlyName = "Insteon Scene";
     this.lastChanged = new Date();
     this.reclalculateState();
 };
-
-ISYScene.prototype.DIM_LEVEL_MINIMUM = 0;
-ISYScene.prototype.DIM_LEVEL_MAXIMUM = 100;
-ISYScene.prototype.ISY_DIM_LEVEL_MAXIMUM = 255;
-ISYScene.prototype.ISY_COMMAND_LIGHT_ON = "DON";
-ISYScene.prototype.ISY_COMMAND_LIGHT_OFF = "DOF";
 
 // Get the current light state
 ISYScene.prototype.getCurrentLightState = function() {
@@ -61,7 +56,7 @@ ISYScene.prototype.markAsChanged = function() {
 };
 
 ISYScene.prototype.sendLightCommand = function(lightState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (lightState) ? this.ISY_COMMAND_LIGHT_ON : this.ISY_COMMAND_LIGHT_OFF, null, resultHandler);
+    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.LIGHT_ON : ISYDefs.cmd.LIGHT_OFF, null, resultHandler);
 };
 
 ISYScene.prototype.getAreAllLightsInSpecifiedState = function(state) {
