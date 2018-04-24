@@ -8,6 +8,7 @@ var isyDevice = require('./isydevice');
 var WebSocket = require("faye-websocket");
 var elkDevice = require('./elkdevice.js');
 var isyDeviceTypeList = require("./isydevicetypes.json");
+var ISYDefs = require("./isydefs.json");
 var ISYOutletDevice = require('./isydevice').ISYOutletDevice;
 var ISYLightDevice = require('./isydevice').ISYLightDevice;
 var ISYLockDevice = require('./isydevice').ISYLockDevice;
@@ -66,31 +67,8 @@ var ISY = function(address, username, password, elkEnabled, changeCallback, useH
         this.elkAlarmPanel = new elkDevice.ELKAlarmPanelDevice(this, 1);
     }
     this.changeCallback = changeCallback;
+    this.defs = ISYDefs;
 };
-
-ISY.prototype.DEVICE_TYPE_LOCK = 'DoorLock';
-ISY.prototype.DEVICE_TYPE_SECURE_LOCK = 'SecureLock';
-ISY.prototype.DEVICE_TYPE_LIGHT = 'Light';
-ISY.prototype.DEVICE_TYPE_DIMMABLE_LIGHT = 'DimmableLight';
-ISY.prototype.DEVICE_TYPE_OUTLET = 'Outlet';
-ISY.prototype.DEVICE_TYPE_FAN = 'Fan';
-ISY.prototype.DEVICE_TYPE_UNKNOWN = 'Unknown';
-ISY.prototype.DEVICE_TYPE_DOOR_WINDOW_SENSOR = "DoorWindowSensor";
-ISY.prototype.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR = 'AlarmDoorWindowSensor';
-ISY.prototype.DEVICE_TYPE_CO_SENSOR = 'COSensor';
-ISY.prototype.DEVICE_TYPE_ALARM_PANEL = 'AlarmPanel';
-ISY.prototype.DEVICE_TYPE_MOTION_SENSOR = 'MotionSensor';
-ISY.prototype.DEVICE_TYPE_LEAK_SENSOR = 'LeakSensor';
-ISY.prototype.DEVICE_TYPE_REMOTE = "Remote";
-ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
-ISY.prototype.DEVICE_TYPE_THERMOSTAT = 'Thermostat';
-ISY.prototype.DEVICE_TYPE_NODE_SERVER_NODE = 'NodeServerNode';
-ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
-ISY.prototype.VARIABLE_TYPE_STATE = '2';
-ISY.prototype.DEVICE_UPDATE_TYPE_ELK = 'ELK_UPDATE';
-ISY.prototype.DEVICE_UPDATE_TYPE_ZONE = 'ZONE_UPDATE';
-ISY.prototype.DEVICE_UPDATE_TYPE_PROPERTY = 'PROPERTY_UPDATE';
-ISY.prototype.DEVICE_UPDATE_TYPE_GENERIC = 'GENERIC_UPDATE';
 
 ISY.prototype.logger = function(msg) {
     if (this.debugLogEnabled || (process.env.ISYJSDEBUG !== undefined && process.env.ISYJSDEBUG !== null)) {
@@ -135,31 +113,31 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
         if (mainType === 1) {
             // Special case fanlinc has a fan element
             if (subType === 46 && subAddress === 2) {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_FAN);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.FAN);
             } else {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DIMMABLE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.DIMMABLE_LIGHT);
             }
         } else if (mainType === 2) {
             // Special case appliance Lincs into outlets
             if (subType === 6 || subType === 9 || subType === 12 || subType === 23) {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.OUTLET);
                 // Outlet lincs
             } else if (subType === 8 || subType === 33) {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.OUTLET);
                 // Dual outlets
             } else if (subType === 57) {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.OUTLET);
             } else {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.LIGHT);
             }
             // Sensors
         } else if (mainType === 7) {
             // I/O Lincs
             if (subType === 0) {
                 if (subAddress === 1) {
-                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.DOOR_WINDOW_SENSOR);
                 } else {
-                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_OUTLET);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.OUTLET);
                 }
                 // Other sensors. Not yet supported
             } else {
@@ -170,7 +148,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // MorningLinc
             if (subType === 6) {
                 if (subAddress === 1) {
-                    return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_LOCK);
+                    return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.LOCK);
                     // Ignore subdevice which operates opposite for the locks
                 } else {
                     return null;
@@ -183,11 +161,11 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // Motion sensors
             if (subType === 1 || subType === 3) {
                 if (subAddress === 1) {
-                    return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_MOTION_SENSOR);
+                    return this.buildDeviceInfoRecord(isyType, "Insteon", ISYDefs.deviceType.MOTION_SENSOR);
                     // Ignore battery level sensor and daylight sensor
                 }
             } else if (subType === 2 || subType === 9 || subType === 17) {
-                return this.buildDeviceInfoRecord(isyType, 'Insteon', this.DEVICE_TYPE_DOOR_WINDOW_SENSOR);
+                return this.buildDeviceInfoRecord(isyType, 'Insteon', ISYDefs.deviceType.DOOR_WINDOW_SENSOR);
                 // Smoke, leak sensors, don't yet know how to support
             } else {
                 return null;
@@ -195,14 +173,14 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
             // No idea how to test or support
         } else if (mainType === 5) {
             // Thermostats
-            return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_THERMOSTAT);
+            return this.buildDeviceInfoRecord(isyType, "Insteon", ISYDefs.deviceType.THERMOSTAT);
         } else if (mainType === 6) {
             // Leak Sensors
-            return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_LEAK_SENSOR);
+            return this.buildDeviceInfoRecord(isyType, "Insteon", ISYDefs.deviceType.LEAK_SENSOR);
         } else if (mainType === 0) {
             if (subType === 6 || subType === 8) {
                 // Insteon Remote
-                return this.buildDeviceInfoRecord(isyType, "Insteon", this.DEVICE_TYPE_REMOTE);
+                return this.buildDeviceInfoRecord(isyType, "Insteon", ISYDefs.deviceType.REMOTE);
             } else {
                 return null;
             }
@@ -215,13 +193,13 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
         if (mainType === 4) {
             // Identified by user zwave on/off switch
             if (subType === 16) {
-                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', ISYDefs.deviceType.LIGHT);
                 // Identified by user door lock
             } else if (subType === 111) {
-                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_SECURE_LOCK);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', ISYDefs.deviceType.SECURE_LOCK);
                 // This is a guess based on the naming in the ISY SDK
             } else if (subType === 109) {
-                return this.buildDeviceInfoRecord(isyType, 'ZWave', this.DEVICE_TYPE_DIMMABLE_LIGHT);
+                return this.buildDeviceInfoRecord(isyType, 'ZWave', ISYDefs.deviceType.DIMMABLE_LIGHT);
                 // Otherwise we don't know how to handle
             } else {
                 return null;
@@ -230,7 +208,7 @@ ISY.prototype.getDeviceTypeBasedOnISYTable = function(deviceNode) {
     } else if (familyId === 10) {
         // Node Server Node
         if (mainType === 1 && subType === 1) { // Node Server Devices are reported as 1.1.0.0.
-            return this.buildDeviceInfoRecord(isyType, "NodeServer", this.DEVICE_TYPE_NODE_SERVER_NODE);
+            return this.buildDeviceInfoRecord(isyType, "NodeServer", ISYDefs.deviceType.NODE_SERVER_NODE);
         }
     }
     return null;
@@ -295,32 +273,32 @@ ISY.prototype.loadDevices = function(result) {
                 deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(node);
             }
             if (deviceTypeInfo !== null) {
-                if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_DIMMABLE_LIGHT ||
-                    deviceTypeInfo.deviceType === this.DEVICE_TYPE_LIGHT) {
+                if (deviceTypeInfo.deviceType === ISYDefs.deviceType.DIMMABLE_LIGHT ||
+                    deviceTypeInfo.deviceType === ISYDefs.deviceType.LIGHT) {
                     newDevice = new ISYLightDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.DOOR_WINDOW_SENSOR) {
                     newDevice = new ISYDoorWindowDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_MOTION_SENSOR) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.MOTION_SENSOR) {
                     newDevice = new ISYMotionSensorDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_LEAK_SENSOR) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.LEAK_SENSOR) {
                     newDevice = new ISYLeakSensorDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_REMOTE) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.REMOTE) {
                     newDevice = new ISYRemoteDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_FAN) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.FAN) {
                     newDevice = new ISYFanDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_LOCK ||
-                    deviceTypeInfo.deviceType === this.DEVICE_TYPE_SECURE_LOCK) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.LOCK ||
+                    deviceTypeInfo.deviceType === ISYDefs.deviceType.SECURE_LOCK) {
                     newDevice = new ISYLockDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_OUTLET) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.OUTLET) {
                     newDevice = new ISYOutletDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_THERMOSTAT) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.THERMOSTAT) {
                     newDevice = new ISYThermostatDevice(this, deviceName, deviceAddress, deviceTypeInfo);
-                } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_NODE_SERVER_NODE) {
+                } else if (deviceTypeInfo.deviceType === ISYDefs.deviceType.NODE_SERVER_NODE) {
                     newDevice = new ISYNodeServerNode(
                         this,
                         deviceName,
                         deviceAddress,
-                        this.DEVICE_TYPE_NODE_SERVER_NODE,
+                        ISYDefs.deviceType.NODE_SERVER_NODE,
                         node.family.instance, // Node Server Number
                         node.pnode, // Parent Node Address
                         node.nodeDefId // Node Type
@@ -334,7 +312,7 @@ ISY.prototype.loadDevices = function(result) {
                     deviceName,
                     deviceAddress,
                     isyDeviceType,
-                    this.DEVICE_TYPE_UNKNOWN,
+                    ISYDefs.deviceType.UNKNOWN,
                     'Insteon'
                 );
             }
@@ -377,7 +355,7 @@ ISY.prototype.loadElkNodes = function(result) {
                 name,
                 1,
                 id,
-                (alarmDef == 17) ? this.DEVICE_TYPE_CO_SENSOR : this.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR);
+                (alarmDef == 17) ? ISYDefs.deviceType.CO_SENSOR : ISYDefs.deviceType.ALARM_DOOR_WINDOW_SENSOR);
             this.zoneMap[newDevice.zone] = newDevice;
         }
     });
@@ -452,9 +430,8 @@ ISY.prototype.loadVariables = function(type, done) {
             retryCount++;
             getVariableInitialValues();
         } else {
-            that.setVariableValues(result);
+            that.setVariableValues(result, done);
         }
-        done();
     };
 
     var getVariableInitialValues = function() {
@@ -532,7 +509,7 @@ ISY.prototype.createVariables = function(type, result) {
     });
 };
 
-ISY.prototype.setVariableValues = function(result) {
+ISY.prototype.setVariableValues = function(result, callback) {
     var p = new x2j.Parser({ explicitArray: false, mergeAttrs: true });
     p.parseString(result, (err, res) => {
         if (err) throw err;
@@ -552,6 +529,7 @@ ISY.prototype.setVariableValues = function(result) {
                 variable.lastChanged = new Date(ts);
             }
         }
+        callback();
     });
 };
 
@@ -589,8 +567,8 @@ ISY.prototype.initialize = function(initializeCompleted) {
                 that.loadNodes(res);
             });
 
-            that.loadVariables(that.VARIABLE_TYPE_INTEGER, function() {
-                that.loadVariables(that.VARIABLE_TYPE_STATE, function() {
+            that.loadVariables(ISYDefs.variableType.INTEGER, function() {
+                that.loadVariables(ISYDefs.variableType.STATE, function() {
                     if (that.elkEnabled) {
                         restler.get(
                             that.protocol + '://' + that.address + '/rest/elk/get/topology',
@@ -666,9 +644,9 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                 this.handleISYStateUpdate(evt.node, actionValue);
                 break;
 
-            case isyDevice.ISY_PROPERTY_CLIMATE_TEMPERATURE:
-            case isyDevice.ISY_PROPERTY_CLIMATE_COOL_SET_POINT:
-            case isyDevice.ISY_PROPERTY_CLIMATE_HEAT_SET_POINT:
+            case ISYDefs.props.climate.TEMPERATURE:
+            case ISYDefs.props.climate.COOL_SET_POINT:
+            case ISYDefs.props.climate.HEAT_SET_POINT:
                 this.logger(JSON.stringify(res, undefined, 3));
                 var uom = Number(evt.action.uom);
                 var precision = evt.action.prec;
@@ -689,19 +667,19 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
 
-            case isyDevice.ISY_PROPERTY_CLIMATE_HUMIDITY:
-            case isyDevice.ISY_PROPERTY_CLIMATE_OPERATING_MODE:
-            case isyDevice.ISY_PROPERTY_CLIMATE_MODE:
-            case isyDevice.ISY_PROPERTY_CLIMATE_FAN:
+            case ISYDefs.props.climate.HUMIDITY:
+            case ISYDefs.props.climate.OPERATING_MODE:
+            case ISYDefs.props.climate.MODE:
+            case ISYDefs.props.climate.FAN:
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
 
-            case isyDevice.ISY_PROPERTY_ZWAVE_BATTERY_LEVEL:
-            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_FACTOR:
-            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_POLARIZED_POWER:
-            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_CURRENT:
-            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_TOTAL_POWER:
-            case isyDevice.ISY_PROPERTY_ZWAVE_ENERGY_POWER_VOLTAGE:
+            case ISYDefs.props.ZWAVE_BATTERY_LEVEL:
+            case ISYDefs.props.ZWAVE_ENERGY_POWER_FACTOR:
+            case ISYDefs.props.ZWAVE_ENERGY_POWER_POLARIZED_POWER:
+            case ISYDefs.props.ZWAVE_ENERGY_POWER_CURRENT:
+            case ISYDefs.props.ZWAVE_ENERGY_POWER_TOTAL_POWER:
+            case ISYDefs.props.ZWAVE_ENERGY_POWER_VOLTAGE:
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
 
@@ -826,7 +804,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
     var deviceToUpdate = this.deviceIndex[address];
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if (deviceToUpdate.handleIsyUpdate(state)) {
-            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC;
+            deviceToUpdate.updateType = ISYDefs.updateType.GENERIC;
             this.nodeChangedHandler(deviceToUpdate);
             if (this.scenesInDeviceList) {
                 // Inefficient, we could build a reverse index (device->scene list)
@@ -834,7 +812,7 @@ ISY.prototype.handleISYStateUpdate = function(address, state) {
                 for (var index = 0; index < this.sceneList.length; index++) {
                     if (this.sceneList[index].isDeviceIncluded(deviceToUpdate)) {
                         if (this.sceneList[index].reclalculateState()) {
-                            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_GENERIC;
+                            deviceToUpdate.updateType = ISYDefs.updateType.GENERIC;
                             this.nodeChangedHandler(this.sceneList[index]);
                         }
                     }
@@ -848,7 +826,7 @@ ISY.prototype.handleISYGenericPropertyUpdate = function(address, state, prop) {
     var deviceToUpdate = this.deviceIndex[address];
     if (deviceToUpdate !== undefined && deviceToUpdate !== null) {
         if (deviceToUpdate.handleIsyGenericPropertyUpdate(state, prop)) {
-            deviceToUpdate.updateType = exports.DEVICE_UPDATE_TYPE_PROPERTY;
+            deviceToUpdate.updateType = ISYDefs.updateType.PROPERTY;
             this.nodeChangedHandler(deviceToUpdate);
         }
     }
