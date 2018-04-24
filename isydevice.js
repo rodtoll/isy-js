@@ -309,15 +309,8 @@ util.inherits(ISYFanDevice, ISYBaseDevice);
 // ISYThermostatDevice
 //
 
-function ISYThermostatDevice(isy, name, address, deviceTypeInfo, status) {
+function ISYThermostatDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
-    for (var i = 0; i < status.length; i++) {
-        if (status[i].id === 'ST') {
-            this.currentValue = status[i].value;
-        } else {
-            this[status[i].id] = status[i].value;
-        }
-    }
 }
 
 util.inherits(ISYThermostatDevice,ISYBaseDevice);
@@ -390,14 +383,6 @@ ISYThermostatDevice.prototype.getFormattedStatus = function() {
         }
     }
     return response;
-};
-
-ISYThermostatDevice.prototype.getFormattedTemp = function(prop) {
-    if (prop in this && typeof this[prop] === 'number') {
-        return (Math.round(this[prop] / 2.0));
-    } else {
-        return 0;
-    }
 };
 
 exports.ISYBaseDevice = ISYBaseDevice;

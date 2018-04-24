@@ -314,11 +314,7 @@ ISY.prototype.loadDevices = function(result) {
                 } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_OUTLET) {
                     newDevice = new ISYOutletDevice(this, deviceName, deviceAddress, deviceTypeInfo);
                 } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_THERMOSTAT) {
-                    var status;
-                    if (deviceAddress.endsWith('1')) {
-                        status = node.property;
-                    }
-                    newDevice = new ISYThermostatDevice(this, deviceName, deviceAddress, deviceTypeInfo, status);
+                    newDevice = new ISYThermostatDevice(this, deviceName, deviceAddress, deviceTypeInfo);
                 } else if (deviceTypeInfo.deviceType === this.DEVICE_TYPE_NODE_SERVER_NODE) {
                     newDevice = new ISYNodeServerNode(
                         this,
@@ -343,11 +339,22 @@ ISY.prototype.loadDevices = function(result) {
                 );
             }
             if (newDevice !== null) {
+                var currentState = 0;
+                if ("property" in node && typeof node.property === "object") {
+                    if (Array.isArray(node.property)) {
+                        for (let p of node.property) {
+                            newDevice[p.id] = isNaN(p.value) ? p.value : Number(p.value);
+                            if (p.id === "ST") {
+                                currentState = Number(p.value);
+                            }
+                        }
+                    } else if ("id" in node.property && node.property.id === "ST") {
+                        currentState = Number(node.property.value);
+                    }
+                }
                 this.deviceIndex[deviceAddress] = newDevice;
                 this.deviceList.push(newDevice);
-                if ("property" in node && typeof node.property === "object") {
-                    this.handleISYStateUpdate(deviceAddress, node.property.value);
-                }
+                this.handleISYStateUpdate(deviceAddress, currentState);
             }
         } else {
             this.logger('Ignoring disabled device: ' + deviceName);
