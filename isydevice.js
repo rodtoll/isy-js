@@ -226,7 +226,7 @@ function ISYLeakSensorDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYLeakSensorDevice,ISYBaseDevice);
+util.inherits(ISYLeakSensorDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYRemoteDevice
@@ -236,7 +236,7 @@ function ISYRemoteDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYRemoteDevice,ISYBaseDevice);
+util.inherits(ISYRemoteDevice, ISYBaseDevice);
 
 ////////////////////////////////////////////////////////////////////////
 // ISYOutletDevice
@@ -266,10 +266,12 @@ function ISYThermostatDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
 }
 
-util.inherits(ISYThermostatDevice,ISYBaseDevice);
+util.inherits(ISYThermostatDevice, ISYBaseDevice);
 
 ISYThermostatDevice.prototype.getFormattedStatus = function() {
     response = {};
+
+    // Insteon Thermostat == Precision is 0.5deg but reported as 2x the actual value
     response.currTemp = Math.round(this.currentState / 2.0);
     if (ISYDefs.props.climate.OPERATING_MODE in this) {
         switch (Number(this[ISYDefs.props.climate.OPERATING_MODE])) {

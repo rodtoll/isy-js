@@ -660,9 +660,6 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                 if (uom == 17) {
                     // UOM 17 = farenheit, UOM 4 = celcius, UOM 26 = Kelvin (probabaly a Hue bulb Color Temp)
                     actionValue = convertToCelsius(actionValue);
-                } else if (uom == 101) {
-                    // Insteon Thermostat == Precision is 0.5deg but reported as 2x the actual value
-                    actionValue = Math.round(actionValue / 2.0);
                 }
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
@@ -674,12 +671,12 @@ ISY.prototype.handleWebSocketMessage = function(event) {
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
 
-            case ISYDefs.props.ZWAVE_BATTERY_LEVEL:
-            case ISYDefs.props.ZWAVE_ENERGY_POWER_FACTOR:
-            case ISYDefs.props.ZWAVE_ENERGY_POWER_POLARIZED_POWER:
-            case ISYDefs.props.ZWAVE_ENERGY_POWER_CURRENT:
-            case ISYDefs.props.ZWAVE_ENERGY_POWER_TOTAL_POWER:
-            case ISYDefs.props.ZWAVE_ENERGY_POWER_VOLTAGE:
+            case ISYDefs.props.BATTERY_LEVEL:
+            case ISYDefs.props.zwave.ENERGY_POWER_FACTOR:
+            case ISYDefs.props.zwave.ENERGY_POWER_POLARIZED_POWER:
+            case ISYDefs.props.zwave.ENERGY_POWER_CURRENT:
+            case ISYDefs.props.zwave.ENERGY_POWER_TOTAL_POWER:
+            case ISYDefs.props.zwave.ENERGY_POWER_VOLTAGE:
                 this.handleISYGenericPropertyUpdate(evt.node, actionValue, evt.control);
                 break;
 
