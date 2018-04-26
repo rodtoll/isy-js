@@ -141,7 +141,7 @@ Properties:
 * `address` - ISY address for the device.
 * `isyType` - ISY type identifier for the device. see isydevicetypes.json for the map from isy types to friendly device names.
 * `deviceFriendlyName` - Friendly name for the type of device.
-* `deviceType` - Type of device. See ISY.DEVICE_TYPE_XXXXX for possible values.
+* `deviceType` - Type of device. See `isydefs.json` > `deviceType` for possible values.
 * `connectionType` - Type of connection to the Insteon network. Possible values - "Insteon Wired", "Insteon Wireless", "Insteon MorningLinc", "ZWave". See isydevicetypes.json for the map.
 * `batteryOperated` - true if this is a battery powered device, false otherwise.
 * `lastChanged` - Date/time the last time this library saw that the device characteristics have changed.
@@ -162,12 +162,8 @@ Functions (All Lights):
 * `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state. true to turn it on, false to turn it off
 
 Functions (Dimmable Lights):
-* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the light to the specified value. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
+* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the light to the specified value. Range: `ISYDefs.props.dimLevelMinimum` to `ISYDefs.props.dimLevelMinimum`.
 * `getCurrentLightDimState()` - Gets the current dim level of the light. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
-
-Constants:
-* `DIM_LEVEL_MINIMUM` - Minimum dim level. (Full off)
-* `DIM_LEVEL_MAXIMUM` - Maximum dim level. (Full on)
 
 ### ISYScene
 
@@ -211,12 +207,6 @@ Represents an Insteon fan device.
 Functions:
 * `getCurrentFanState()`- Gets the current state of the fan. See the FAN_XXX constants for possible values. 
 * `sendFanCommand(state,resultCallback(success))` - Sends the command to set the fan state to the specified state. See the FAN_XXX constants for possible values.
-
-Constants:
-* `FAN_OFF` - Fan should be off.
-* `FAN_LEVEL_LOW` - Fan level is low.
-* `FAN_LEVEL_MEDIUM` - Fan level is medium.
-* `FAN_LEVEL_HIGH` - Fan level is high.
 
 ### ISYDoorWindowDevice
 
@@ -335,6 +325,7 @@ Added in v0.6.0 to support ISYv5+ node servers. For node server device nodes, a 
 CHANGELOG
 ---------
 
+* 0.6.2 - 2018/04/26 - Further linting and migration to JavaScript. Include formatted status/property values from ISY as `ISYDevice.currentState_f` (or `ISYDevice.propName_f`).
 * 0.6.1 - 2018/04/24 - Offloaded all constants (except Elk) to `isydefs.json` file. Available in code by using `ISYDefs` object or with a reference to the ISY object using `isy.defs` object.
 * 0.6.0 - 2018/04/23 - Update to use XML2JS to parse XML responses into native JS objects. Added support for Node Server nodes and advanced properties.
 * 0.5.0 - 2017/10/25 - Limited support resumed. Changes from shbatm/isy-js and tenstartups/isy-js have been incorportated. Changes include: removal of guardian timer, limited support for programs (executing), read-only support for Insteon Thermostats, bug fixes to support ISY v5 Firmware and Node Servers.
@@ -357,9 +348,8 @@ Older version history was not captured.
 TODO
 ----
 
-* Support for programs.
+* Additional support for programs.
 * Better error checking.
-* Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
 * ELk > 1 areas
 

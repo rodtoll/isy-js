@@ -1,3 +1,5 @@
+/* jshint esversion:6 */
+
 var util = require('util');
 var assert = require('assert');
 var ISYDefs = require("./isydefs.json");
@@ -17,14 +19,16 @@ function ISYBaseDevice(isy, name, address, isyType, deviceType, deviceFamily) {
     this.connectionType = deviceFamily;
     this.deviceFriendlyName = 'Generic Device';
     this.currentState = 0;
+    this.currentState_f = 0;
     this.lastChanged = new Date();
     this.updateType = null;
     this.updatedProperty = null;
 }
 
-ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
+ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue, formatted = undefined) {
     if (Number(actionValue) != this.currentState) {
         this.currentState = Number(actionValue);
+        this.currentState_f = ("formatted" !== undefined) ? ((isNaN(formatted)) ? formatted : Number(formatted)) : Number(actionValue);
         this.lastChanged = new Date();
         return true;
     } else {
@@ -32,9 +36,10 @@ ISYBaseDevice.prototype.handleIsyUpdate = function(actionValue) {
     }
 };
 
-ISYBaseDevice.prototype.handleIsyGenericPropertyUpdate = function(actionValue, prop) {
+ISYBaseDevice.prototype.handleIsyGenericPropertyUpdate = function(actionValue, prop, formatted = undefined) {
     if (Number(actionValue) != this[prop]) {
         this[prop] = Number(actionValue);
+        this[prop + "_f"] = ("formatted" !== undefined) ? ((isNaN(formatted)) ? formatted : Number(formatted)) : Number(actionValue);
         this.lastChanged = new Date();
         this.updatedProperty = prop;
         return true;
@@ -56,23 +61,23 @@ ISYBaseDevice.prototype.getCurrentLightState = function() {
 };
 
 ISYBaseDevice.prototype.getCurrentLightDimState = function() {
-    return Math.floor((this.currentState * ISYDefs.props.DIM_LEVEL_MAXIMUM) / ISYDefs.props.ISY_DIM_LEVEL_MAXIMUM);
+    return Math.floor((this.currentState * ISYDefs.props.dimLevelMaximum) / ISYDedefs.props.isyDimLevelMaximum);
 };
 
 ISYBaseDevice.prototype.sendLightCommand = function(lightState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.LIGHT_ON : ISYDefs.cmd.LIGHT_OFF, null, resultHandler);
+    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.lightOn : ISYDefs.cmd.lightOff, null, resultHandler);
 };
 
 ISYBaseDevice.prototype.sendLightDimCommand = function(dimLevel, resultHandler) {
-    var isyDimLevel = Math.ceil(dimLevel * ISYDefs.props.ISY_DIM_LEVEL_MAXIMUM / ISYDefs.props.DIM_LEVEL_MAXIMUM);
-    this.isy.sendRestCommand(this.address, ISYDefs.cmd.LIGHT_ON, isyDimLevel, resultHandler);
+    var isyDimLevel = Math.ceil(dimLevel * ISYDefs.props.isyDimLevelMaximum / ISYDefs.props.dimLevelMaximum);
+    this.isy.sendRestCommand(this.address, ISYDefs.cmd.lightOn, isyDimLevel, resultHandler);
 };
 
 ////////////////////////////////////////////////////////////////////////
 // LOCKS
 
 ISYBaseDevice.prototype.getCurrentNonSecureLockState = function() {
-    return (this.currentState != ISYDefs.states.LOCK_UNLOCKED);
+    return (this.currentState != ISYDefs.states.lockUnlocked);
 };
 
 ISYBaseDevice.prototype.getCurrentSecureLockState = function() {
@@ -81,17 +86,17 @@ ISYBaseDevice.prototype.getCurrentSecureLockState = function() {
 
 ISYBaseDevice.prototype.sendNonSecureLockCommand = function(lockState, resultHandler) {
     if (lockState) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.LOCK_LOCK, null, resultHandler);
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.lockLock, null, resultHandler);
     } else {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.LOCK_UNLOCK, null, resultHandler);
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.lockUnlock, null, resultHandler);
     }
 };
 
 ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandler) {
     if (lockState) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.SECURE_LOCK_BASE, ISYDefs.cmd.SECURE_LOCK_PARAMETER_LOCK, resultHandler);
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.secureLockBase, ISYDefs.cmd.secureLockParameterLock, resultHandler);
     } else {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.SECURE_LOCK_BASE, ISYDefs.cmd.SECURE_LOCK_PARAMETER_UNLOCK, resultHandler);
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.secureLockBase, ISYDefs.cmd.secureLockParameterUnlock, resultHandler);
     }
 };
 
@@ -99,7 +104,7 @@ ISYBaseDevice.prototype.sendSecureLockCommand = function(lockState, resultHandle
 // DOOR/WINDOW SENSOR
 
 ISYBaseDevice.prototype.getCurrentDoorWindowState = function() {
-    return (this.currentState !== ISYDefs.state.DOOR_WINDOW_CLOSED);
+    return (this.currentState !== ISYDefs.state.doorWindowClosed);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -110,14 +115,14 @@ ISYBaseDevice.prototype.getCurrentOutletState = function() {
 };
 
 ISYBaseDevice.prototype.sendOutletCommand = function(outletState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (outletState) ? ISYDefs.cmd.OUTLET_ON : ISYDefs.cmd.OUTLET_OFF, null, resultHandler);
+    this.isy.sendRestCommand(this.address, (outletState) ? ISYDefs.cmd.outletOn : ISYDefs.cmd.outletOff, null, resultHandler);
 };
 
 ////////////////////////////////////////////////////////////////////////
 // MOTION SENSORS
 
 ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
-    return (this.currentState === ISYDefs.state.MOTION_SENSOR_ON) ? true : false;
+    return (this.currentState === ISYDefs.state.motionSensorOn) ? true : false;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -130,27 +135,27 @@ ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
 
 ISYBaseDevice.prototype.getCurrentFanState = function() {
     if (this.currentState === 0) {
-        return ISYDefs.props.fan.OFF;
-    } else if (this.currentState == ISYDefs.cmd.FAN_PARAMETER_LOW) {
-        return ISYDefs.props.fan.LOW;
-    } else if (this.currentState == ISYDefs.cmd.FAN_PARAMETER_MEDIUM) {
-        return ISYDefs.props.fan.MEDIUM;
-    } else if (this.currentState == ISYDefs.cmd.FAN_PARAMETER_HIGH) {
-        return ISYDefs.props.fan.HIGH;
+        return ISYDefs.props.fan.off;
+    } else if (this.currentState == ISYDefs.cmd.fanParameterLow) {
+        return ISYDefs.props.fan.low;
+    } else if (this.currentState == ISYDefs.cmd.fanParameterMedium) {
+        return ISYDefs.props.fan.medium;
+    } else if (this.currentState == ISYDefs.cmd.fanParameterHigh) {
+        return ISYDefs.props.fan.high;
     } else {
         assert(false, 'Unexpected fan state: ' + this.currentState);
     }
 };
 
 ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
-    if (fanState == this.FAN_OFF) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.FAN_OFF, null, resultHandler);
-    } else if (fanState == this.FAN_LEVEL_LOW) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.FAN_BASE, ISYDefs.cmd.FAN_PARAMETER_LOW, resultHandler);
-    } else if (fanState == this.FAN_LEVEL_MEDIUM) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.FAN_BASE, ISYDefs.cmd.FAN_PARAMETER_MEDIUM, resultHandler);
-    } else if (fanState == this.FAN_LEVEL_HIGH) {
-        this.isy.sendRestCommand(this.address, ISYDefs.cmd.FAN_BASE, ISYDefs.cmd.FAN_PARAMETER_HIGH, resultHandler);
+    if (fanState == this.fanOff) {
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanOff, null, resultHandler);
+    } else if (fanState == this.fanLevelLow) {
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterLow, resultHandler);
+    } else if (fanState == this.fanLevelMedium) {
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterMedium, resultHandler);
+    } else if (fanState == this.fanLevelHigh) {
+        this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterHigh, resultHandler);
     } else {
         assert(false, 'Unexpected fan level: ' + fanState);
     }
@@ -162,7 +167,7 @@ ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
 
 function ISYLightDevice(isy, name, address, deviceTypeInfo) {
     ISYBaseDevice.call(this, isy, name, address, deviceTypeInfo.type, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
-    this.isDimmable = (deviceTypeInfo.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT);
+    this.isDimmable = (deviceTypeInfo.deviceType == "dimmableLight");
 }
 
 util.inherits(ISYLightDevice, ISYBaseDevice);
@@ -178,9 +183,9 @@ function ISYLockDevice(isy, name, address, deviceTypeInfo) {
 util.inherits(ISYLockDevice, ISYBaseDevice);
 
 ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
-    if (this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+    if (this.deviceType == "lock") {
         this.sendNonSecureLockCommand(lockState, resultHandler);
-    } else if (this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+    } else if (this.deviceType == "secureLock") {
         this.sendSecureLockCommand(lockState, resultHandler);
     } else {
         assert(false, 'Should not ever have lock which is not one of the known lock types');
@@ -188,9 +193,9 @@ ISYLockDevice.prototype.sendLockCommand = function(lockState, resultHandler) {
 };
 
 ISYLockDevice.prototype.getCurrentLockState = function() {
-    if (this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
+    if (this.deviceType == "lock") {
         return this.getCurrentNonSecureLockState();
-    } else if (this.deviceType == this.isy.DEVICE_TYPE_SECURE_LOCK) {
+    } else if (this.deviceType == "secureLock") {
         return this.getCurrentSecureLockState();
     } else {
         assert(false, 'Should not ever have lock which is not one of the known lock types');
@@ -273,71 +278,23 @@ ISYThermostatDevice.prototype.getFormattedStatus = function() {
 
     // Insteon Thermostat == Precision is 0.5deg but reported as 2x the actual value
     response.currTemp = Math.round(this.currentState / 2.0);
-    if (ISYDefs.props.climate.OPERATING_MODE in this) {
-        switch (Number(this[ISYDefs.props.climate.OPERATING_MODE])) {
-            case 0:
-                response.currentStatus = 'off';
-                break;
-            case 1:
-                response.currentStatus = 'heating';
-                break;
-            case 2:
-                response.currentStatus = 'cooling';
-                break;
-            default:
-                response.currentStatus = this[ISYDefs.props.climate.OPERATING_MODE];
-        }
+    if (ISYDefs.props.climate.operatingMode + "_f" in this) {
+        response.currentStatus = this[ISYDefs.props.climate.operatingMode + "_f"];
     }
-    if (ISYDefs.props.climate.HUMIDITY in this) {
-        response.humidity = Number(this[ISYDefs.props.climate.HUMIDITY]);
+    if (ISYDefs.props.climate.humidity in this) {
+        response.humidity = Number(this[ISYDefs.props.climate.humidity]);
     }
-    if (ISYDefs.props.climate.COOL_SET_POINT in this) {
-        response.coolSetPoint = Math.round(this[ISYDefs.props.climate.COOL_SET_POINT] / 2.0);
+    if (ISYDefs.props.climate.coolSetPoint in this) {
+        response.coolSetPoint = Math.round(this[ISYDefs.props.climate.coolSetPoint] / 2.0);
     }
-    if (ISYDefs.props.climate.HEAT_SET_POINT in this) {
-        response.heatSetPoint = Math.round(this[ISYDefs.props.climate.HEAT_SET_POINT] / 2.0);
+    if (ISYDefs.props.climate.heatSetPoint in this) {
+        response.heatSetPoint = Math.round(this[ISYDefs.props.climate.heatSetPoint] / 2.0);
     }
-    if (ISYDefs.props.climate.FAN in this) {
-        switch (Number(this[ISYDefs.props.climate.FAN])) {
-            case 7:
-                response.fanSetting = "on";
-                break;
-            case 8:
-                response.fanSetting = "auto";
-                break;
-            default:
-                response.fanSetting = this[ISYDefs.props.climate.FAN];
-        }
+    if (ISYDefs.props.climate.fan + "_f" in this) {
+        response.fanSetting = this[ISYDefs.props.climate.fan + "_f"];
     }
-    if (ISYDefs.props.climate.MODE in this) {
-        switch (Number(this[ISYDefs.props.climate.MODE])) {
-            case 0:
-                response.mode = 'off';
-                break;
-            case 1:
-                response.mode = 'heat';
-                break;
-            case 2:
-                response.mode = 'cool';
-                break;
-            case 3:
-                response.mode = 'auto';
-                break;
-            case 4:
-                response.mode = 'fan';
-                break;
-            case 5:
-                response.mode = 'program auto';
-                break;
-            case 6:
-                response.mode = 'program heat';
-                break;
-            case 7:
-                response.mode = 'program cool';
-                break;
-            default:
-                response.mode = this.CLIMD;
-        }
+    if (ISYDefs.props.climate.mode + "_f" in this) {
+        response.mode = this[ISYDefs.props.climate.mode + "_f"];
     }
     return response;
 };

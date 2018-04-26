@@ -2,7 +2,7 @@
   "name": "isy-js",
   "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application. No longer under active development by original author. Limited development by contributors: shbatm",
   "license": "MIT",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": {
     "name": "Rod Toll",
     "email": "rod_toll@hotmail.com"

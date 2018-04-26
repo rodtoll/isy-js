@@ -9,7 +9,7 @@ var ISYScene = function(isy, name, address, childDevices) {
     this.connectionType = 'Insteon Wired';
     this.batteryOperated = false;
     this.childDevices = childDevices;
-    this.deviceType = ISYDefs.deviceType.SCENE;
+    this.deviceType = "scene";
     this.deviceFriendlyName = "Insteon Scene";
     this.lastChanged = new Date();
     this.reclalculateState();
@@ -56,7 +56,7 @@ ISYScene.prototype.markAsChanged = function() {
 };
 
 ISYScene.prototype.sendLightCommand = function(lightState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.LIGHT_ON : ISYDefs.cmd.LIGHT_OFF, null, resultHandler);
+    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.lightOn : ISYDefs.cmd.lightOff, null, resultHandler);
 };
 
 ISYScene.prototype.getAreAllLightsInSpecifiedState = function(state) {

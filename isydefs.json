@@ -1,87 +1,87 @@
 {
   "states": {
-    "LOCK_UNLOCKED": 0,
-    "DOOR_WINDOW_CLOSED": 0,
-    "MOTION_SENSOR_ON": 255,
-    "MOTION_SENSOR_ON": 255,
-    "LEAK_SENSOR_DRY": "Dry",
-    "LEAK_SENSOR_WET": "Wet",
-    "LEAK_SENSOR_HB": "Heartbeat"
+    "lockUnlocked": 0,
+    "doorWindowClosed": 0,
+    "motionSensorOn": 255,
+    "motionSensorOff": 0,
+    "leakSensorDry": "Dry",
+    "leakSensorWet": "Wet",
+    "leakSensorHb": "Heartbeat"
   },
   "cmd": {
-    "OUTLET_ON": "DON",
-    "OUTLET_OFF": "DOF",
-    "LIGHT_ON": "DON",
-    "LIGHT_OFF": "DOF",
-    "LOCK_LOCK": "DON",
-    "LOCK_UNLOCK": "DOF",
-    "SECURE_LOCK_BASE": "SECMD",
-    "SECURE_LOCK_PARAMETER_LOCK": 1,
-    "SECURE_LOCK_PARAMETER_UNLOCK": 0,
-    "FAN_BASE": "DON",
-    "FAN_OFF": "DOF",
-    "FAN_PARAMETER_LOW": 63,
-    "FAN_PARAMETER_MEDIUM": 191,
-    "FAN_PARAMETER_HIGH": 255
+    "outletOn": "DON",
+    "outletOff": "DOF",
+    "lightOn": "DON",
+    "lightOff": "DOF",
+    "lockLock": "DON",
+    "lockUnlock": "DOF",
+    "secureLockBase": "SECMD",
+    "secureLockParameterLock": 1,
+    "secureLockParameterUnlock": 0,
+    "fanBase": "DON",
+    "fanOff": "DOF",
+    "fanParameterLow": 63,
+    "fanParameterMedium": 191,
+    "fanParameterHigh": 255
   },
   "props": {
-    "DIM_LEVEL_MINIMUM": 0,
-    "DIM_LEVEL_MAXIMUM": 100,
-    "ISY_DIM_LEVEL_MAXIMUM": 255,
-    "BATTERY_LEVEL": "BATLVL",
+    "dimLevelMinimum": 0,
+    "dimLevelMaximum": 100,
+    "isyDimLevelMaximum": 255,
+    "batteryLevel": "BATLVL",
     "fan": {
-      "OFF": "Off",
-      "LOW": "Low",
-      "MEDIUM": "Medium",
-      "HIGH": "High"
+      "off": "Off",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
     },
     "zwave": {
-      "LOCK_ALARM": "ALARM",
-      "LOCK_ACCESS": "USRNUM",
-      "LOCK_STATUS": "ST",
-      "ENERGY_POWER_FACTOR": "PF",
-      "ENERGY_POWER_POLARIZED_POWER": "PPW",
-      "ENERGY_POWER_CURRENT": "CC",
-      "ENERGY_POWER_TOTAL_POWER": "TPW",
-      "ENERGY_POWER_VOLTAGE": "CV"
+      "lockAlarm": "ALARM",
+      "lockAccess": "USRNUM",
+      "lockStatus": "ST",
+      "energyPowerFactor": "PF",
+      "energyPowerPolarizedPower": "PPW",
+      "energyPowerCurrent": "CC",
+      "energyPowerTotalPower": "TPW",
+      "energyPowerVoltage": "CV"
     },
     "climate": {
-      "TEMPERATURE": "CLITEMP",
-      "HUMIDITY": "CLIHUM",
-      "OPERATING_MODE": "CLIHCS",
-      "MODE": "CLIMD",
-      "FAN": "CLIFS",
-      "COOL_SET_POINT": "CLISPC",
-      "HEAT_SET_POINT": "CLISPH"
+      "temperature": "CLITEMP",
+      "humidity": "CLIHUM",
+      "operatingMode": "CLIHCS",
+      "mode": "CLIMD",
+      "fan": "CLIFS",
+      "coolSetPoint": "CLISPC",
+      "heatSetPoint": "CLISPH"
     }
   },
-  "deviceType": {
-    "LOCK": "DoorLock",
-    "SECURE_LOCK": "SecureLock",
-    "LIGHT": "Light",
-    "DIMMABLE_LIGHT": "DimmableLight",
-    "OUTLET": "Outlet",
-    "FAN": "Fan",
-    "UNKNOWN": "Unknown",
-    "DOOR_WINDOW_SENSOR": "DoorWindowSensor",
-    "ALARM_DOOR_WINDOW_SENSOR": "AlarmDoorWindowSensor",
-    "CO_SENSOR": "COSensor",
-    "ALARM_PANEL": "AlarmPanel",
-    "MOTION_SENSOR": "MotionSensor",
-    "LEAK_SENSOR": "LeakSensor",
-    "REMOTE": "Remote",
-    "SCENE": "Scene",
-    "THERMOSTAT": "Thermostat",
-    "NODE_SERVER_NODE": "NodeServerNode"
-  },
+  "deviceType": [
+    "lock",
+    "secureLock",
+    "light",
+    "dimmableLight",
+    "outlet",
+    "fan",
+    "unknown",
+    "doorWindowSensor",
+    "alarmDoorWindowSensor",
+    "coSensor",
+    "alarmPanel",
+    "motionSensor",
+    "leakSensor",
+    "remote",
+    "scene",
+    "thermostat",
+    "nodeServerNode"
+  ],
   "variableType": {
-    "INTEGER": "1",
-    "STATE": "2"
+    "integer": "1",
+    "state": "2"
   },
   "updateType": {
-    "ELK": "ELK_UPDATE",
-    "ZONE": "ZONE_UPDATE",
-    "PROPERTY": "PROPERTY_UPDATE",
-    "GENERIC": "GENERIC_UPDATE"
+    "elk": "ELK_UPDATE",
+    "zone": "ZONE_UPDATE",
+    "property": "PROPERTY_UPDATE",
+    "generic": "GENERIC_UPDATE"
   }
 }
