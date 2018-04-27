@@ -64,8 +64,17 @@ ISYBaseDevice.prototype.getCurrentLightDimState = function() {
     return Math.floor((this.currentState * ISYDefs.props.dimLevelMaximum) / ISYDedefs.props.isyDimLevelMaximum);
 };
 
-ISYBaseDevice.prototype.sendLightCommand = function(lightState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (lightState) ? ISYDefs.cmd.lightOn : ISYDefs.cmd.lightOff, null, resultHandler);
+ISYBaseDevice.prototype.sendLightCommand = function(command, resultHandler) {
+    // command can be passed as an ISY command (DON/DOF/DFOF/DFON), a number 0/100, or a boolean of the current light state to toggle a light
+    var cmd = ISYDefs.cmd.lightOn;
+    if (typeof command === "boolean") {
+        cmd = (command) ? ISYDefs.cmd.lightOn : ISYDefs.cmd.lightOff;
+    } else if (typeof command === "number") {
+        cmd = (command > 0) ? ISYDefs.cmd.lightOn : ISYDefs.cmd.lightOff;
+    } else {
+        cmd = command;
+    }
+    this.isy.sendRestCommand(this.address, cmd, null, resultHandler);
 };
 
 ISYBaseDevice.prototype.sendLightDimCommand = function(dimLevel, resultHandler) {
@@ -110,12 +119,19 @@ ISYBaseDevice.prototype.getCurrentDoorWindowState = function() {
 ////////////////////////////////////////////////////////////////////////
 // OUTLETS
 
-ISYBaseDevice.prototype.getCurrentOutletState = function() {
+ISYOutletDevice.prototype.getCurrentOutletState = function() {
     return (this.currentState > 0) ? true : false;
 };
 
-ISYBaseDevice.prototype.sendOutletCommand = function(outletState, resultHandler) {
-    this.isy.sendRestCommand(this.address, (outletState) ? ISYDefs.cmd.outletOn : ISYDefs.cmd.outletOff, null, resultHandler);
+ISYOutletDevice.prototype.sendOutletCommand = function(command, resultHandler) {
+    // command can be passed as an ISY command (DON/DOF), or a boolean of the current light state to toggle
+    var cmd = ISYDefs.cmd.outletOn;
+    if (typeof command === "boolean") {
+        cmd = (command) ? ISYDefs.cmd.outletOn : ISYDefs.cmd.outletOff;
+    } else {
+        cmd = command;
+    }
+    this.isy.sendRestCommand(this.address, cmd, null, resultHandler);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -133,28 +149,28 @@ ISYBaseDevice.prototype.getCurrentMotionSensorState = function() {
 ////////////////////////////////////////////////////////////////////////
 // FANS MOTORS
 
-ISYBaseDevice.prototype.getCurrentFanState = function() {
+ISYFanDevice.prototype.getCurrentFanState = function() {
     if (this.currentState === 0) {
-        return ISYDefs.props.fan.off;
+        return "Off";
     } else if (this.currentState == ISYDefs.cmd.fanParameterLow) {
-        return ISYDefs.props.fan.low;
+        return "Low";
     } else if (this.currentState == ISYDefs.cmd.fanParameterMedium) {
-        return ISYDefs.props.fan.medium;
+        return "Medium";
     } else if (this.currentState == ISYDefs.cmd.fanParameterHigh) {
-        return ISYDefs.props.fan.high;
+        return "High";
     } else {
         assert(false, 'Unexpected fan state: ' + this.currentState);
     }
 };
 
-ISYBaseDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
-    if (fanState == this.fanOff) {
+ISYFanDevice.prototype.sendFanCommand = function(fanState, resultHandler) {
+    if (fanState === "Off") {
         this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanOff, null, resultHandler);
-    } else if (fanState == this.fanLevelLow) {
+    } else if (fanState == "Low") {
         this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterLow, resultHandler);
-    } else if (fanState == this.fanLevelMedium) {
+    } else if (fanState == "Medium") {
         this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterMedium, resultHandler);
-    } else if (fanState == this.fanLevelHigh) {
+    } else if (fanState == "High") {
         this.isy.sendRestCommand(this.address, ISYDefs.cmd.fanBase, ISYDefs.cmd.fanParameterHigh, resultHandler);
     } else {
         assert(false, 'Unexpected fan level: ' + fanState);

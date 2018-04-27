@@ -13,6 +13,8 @@
     "outletOff": "DOF",
     "lightOn": "DON",
     "lightOff": "DOF",
+    "lightFastOn": "DFON",
+    "lightFastOff": "DFOF",
     "lockLock": "DON",
     "lockUnlock": "DOF",
     "secureLockBase": "SECMD",
@@ -29,12 +31,12 @@
     "dimLevelMaximum": 100,
     "isyDimLevelMaximum": 255,
     "batteryLevel": "BATLVL",
-    "fan": {
-      "off": "Off",
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High"
-    },
+    "fan": [
+      "off",
+      "low",
+      "medium",
+      "high"
+    ],
     "zwave": {
       "lockAlarm": "ALARM",
       "lockAccess": "USRNUM",
