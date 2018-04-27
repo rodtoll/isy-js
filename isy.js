@@ -17,7 +17,7 @@ var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
-var xmlbuilder = require('xml2js');
+var Parser = require('xml2js').Parser;
 
 //import {xmlbuilder} from 'xmlbuilder';
 
@@ -228,8 +228,8 @@ class ISY {
         this.loadDevices2(result);
     
         var document = new xmldoc.XmlDocument(result);
-        var obj = JSON.parse(document.toString());
-        console.dir(obj.nodes.node);
+        //var obj = JSON.parse(document.toString());
+        //console.dir(obj.nodes.node);
         this.loadDevices(document);
         this.loadScenes(document);
     }
@@ -315,8 +315,8 @@ class ISY {
     }
 
     loadDevices2(result) {
-        let doc = new xmlbuilder.parseInt()
-        doc.parseInt
+        let doc = new Parser({explicitArray: false});
+        
         doc.parseString(result,(err,obj) => {
             console.dir(obj.nodes.node);
          
