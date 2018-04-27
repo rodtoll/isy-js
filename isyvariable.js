@@ -1,5 +1,3 @@
-var isy = require('./isy.js');
-
 var ISYVariable = function(isy, id, name, type) {
     this.isy = isy;
     this.id = id;
@@ -8,16 +6,16 @@ var ISYVariable = function(isy, id, name, type) {
     this.init = undefined;
     this.type = type;
     this.lastChanged = new Date();
-}
+};
 
 ISYVariable.prototype.markAsChanged = function() {
     this.lastChanged = new Date();
-}
+};
 
-ISYVariable.prototype.sendSetValue = function(value,onComplete) {
+ISYVariable.prototype.sendSetValue = function(value, onComplete) {
     this.isy.sendSetVariable(this.id, this.type, value, function(success) {
         onComplete(success);
-    })
-}
+    });
+};
 
 exports.ISYVariable = ISYVariable;

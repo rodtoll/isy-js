@@ -1,19 +1,7 @@
 
 # isy-js
 (C) Rod Toll 2015-2017, Licensed under the MIT-LICENSE.
-
-# ACTIVE DEVELOPMENT & SUPPORT DISCONTINUED
-I am sad to announce that I am discontinuing support for this library. This means I will no longer be addressing any open bugs, responding to feature requests or 
-releasing new versions. Between work and my home life there simply isn't the time. I will leave the repository online and the 
-package on npm but that is it. As this code is licensed under the MIT license you are of course welcome to branch this code and make it your own and use it in your 
-own projects -- but you do so, as always, with no warranty or support from me. 
-
-I want to thank everyone who helped along the way through questions and issues and code contributions -- your assistance was very much appreciated. And it made the 
-late nights and testing worth it. 
-
-If you find a good alternative and want others to know about it then open a new issue and provide a pointer. I might post a link here.
-
-# Old Readme..
+Continued development by shbatm, 2017-
 
 Javascript library for interfacing with the ISY-99i from Universal Devices. (http://www.universal-devices.com).
 
@@ -49,6 +37,7 @@ Features
 * Support for scenes
 * Support for generic devices through ISYBaseDevice
 * Support for variables (thanks @bdstark)
+* Support for Node Servers
 
 Setup
 -----
@@ -127,22 +116,6 @@ console during execution. Useful for debugging problems. The final parameter is 
 * `getVariableList()` - Returns a list of ISYVariable objects, one for each variable the ISY supports.
 * `getVariable(type,id)` - Returns the ISYVariable object representing the ISY variable of the specified type and id. null if not found.
 
-Constants:
-* `DEVICE_TYPE_LOCK` - Indicates a morninglinc lock device.
-* `DEVICE_TYPE_SECURE_LOCK` - Indicates a zwave lock device.
-* `DEVICE_TYPE_LIGHT` - Indicates a light, non-dimmable device type.
-* `DEVICE_TYPE_DIMMABLE_LIGHT` - Indicates a dimmable light device type.
-* `DEVICE_TYPE_OUTLET` - Indicates a outlet device type. 
-* `DEVICE_TYPE_FAN` - Indicates a fan device type. 
-* `DEVICE_TYPE_DOOR_WINDOW_SENSOR` - Indicates a door/window sensor device type.
-* `DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR` - Indicates an elk door/window sensor device type.
-* `DEVICE_TYPE_CO_SENSOR` - Indicates an Elk CO sensor device type.
-* `DEVICE_TYPE_ALARM_PANEL` - Indicates an Elk alarm panel device type. 
-* `DEVICE_TYPE_MOTION_SENSOR` - Indicates an Insteon motion sensor
-* `DEVICE_TYPE_SCENE` - Indicates an Insteon scene
-* `VARIABLE_TYPE_INTEGER` - Indicates that the variable is of type integer
-* `VARIABLE_TYPE_STATE` - Indicates that the variable is of type state.
-
 ### Notifications - Devices/Scenes
 
 The function `changeCallback` specified in the constructor will be called when a device state changes. It will also be
@@ -168,7 +141,7 @@ Properties:
 * `address` - ISY address for the device.
 * `isyType` - ISY type identifier for the device. see isydevicetypes.json for the map from isy types to friendly device names.
 * `deviceFriendlyName` - Friendly name for the type of device.
-* `deviceType` - Type of device. See ISY.DEVICE_TYPE_XXXXX for possible values.
+* `deviceType` - Type of device. See `isydefs.json` > `deviceType` for possible values.
 * `connectionType` - Type of connection to the Insteon network. Possible values - "Insteon Wired", "Insteon Wireless", "Insteon MorningLinc", "ZWave". See isydevicetypes.json for the map.
 * `batteryOperated` - true if this is a battery powered device, false otherwise.
 * `lastChanged` - Date/time the last time this library saw that the device characteristics have changed.
@@ -189,12 +162,8 @@ Functions (All Lights):
 * `sendLightCommand(state,resultCallback(success))` - Sends the command to set the Light power state. true to turn it on, false to turn it off
 
 Functions (Dimmable Lights):
-* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the light to the specified value. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
+* `sendLightDimCommand(level,resultCallback(success))` - Sets the dim level of the light to the specified value. Range: `ISYDefs.props.dimLevelMinimum` to `ISYDefs.props.dimLevelMinimum`.
 * `getCurrentLightDimState()` - Gets the current dim level of the light. Range: DIM_LEVEL_MINIMUM to DIM_LEVEL_MAXIMUM.
-
-Constants:
-* `DIM_LEVEL_MINIMUM` - Minimum dim level. (Full off)
-* `DIM_LEVEL_MAXIMUM` - Maximum dim level. (Full on)
 
 ### ISYScene
 
@@ -238,12 +207,6 @@ Represents an Insteon fan device.
 Functions:
 * `getCurrentFanState()`- Gets the current state of the fan. See the FAN_XXX constants for possible values. 
 * `sendFanCommand(state,resultCallback(success))` - Sends the command to set the fan state to the specified state. See the FAN_XXX constants for possible values.
-
-Constants:
-* `FAN_OFF` - Fan should be off.
-* `FAN_LEVEL_LOW` - Fan level is low.
-* `FAN_LEVEL_MEDIUM` - Fan level is medium.
-* `FAN_LEVEL_HIGH` - Fan level is high.
 
 ### ISYDoorWindowDevice
 
@@ -352,9 +315,20 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 * `getCurrentSecureLockState()` - Gets the current locked state of the secure lock device (usually zwave locks). true for locked, false for unlocked.
 * `sendSecureLockCommand(state,resultCallback(success))` - Sends the command to set the lock device (usually zwave locks) lock state to the specified state. true to lock the door, false to unlock it.
 
+API - NODE SERVER DEVICES
+-------------------------
+
+### ISYNodeServerNode
+
+Added in v0.6.0 to support ISYv5+ node servers. For node server device nodes, a generic object will be built during initialization. After initial loading, the ISY will send a status update for node server nodes and additional properties will be populated. For "Generic Value" changes (e.g. GV11), if a formatted value and name is returned, it will be added to the device object.  For example, the ISY Data Node Server returns the current year as GV9, you can access this via device.GV9 = 2018, or device.Year = "2018". From your program call `device.getFormattedStatus()` to return a JSON dump of all of a node server device's properties.
+
 CHANGELOG
 ---------
 
+* 0.6.2 - 2018/04/26 - Further linting and migration to JavaScript. Include formatted status/property values from ISY as `ISYDevice.currentState_f` (or `ISYDevice.propName_f`).
+* 0.6.1 - 2018/04/24 - Offloaded all constants (except Elk) to `isydefs.json` file. Available in code by using `ISYDefs` object or with a reference to the ISY object using `isy.defs` object.
+* 0.6.0 - 2018/04/23 - Update to use XML2JS to parse XML responses into native JS objects. Added support for Node Server nodes and advanced properties.
+* 0.5.0 - 2017/10/25 - Limited support resumed. Changes from shbatm/isy-js and tenstartups/isy-js have been incorportated. Changes include: removal of guardian timer, limited support for programs (executing), read-only support for Insteon Thermostats, bug fixes to support ISY v5 Firmware and Node Servers.
 * 0.4.5 - 2017/07/04 - Support suspended. Active development ended. 
 * 0.4.4 - 2017/01/14 - Restored chatty scene notifications, logic to quiet them wasn't right. Better chatty and correct then wrong and less chatty.
 * 0.4.3 - 2016/04/09 - Improved error checking to handle errors better. Now handles ISYs with no variables defined.
@@ -374,8 +348,21 @@ Older version history was not captured.
 TODO
 ----
 
-* Support for programs.
+* Additional support for programs.
 * Better error checking.
-* Recoverability in the websocket connection. These can drop over time.
 * The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
 * ELk > 1 areas
+
+## From original author: ACTIVE DEVELOPMENT & SUPPORT DISCONTINUED
+I am sad to announce that I am discontinuing support for this library. This means I will no longer be addressing any open bugs, responding to feature requests or 
+releasing new versions. Between work and my home life there simply isn't the time. I will leave the repository online and the 
+package on npm but that is it. As this code is licensed under the MIT license you are of course welcome to branch this code and make it your own and use it in your 
+own projects -- but you do so, as always, with no warranty or support from me. 
+
+I want to thank everyone who helped along the way through questions and issues and code contributions -- your assistance was very much appreciated. And it made the 
+late nights and testing worth it. 
+
+If you find a good alternative and want others to know about it then open a new issue and provide a pointer. I might post a link here.
+
+## From Contributor SHBATM:
+I will provide limited continued development of this module. Please direct any pull requests to the shbatm/isy-js fork for now to include any changes.
