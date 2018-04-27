@@ -17,7 +17,9 @@ var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
-var xmlbuilder = require('xmlbuilder');
+//var xmlbuilder = require('xmlbuilder');
+
+import {xmlbuilder} from 'xmlbuilder';
 
 
 function isyTypeToTypeName(isyType, address) {
@@ -311,7 +313,7 @@ class ISY {
 
     loadDevices2(result) {
         let doc = new xmlbuilder();
-    
+        doc.parseInt
         doc.parseString(result,(err,obj) => {
             console.dir(obj.nodes.node);
            

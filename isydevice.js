@@ -254,7 +254,7 @@ class ISYThermostatDevice extends ISYBaseDevice {
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_HOT_SETPOINT) {
+            } else if (propertyName == this.ISY_PROPERTY_HEAT_SETPOINT) {
                 if (actionValue != this.heatSetPoint) {
                     this.heatSetPoint = Number(actionValue);
                     this.lastChanged = new Date();
