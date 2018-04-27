@@ -3,6 +3,10 @@ var util = require('util');
 var assert = require('assert');
 
 class ISYBaseDevice {
+
+    
+
+
     constructor(isy, name, address, isyType, productName, deviceType, deviceFamily) {
         this.isy = isy;
         this.name = name;
@@ -66,7 +70,7 @@ class ISYBaseDevice {
     
     ////////////////////////////////////////////////////////////////////////
     // OUTLETS
-    getCurrentOutletState() {
+    getCurrentOutletState(){
         return (this.currentState > 0) ? true : false;
     }
     sendOutletCommand(outletState, resultHandler) {
@@ -188,7 +192,7 @@ class ISYDoorWindowDevice extends ISYBaseDevice {
         super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
     }
     getCurrentDoorWindowState() {
-        return !(this.currentState == this.ISY_STATE_DOOR_WINDOW_CLOSED);
+        return (this.currentState != this.ISY_STATE_DOOR_WINDOW_CLOSED);
     }
 }
 
