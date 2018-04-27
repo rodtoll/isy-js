@@ -17,9 +17,9 @@ var ISYThermostatDevice = require('./isydevice').ISYThermostatDevice;
 var ISYScene = require('./isyscene').ISYScene;
 var ISYBaseDevice = require('./isydevice').ISYBaseDevice;
 var ISYVariable = require('./isyvariable').ISYVariable;
-//var xmlbuilder = require('xmlbuilder');
+var xmlbuilder = require('xmlbuilder');
 
-import {xmlbuilder} from 'xmlbuilder';
+//import {xmlbuilder} from 'xmlbuilder';
 
 
 function isyTypeToTypeName(isyType, address) {
