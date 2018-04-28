@@ -81,20 +81,20 @@ class ISY {
     }
     getDeviceTypeBasedOnISYTable(deviceNode) {
         var familyId = 1;
-        if (deviceNode.childNamed('family') != null) {
-            familyId = Number(deviceNode.childNamed('family').val);
+        if (deviceNode.family!= null) {
+            familyId = Number(deviceNode.family);
         }
-        var isyType = deviceNode.childNamed('type').val;
-        var addressData = deviceNode.childNamed('address').val;
+        var isyType = deviceNode.type;
+        var addressData = deviceNode.address;
         var addressElements = addressData.split(' ');
         var typeElements = isyType.split('.');
         var mainType = Number(typeElements[0]);
         var subType = Number(typeElements[1]);
         var subAddress = Number(addressElements[3]);
         // ZWave nodes identify themselves with devtype node
-        if (deviceNode.childNamed('devtype') != null) {
-            if (deviceNode.childNamed('devtype').childNamed('cat') != null) {
-                subType = Number(deviceNode.childNamed('devtype').childNamed('cat').val);
+        if (deviceNode.devtype != null) {
+            if (deviceNode.devtype.cat != null) {
+                subType = Number(deviceNode.devtype.cat);
             }
         }
         // Insteon Device Family    
@@ -230,7 +230,7 @@ class ISY {
         var document = new xmldoc.XmlDocument(result);
         //var obj = JSON.parse(document.toString());
         //console.dir(obj.nodes.node);
-        this.loadDevices(document);
+        //this.loadDevices(document);
         this.loadScenes(document);
     }
     loadScenes(document) {
@@ -320,23 +320,19 @@ class ISY {
         doc.parseString(result,(err,obj) => {
             console.dir(obj.nodes.node);
             for(var device of obj.nodes.node)
+            {
                 console.log(device);
-        });
-
-
-
-       /*  var nodes = document.childrenNamed('node');
-        for (var index = 0; index < nodes.length; index++) {
-            var deviceAddress = nodes[index].childNamed('address').val;
-            var isyDeviceType = nodes[index].childNamed('type').val;
-            var deviceName = nodes[index].childNamed('name').val;
+     
+            var deviceAddress = device.address;
+            var isyDeviceType = device.type;
+            var deviceName = device.name;
             var newDevice = null;
             var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
-            var enabled = nodes[index].childNamed('enabled').val;
+            var enabled = device.enabled;
             if (enabled !== 'false') {
                 // Try fallback to new generic device identification when not specifically identified.  
                 if (deviceTypeInfo == null) {
-                    deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(nodes[index]);
+                    deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(device);
                 }
                 if (deviceTypeInfo != null) {
                     if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
@@ -365,22 +361,25 @@ class ISY {
                     // Support the device with a base device object
                 }
                 else {
-                    this.logger('Device: ' + deviceName + ' type: ' + isyDeviceType + ' is not specifically supported, returning generic device object. ');
+                    this.logger(`Device: ${deviceName} type: ${isyDeviceType} is not specifically supported, returning generic device object. `);
                     newDevice = new ISYBaseDevice(this, deviceName, deviceAddress, isyDeviceType, this.DEVICE_TYPE_UNKNOWN, 'Insteon');
                 }
                 if (newDevice != null) {
                     this.deviceIndex[deviceAddress] = newDevice;
                     this.deviceList.push(newDevice);
-                    var properties = nodes[index].childrenNamed('property');
-                    for (var j = 0; j < properties.length; j++) {
-                        this.handleISYStateUpdate(deviceAddress, properties[j].attr.value, properties[j].attr.id);
+                    //var properties = nodes[index].childrenNamed('property');
+                    for (var prop of device.property) {
+                        this.handleISYStateUpdate(deviceAddress, prop.$.value, prop.$.id);
                     }
                 }
             }
             else {
-                this.logger('Ignoring disabled device: ' + deviceName);
+                this.logger(`Ignoring disabled device: ${deviceName}`);
             }
-        } */
+        } 
+    });
+
+
     }
 
     loadElkNodes(result) {
