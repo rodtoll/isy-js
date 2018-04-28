@@ -66,7 +66,7 @@ class ISY {
     logger(msg) {
         if (this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
             var timeStamp = new Date();
-            console.log(timeStamp.getFullYear() + "-" + timeStamp.getMonth() + "-" + timeStamp.getDay() + "#" + timeStamp.getHours() + ":" + timeStamp.getMinutes() + ":" + timeStamp.getSeconds() + "- " + msg);
+            console.log(`${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}#${timeStamp.getHours()}:${timeStamp.getMinutes()}:${timeStamp.getSeconds()}- ${msg}`);
         }
     }
     buildDeviceInfoRecord(isyType, deviceFamily, deviceType) {
@@ -217,7 +217,7 @@ class ISY {
     nodeChangedHandler(node) {
         var that = this;
         if (this.nodesLoaded) {
-            this.logger('Node: ' + node.address + ' changed');
+            this.logger(`Node: ${node.address} changed`);
             this.changeCallback(that, node);
         }
     }
@@ -319,8 +319,12 @@ class ISY {
         
         doc.parseString(result,(err,obj) => {
             console.dir(obj.nodes.node);
-         
+            for(var device of obj.nodes.node)
+                console.log(device);
         });
+
+
+
        /*  var nodes = document.childrenNamed('node');
         for (var index = 0; index < nodes.length; index++) {
             var deviceAddress = nodes[index].childNamed('address').val;

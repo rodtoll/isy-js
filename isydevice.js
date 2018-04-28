@@ -4,9 +4,6 @@ var assert = require('assert');
 
 class ISYBaseDevice {
 
-    
-
-
     constructor(isy, name, address, isyType, productName, deviceType, deviceFamily) {
         this.isy = isy;
         this.name = name;
@@ -35,7 +32,6 @@ class ISYBaseDevice {
         this.ISY_STATE_MOTION_SENSOR_ON = 255;
         this.ISY_COMMAND_OUTLET_ON = 'DON';
         this.ISY_COMMAND_OUTLET_OFF = 'DOF';
-        
         this.FAN_OFF = 'Off';
         this.FAN_LEVEL_LOW = 'Low';
         this.FAN_LEVEL_MEDIUM = 'Medium';
@@ -66,52 +62,17 @@ class ISYBaseDevice {
         return changed;
     }
    
-    // DOOR/WINDOW SENSOR
-    
-    ////////////////////////////////////////////////////////////////////////
-    // OUTLETS
     getCurrentOutletState(){
         return (this.currentState > 0) ? true : false;
     }
     sendOutletCommand(outletState, resultHandler) {
         this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
     }
-    ////////////////////////////////////////////////////////////////////////
-    // MOTION SENSORS
+   
     getCurrentMotionSensorState() {
         return (this.currentState == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
     }
-    ////////////////////////////////////////////////////////////////////////
-    // THERMOSTATS
-
-    ////////////////////////////////////////////////////////////////////////
-    // FANS MOTORS
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class ISYLightDevice extends ISYBaseDevice {
     constructor(isy, name, address, deviceTypeInfo) {
@@ -205,11 +166,6 @@ class ISYMotionSensorDevice extends ISYBaseDevice {
         super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
     }
 }
-
-
-
-
-
 class ISYThermostatDevice extends ISYBaseDevice {
     constructor(isy, name, address, deviceTypeInfo) {
         super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
@@ -332,18 +288,6 @@ class ISYThermostatDevice extends ISYBaseDevice {
     }
 }
 
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-// ISYOutletDevice
-//
 
 class ISYOutletDevice extends ISYBaseDevice {
     constructor(isy, name, address, deviceTypeInfo) {
