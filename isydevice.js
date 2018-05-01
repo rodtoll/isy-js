@@ -4,12 +4,12 @@ var assert = require('assert');
 
 class ISYBaseDevice {
 
-    constructor(isy, name, address, isyType, productName, deviceType, deviceFamily) {
+    constructor(isy, productName, deviceType, deviceFamily, deviceNode) {
         this.isy = isy;
-        this.name = name;
-        this.address = address;
+        this.name = deviceNode.name;
+        this.address = deviceNode.address;
         this.productName = productName;
-        this.isyType = isyType;
+        this.isyType = deviceNode.type;
         this.deviceType = deviceType;
         this.batteryOperated = deviceType == 'MotionSensor';
         this.connectionType = deviceFamily;
@@ -48,6 +48,7 @@ class ISYBaseDevice {
         this.ISY_PROPERTY_HUMIDITY = 'CLIHUM';
         this.ISY_PROPERTY_HEATING_COOLING_STATE = 'CLIHCS';
         this.ISY_PROPERTY_FAN_STATE = 'CLIFS';
+        this.deviceNode= deviceNode;
     }
 
     handleIsyUpdate(actionValue, propertyName, subAddress) {
@@ -62,21 +63,14 @@ class ISYBaseDevice {
         return changed;
     }
    
-    getCurrentOutletState(){
-        return (this.currentState > 0) ? true : false;
-    }
-    sendOutletCommand(outletState, resultHandler) {
-        this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
-    }
+    
    
-    getCurrentMotionSensorState() {
-        return (this.currentState == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
-    }
+   
 }
 
 class ISYLightDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo, deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
         this.isDimmable = (deviceTypeInfo.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT);
     }
     getCurrentLightState() {
@@ -97,8 +91,8 @@ class ISYLightDevice extends ISYBaseDevice {
 
 
 class ISYLockDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo, deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
     }
     sendLockCommand(lockState, resultHandler) {
         if (this.deviceType == this.isy.DEVICE_TYPE_LOCK) {
@@ -149,8 +143,8 @@ class ISYLockDevice extends ISYBaseDevice {
 //
 
 class ISYDoorWindowDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo,deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
     getCurrentDoorWindowState() {
         return (this.currentState != this.ISY_STATE_DOOR_WINDOW_CLOSED);
@@ -162,13 +156,17 @@ class ISYDoorWindowDevice extends ISYBaseDevice {
 //
 
 class ISYMotionSensorDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy,deviceTypeInfo,deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
+    }
+
+    getCurrentMotionSensorState() {
+        return (this.currentState == this.ISY_STATE_MOTION_SENSOR_ON) ? true : false;
     }
 }
 class ISYThermostatDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo,deviceNode) {
+        super(isy,deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
         this.coolSetPoint = 0;
         this.heatSetPoint = 0;
         this.humidity = 0;
@@ -290,8 +288,14 @@ class ISYThermostatDevice extends ISYBaseDevice {
 
 
 class ISYOutletDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo,deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
+    }
+    getCurrentOutletState(){
+        return (this.currentState > 0) ? true : false;
+    }
+    sendOutletCommand(outletState, resultHandler) {
+        this.isy.sendRestCommand(this.address, (outletState) ? this.ISY_COMMAND_OUTLET_ON : this.ISY_COMMAND_OUTLET_OFF, null, resultHandler);
     }
 }
 
@@ -301,8 +305,8 @@ class ISYOutletDevice extends ISYBaseDevice {
 //
 
 class ISYFanDevice extends ISYBaseDevice {
-    constructor(isy, name, address, deviceTypeInfo) {
-        super(isy, name, address, deviceTypeInfo.type, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType);
+    constructor(isy, deviceTypeInfo,deviceNode) {
+        super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
 
     getCurrentFanState() {

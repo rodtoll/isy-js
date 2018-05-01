@@ -225,7 +225,7 @@ class ISY {
         return this.elkAlarmPanel;
     }
     loadNodes(result) {
-        this.loadDevices2(result);
+        this.loadDevices(result);
     
         var document = new xmldoc.XmlDocument(result);
         //var obj = JSON.parse(document.toString());
@@ -255,7 +255,7 @@ class ISY {
             }
         }
     }
-    loadDevices(document) {
+    /* loadDevices(document) {
         var nodes = document.childrenNamed('node');
         for (var index = 0; index < nodes.length; index++) {
             var deviceAddress = nodes[index].childNamed('address').val;
@@ -272,32 +272,32 @@ class ISY {
                 if (deviceTypeInfo != null) {
                     if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
                         deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-                        newDevice = new ISYLightDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYLightDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-                        newDevice = new ISYDoorWindowDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYDoorWindowDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
-                        newDevice = new ISYMotionSensorDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYMotionSensorDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
-                        newDevice = new ISYFanDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYFanDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK ||
                         deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
-                        newDevice = new ISYLockDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYLockDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
-                        newDevice = new ISYOutletDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYOutletDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_THERMOSTAT) {
-                        newDevice = new ISYThermostatDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYThermostatDevice(this, device, deviceTypeInfo);
                     }
                     // Support the device with a base device object
                 }
                 else {
                     this.logger('Device: ' + deviceName + ' type: ' + isyDeviceType + ' is not specifically supported, returning generic device object. ');
-                    newDevice = new ISYBaseDevice(this, deviceName, deviceAddress, isyDeviceType, this.DEVICE_TYPE_UNKNOWN, 'Insteon');
+                    newDevice = new ISYBaseDevice(this, device, isyDeviceType, this.DEVICE_TYPE_UNKNOWN, 'Insteon');
                 }
                 if (newDevice != null) {
                     this.deviceIndex[deviceAddress] = newDevice;
@@ -312,22 +312,20 @@ class ISY {
                 this.logger('Ignoring disabled device: ' + deviceName);
             }
         }
-    }
+    } */
 
-    loadDevices2(result) {
+    loadDevices(result) {
         let doc = new Parser({explicitArray: false});
         
         doc.parseString(result,(err,obj) => {
-            console.dir(obj.nodes.node);
+            this.logger(obj.nodes.node);
             for(var device of obj.nodes.node)
             {
-                console.log(device);
+            this.logger(device);
      
-            var deviceAddress = device.address;
-            var isyDeviceType = device.type;
-            var deviceName = device.name;
+            
             var newDevice = null;
-            var deviceTypeInfo = isyTypeToTypeName(isyDeviceType, deviceAddress);
+            var deviceTypeInfo = isyTypeToTypeName(device.type, device.address);
             var enabled = device.enabled;
             if (enabled !== 'false') {
                 // Try fallback to new generic device identification when not specifically identified.  
@@ -337,44 +335,54 @@ class ISY {
                 if (deviceTypeInfo != null) {
                     if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DIMMABLE_LIGHT ||
                         deviceTypeInfo.deviceType == this.DEVICE_TYPE_LIGHT) {
-                        newDevice = new ISYLightDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYLightDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-                        newDevice = new ISYDoorWindowDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYDoorWindowDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_MOTION_SENSOR) {
-                        newDevice = new ISYMotionSensorDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYMotionSensorDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_FAN) {
-                        newDevice = new ISYFanDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYFanDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_LOCK ||
                         deviceTypeInfo.deviceType == this.DEVICE_TYPE_SECURE_LOCK) {
-                        newDevice = new ISYLockDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYLockDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_OUTLET) {
-                        newDevice = new ISYOutletDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYOutletDevice(this, device, deviceTypeInfo);
                     }
                     else if (deviceTypeInfo.deviceType == this.DEVICE_TYPE_THERMOSTAT) {
-                        newDevice = new ISYThermostatDevice(this, deviceName, deviceAddress, deviceTypeInfo);
+                        newDevice = new ISYThermostatDevice(this, device, deviceTypeInfo);
                     }
                     // Support the device with a base device object
                 }
                 else {
-                    this.logger(`Device: ${deviceName} type: ${isyDeviceType} is not specifically supported, returning generic device object. `);
-                    newDevice = new ISYBaseDevice(this, deviceName, deviceAddress, isyDeviceType, this.DEVICE_TYPE_UNKNOWN, 'Insteon');
+                    this.logger(`Device: ${device.name} type: ${device.type} is not specifically supported, returning generic device object. `);
+                    newDevice = new ISYBaseDevice(this, device, this.DEVICE_TYPE_UNKNOWN, 'Insteon', device);
                 }
                 if (newDevice != null) {
-                    this.deviceIndex[deviceAddress] = newDevice;
+                    this.deviceIndex[device.address] = newDevice;
                     this.deviceList.push(newDevice);
-                    //var properties = nodes[index].childrenNamed('property');
-                    for (var prop of device.property) {
-                        this.handleISYStateUpdate(deviceAddress, prop.$.value, prop.$.id);
+                    if(Array.isArray(device.property))
+                    {//var properties = nodes[index].childrenNamed('property');
+                        console.log(device.property);
+                        for (var prop of device.property) {
+                            console.log(prop);
+                            this.handleISYStateUpdate(device.address, prop.$.value, prop.$.id);
+                            
+                        }
+                    }
+                    else
+                    {
+                        console.log(device.property);
+                        this.handleISYStateUpdate(device.address, device.property.$.value, device.property.$.id);
                     }
                 }
             }
             else {
-                this.logger(`Ignoring disabled device: ${deviceName}`);
+                this.logger(`Ignoring disabled device: ${device.name}`);
             }
         } 
     });
@@ -675,7 +683,7 @@ class ISY {
         }
     }
     sendISYCommand(path, handleResult) {
-        var uriToUse = this.protocol + '://' + this.address + '/rest/' + path;
+        var uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
         this.logger("ISY-JS: Sending ISY command..." + uriToUse);
         var options = {
             username: this.userName,
@@ -691,11 +699,11 @@ class ISY {
         });
     }
     sendRestCommand(deviceAddress, command, parameter, handleResult) {
-        var uriToUse = this.protocol + '://' + this.address + '/rest/nodes/' + deviceAddress + '/cmd/' + command;
+        var uriToUse = `${this.protocol}://${this.address}/rest/nodes/${deviceAddress}/cmd/${command}`;
         if (parameter != null) {
             uriToUse += '/' + parameter;
         }
-        this.logger("ISY-JS: Sending command..." + uriToUse);
+        this.logger(`ISY-JS: Sending command...${uriToUse}`);
         var options = {
             username: this.userName,
             password: this.password
@@ -710,8 +718,8 @@ class ISY {
         });
     }
     sendGetVariable(id, type, handleResult) {
-        var uriToUse = this.protocol + '://' + this.address + '/rest/vars/get/' + type + '/' + id;
-        this.logger("ISY-JS: Sending ISY command..." + uriToUse);
+        var uriToUse = `${this.protocol}://${this.address}/rest/vars/get/${type}/${id}`;
+        this.logger(`ISY-JS: Sending ISY command...${uriToUse}`);
         var options = {
             username: this.userName,
             password: this.password
@@ -726,8 +734,8 @@ class ISY {
         });
     }
     sendSetVariable(id, type, value, handleResult) {
-        var uriToUse = this.protocol + '://' + this.address + '/rest/vars/set/' + type + '/' + id + '/' + value;
-        this.logger("ISY-JS: Sending ISY command..." + uriToUse);
+        var uriToUse = `${this.protocol}://${this.address}/rest/vars/set/${type}/${id}/${value}`;
+        this.logger(`ISY-JS: Sending ISY command...${uriToUse}`);
         var options = {
             username: this.userName,
             password: this.password
