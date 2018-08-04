@@ -3,7 +3,6 @@ var util = require('util');
 var assert = require('assert');
 
 class ISYBaseDevice {
-
     constructor(isy, productName, deviceType, deviceFamily, deviceNode) {
         this.isy = isy;
         this.name = deviceNode.name;
@@ -48,12 +47,13 @@ class ISYBaseDevice {
         this.ISY_PROPERTY_HUMIDITY = 'CLIHUM';
         this.ISY_PROPERTY_HEATING_COOLING_STATE = 'CLIHCS';
         this.ISY_PROPERTY_FAN_STATE = 'CLIFS';
-        this.deviceNode= deviceNode;
+        this.childDevices = {};
+        this.deviceNode = deviceNode;
     }
 
     handleIsyUpdate(actionValue, propertyName, subAddress) {
         var changed = false;
-        if (propertyName == "ST") {
+        if (propertyName == this.ISY_PROPERTY_STATE) {
             if (actionValue != this.currentState) {
                 this.currentState = Number(actionValue);
                 this.lastChanged = new Date();
@@ -62,14 +62,10 @@ class ISYBaseDevice {
         }
         return changed;
     }
-   
-    
-   
-   
 }
 
 class ISYLightDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo, deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo)  {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
         this.isDimmable = (deviceTypeInfo.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT);
     }
@@ -91,7 +87,7 @@ class ISYLightDevice extends ISYBaseDevice {
 
 
 class ISYLockDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo, deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo) {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
     }
     sendLockCommand(lockState, resultHandler) {
@@ -143,7 +139,7 @@ class ISYLockDevice extends ISYBaseDevice {
 //
 
 class ISYDoorWindowDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo,deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo)  {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
     getCurrentDoorWindowState() {
@@ -156,7 +152,7 @@ class ISYDoorWindowDevice extends ISYBaseDevice {
 //
 
 class ISYMotionSensorDevice extends ISYBaseDevice {
-    constructor(isy,deviceTypeInfo,deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo)  {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
 
@@ -165,7 +161,7 @@ class ISYMotionSensorDevice extends ISYBaseDevice {
     }
 }
 class ISYThermostatDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo,deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo) {
         super(isy,deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType, deviceNode);
         this.coolSetPoint = 0;
         this.heatSetPoint = 0;
@@ -288,7 +284,7 @@ class ISYThermostatDevice extends ISYBaseDevice {
 
 
 class ISYOutletDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo,deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo)  {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
     getCurrentOutletState(){
@@ -305,7 +301,7 @@ class ISYOutletDevice extends ISYBaseDevice {
 //
 
 class ISYFanDevice extends ISYBaseDevice {
-    constructor(isy, deviceTypeInfo,deviceNode) {
+    constructor(isy, deviceNode, deviceTypeInfo) {
         super(isy, deviceTypeInfo.name, deviceTypeInfo.deviceType, deviceTypeInfo.connectionType,deviceNode);
     }
 
