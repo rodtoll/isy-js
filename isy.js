@@ -215,13 +215,15 @@ class ISY {
         }
         return null;
     }
-    nodeChangedHandler(node) {
+
+    nodeChangedHandler(node, propertyName) {
         var that = this;
         if (this.nodesLoaded) {
             this.logger(`Node: ${node.address} changed`);
-            this.changeCallback(that, node);
+            this.changeCallback(that, node, propertyName);
         }
     }
+
     getElkAlarmPanel() {
         return this.elkAlarmPanel;
     }
@@ -618,7 +620,7 @@ class ISY {
         var subAddress = address[address.length - 1];
         if (deviceToUpdate != undefined && deviceToUpdate != null) {
             if (deviceToUpdate.handleIsyUpdate(state, propertyName, subAddress)) {
-                this.nodeChangedHandler(deviceToUpdate);
+                this.nodeChangedHandler(deviceToUpdate,propertyName);
                 if (this.scenesInDeviceList) {
                     // Inefficient, we could build a reverse index (device->scene list)
                     // but device list is relatively small
@@ -634,6 +636,7 @@ class ISY {
             }
         }
     }
+
     sendISYCommand(path, handleResult) {
         var uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
         this.logger("ISY-JS: Sending ISY command..." + uriToUse);

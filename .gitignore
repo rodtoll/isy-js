@@ -15,3 +15,7 @@ node_modules/*
 ISYNodeInfo.xml
 ISYNodes.json
 ISYNodes.xml
+.vscode
+.jshintrc
+.eslintrc*
+package-lock.json
