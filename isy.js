@@ -723,41 +723,5 @@ ISY.prototype.DEVICE_TYPE_SCENE = 'Scene';
 ISY.prototype.VARIABLE_TYPE_INTEGER = '1';
 ISY.prototype.VARIABLE_TYPE_STATE = '2';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 exports.ISY = ISY;
 

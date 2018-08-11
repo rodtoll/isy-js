@@ -2,8 +2,17 @@ var isy = require('./isy.js');
 var util = require('util');
 var assert = require('assert');
 
+
+ const  ISY_PROPERTY_STATE = 'ST';
+ const  ISY_PROPERTY_COOL_SETPOINT = 'CLISPC';
+ const  ISY_PROPERTY_HEAT_SETPOINT = 'CLISPH';
+ const  ISY_PROPERTY_MODE = 'CLIMD';
+ const  ISY_PROPERTY_HUMIDITY = 'CLIHUM';
+ const  ISY_PROPERTY_HEATING_COOLING_STATE = 'CLIHCS';
+ const  ISY_PROPERTY_FAN_STATE = 'CLIFS';
+
 class ISYBaseDevice {
-    constructor(isy, productName, deviceType, deviceFamily, deviceNode) {
+    constructor(isy, productName, deviceType, deviceFamily, deviceNode, propertyChangeCallback) {
         this.isy = isy;
         this.name = deviceNode.name;
         this.address = deviceNode.address;
@@ -15,7 +24,6 @@ class ISYBaseDevice {
         this.deviceFriendlyName = deviceType;
         this.currentState = 0;
         this.lastChanged = new Date();
-        this.ISY_PROPERTY_STATUS = "ST";
         this.DIM_LEVEL_MINIMUM = 0;
         this.DIM_LEVEL_MAXIMUM = 100;
         this.ISY_DIM_LEVEL_MAXIMUM = 255;
@@ -40,26 +48,22 @@ class ISYBaseDevice {
         this.ISY_COMMAND_FAN_PARAMETER_LOW = 63;
         this.ISY_COMMAND_FAN_PARAMETER_MEDIUM = 191;
         this.ISY_COMMAND_FAN_PARAMETER_HIGH = 255;
-        this.ISY_PROPERTY_STATE = 'ST';
-        this.ISY_PROPERTY_COOL_SETPOINT = 'CLISPC';
-        this.ISY_PROPERTY_HEAT_SETPOINT = 'CLISPH';
-        this.ISY_PROPERTY_MODE = 'CLIMD';
-        this.ISY_PROPERTY_HUMIDITY = 'CLIHUM';
-        this.ISY_PROPERTY_HEATING_COOLING_STATE = 'CLIHCS';
-        this.ISY_PROPERTY_FAN_STATE = 'CLIFS';
         this.childDevices = {};
         this.deviceNode = deviceNode;
+        this.propertyChangeCallback = propertyChangeCallback;
     }
 
     handleIsyUpdate(actionValue, propertyName, subAddress) {
         var changed = false;
-        if (propertyName == this.ISY_PROPERTY_STATE) {
+        if (propertyName == ISY_PROPERTY_STATE) {
             if (actionValue != this.currentState) {
                 this.currentState = Number(actionValue);
                 this.lastChanged = new Date();
                 changed = true;
             }
         }
+        if(this.propertyChangeCallback !== null && this.propertyChangeCallback !== undefined && changed)
+            this.propertyChangeCallback(propertyName,actionValue);
         return changed;
     }
 }
@@ -173,7 +177,7 @@ class ISYThermostatDevice extends ISYBaseDevice {
 
     handleIsyUpdate(actionValue, propertyName, subAddress) {
         var changed = false;
-        console.log(this.name, ':', propertyName, ':', actionValue, ":", subAddress);
+     
         if (subAddress == 2) {
             var isOn = actionValue == 255;
             if (isOn && this.currentMode != 3) {
@@ -196,43 +200,43 @@ class ISYThermostatDevice extends ISYBaseDevice {
                 changed = true;
             }
         } else {
-            if (propertyName == this.ISY_PROPERTY_STATE) {
+            if (propertyName == ISY_PROPERTY_STATE) {
                 if (actionValue != this.currentState) {
                     this.currentState = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_COOL_SETPOINT) {
+            } else if (propertyName == ISY_PROPERTY_COOL_SETPOINT) {
                 if (actionValue != this.coolSetPoint) {
                     this.coolSetPoint = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_HEAT_SETPOINT) {
+            } else if (propertyName == ISY_PROPERTY_HEAT_SETPOINT) {
                 if (actionValue != this.heatSetPoint) {
                     this.heatSetPoint = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_MODE) {
+            } else if (propertyName == ISY_PROPERTY_MODE) {
                 if (actionValue != this.mode) {
                     this.mode = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_HUMIDITY) {
+            } else if (propertyName == ISY_PROPERTY_HUMIDITY) {
                 if (actionValue != this.humidity) {
                     this.humidity = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_HEATING_COOLING_STATE) {
+            } else if (propertyName == ISY_PROPERTY_HEATING_COOLING_STATE) {
                 if (actionValue != this.currentMode) {
                     this.currentMode = Number(actionValue);
                     this.lastChanged = new Date();
                     changed = true;
                 }
-            } else if (propertyName == this.ISY_PROPERTY_FAN_STATE) {
+            } else if (propertyName == ISY_PROPERTY_FAN_STATE) {
                 if (actionValue != this.fanState) {
                     this.fanState = Number(actionValue);
                     this.lastChanged = new Date();
@@ -240,6 +244,8 @@ class ISYThermostatDevice extends ISYBaseDevice {
                 }
             }
         }
+        if(this.propertyChangeCallback !== null && this.propertyChangeCallback !== undefined && changed)
+            this.propertyChangeCallback(propertyName,actionValue);
         return changed;
     }
     getCurrentTemperatureState() {
@@ -266,18 +272,18 @@ class ISYThermostatDevice extends ISYBaseDevice {
     }
     sendUpdateCoolSetPointCommand(value, resultHandler) {
         
-       this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_COOL_SETPOINT, value * 2, resultHandler);
+       this.isy.sendRestCommand(this.address, ISY_PROPERTY_COOL_SETPOINT, value * 2, resultHandler);
         
     }
 
     sendUpdateHeatSetPointCommand(value, resultHandler) {
         
-        this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_HEAT_SETPOINT, value * 2, resultHandler);
+        this.isy.sendRestCommand(this.address, ISY_PROPERTY_HEAT_SETPOINT, value * 2, resultHandler);
     
     }
     sendUpdateHeatingCoolingModeCommand(value, resultHandler) {
         
-        this.isy.sendRestCommand(this.address, this.ISY_PROPERTY_MODE, value * 2, resultHandler);
+        this.isy.sendRestCommand(this.address, ISY_PROPERTY_MODE, value * 2, resultHandler);
     
     }
 }
@@ -349,11 +355,11 @@ class ISYFanDevice extends ISYBaseDevice {
     }
 */}
 
-    exports.ISYBaseDevice = ISYBaseDevice;
-    exports.ISYOutletDevice = ISYOutletDevice;
-    exports.ISYLightDevice = ISYLightDevice;
-    exports.ISYLockDevice = ISYLockDevice;
-    exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
-    exports.ISYFanDevice = ISYFanDevice;
-    exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
-    exports.ISYThermostatDevice = ISYThermostatDevice;
+exports.ISYBaseDevice = ISYBaseDevice;
+exports.ISYOutletDevice = ISYOutletDevice;
+exports.ISYLightDevice = ISYLightDevice;
+exports.ISYLockDevice = ISYLockDevice;
+exports.ISYDoorWindowDevice = ISYDoorWindowDevice;
+exports.ISYFanDevice = ISYFanDevice;
+exports.ISYMotionSensorDevice = ISYMotionSensorDevice;
+exports.ISYThermostatDevice = ISYThermostatDevice;
