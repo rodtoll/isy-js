@@ -1,16 +1,16 @@
 {
     "name": "isy-js",
-    "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application",
-    "license" : "MIT",
-    "version" : "0.4.4",
-    "author" : {
+    "description": "Javascript wrapper for ISY interface including websockets for change notifications. Designed to be used in a node.js application.",
+    "license": "MIT",
+    "version": "0.5.0",
+    "author": {
         "name": "Rod Toll",
         "email": "rod_toll@hotmail.com"
     },
-    "scripts" : {
-        "test": "mocha"    
+    "scripts": {
+        "test": "mocha"
     },
-    "keywords" : [
+    "keywords": [
         "isy",
         "universal devies",
         "insteon"
@@ -18,7 +18,9 @@
     "main": "isy.js",
     "devDependencies": {
         "mocha": "",
-        "fake-isy-994i": ""
+        "fake-isy-994i": "",
+        "hap-nodejs": "",
+        "xml2js": ""
     },
     "dependencies": {
         "restler": "",
@@ -26,10 +28,10 @@
         "xmldoc": ""
     },
     "bugs": {
-        "url": "https://github.com/rodtoll/isy-js/issues"
+        "url": "https://github.com/pradeepmouli/isy-js/issues"
     },
-    "repository" : {
-         "type" : "git", 
-         "url" : "https://github.com/rodtoll/isy-js.git"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pradeepmouli/isy-js.git"
     }
 }

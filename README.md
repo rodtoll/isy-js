@@ -1,7 +1,7 @@
 
-# isy-js [![Build Status](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)](https://api.travis-ci.org/rodtoll/isy-js.svg?branch=master)
+# isy-js
 
-(C) Rod Toll 2015, Licensed under the MIT-LICENSE.
+(C) Rod Toll 2015-2017, Licensed under the MIT-LICENSE. Additional development work by pradeepmouli, 2018-
 
 Javascript library for interfacing with the ISY-99i from Universal Devices. (http://www.universal-devices.com).
 
@@ -350,6 +350,9 @@ documentation for each of the specific device types ISYXXXDevice. Beyond those t
 
 CHANGELOG
 ---------
+
+* 0.4.6 - 2018/05/01 - Development resumed.
+* 0.4.5 - 2017/07/04 - Support suspended. Active development ended. 
 * 0.4.4 - 2017/01/14 - Restored chatty scene notifications, logic to quiet them wasn't right. Better chatty and correct then wrong and less chatty.
 * 0.4.3 - 2016/04/09 - Improved error checking to handle errors better. Now handles ISYs with no variables defined.
 * 0.4.2 - 2016/02/15 - Added check to watch for loss of connection. If no notifications are seen in 60 seconds connection is reestablished. Also
@@ -368,8 +371,8 @@ Older version history was not captured.
 TODO
 ----
 
+* Merge shbatm codebase
 * Support for programs.
 * Better error checking.
 * Recoverability in the websocket connection. These can drop over time.
-* The ISY-994 will sometimes return incomplete XML (missing part of the closing tag) and we should be resilient to that.
 * ELk > 1 areas
