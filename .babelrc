@@ -1,0 +1,12 @@
+{
+    
+    "plugins": [
+        "transform-es2015-modules-commonjs"
+    ],
+    "ignore": [
+        "./node_modules",
+        "./lib",
+        "./isySampleOutput",
+        "./test"
+    ]
+}

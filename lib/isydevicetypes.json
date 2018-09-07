@@ -306,7 +306,7 @@
   {
     "type": "2.57.68.0",
     "address": "1",
-    "name": "(2663-222) Insteon Dual On/Off Top",
+    "name": "(2663-222) Insteon Dual On/Off  Top",
     "deviceType": "Outlet",
     "connectionType": "Insteon Wireless",
     "batteryOperated": false

@@ -1,0 +1,1825 @@
+export interface DeviceSpec {
+	make: string[];
+	manufacturerURL: string[];
+	model: string[];
+	icon: string[];
+	archive: string[];
+	chart: string[];
+	queryOnInit: string[];
+	oneNodeAtATime: string[];
+	baseProtocolOptional: string[];
+}
+
+export interface UpnpDevice {
+	utype: string[];
+	version: string[];
+}
+
+export interface UpnpService {
+	utype: string[];
+	version: string[];
+}
+
+export interface UpnpSpec {
+	upnpDevice: UpnpDevice[];
+	upnpService: UpnpService[];
+}
+
+export interface Control {
+	name: string[];
+	label: string[];
+}
+
+export interface Control {
+	control: Control[];
+}
+
+export interface Root {
+	id: string[];
+	name: string[];
+}
+
+export interface Product {
+	id: string[];
+	desc: string[];
+}
+
+export interface Feature {
+	id: string[];
+	desc: string[];
+	isInstalled: string[];
+	isAvailable: string[];
+}
+
+export interface Feature {
+	feature: Feature[];
+}
+
+export interface $ {
+	type: string;
+	version: string;
+}
+
+export interface Secsy {
+	$: $;
+}
+
+export interface $ {
+	type: string;
+	version: string;
+}
+
+
+
+e
+    "configuration": {
+        "deviceSpecs": [{
+            "make": [
+                "Universal Devices Inc."
+            ],
+            "manufacturerURL": [
+                "https://www.universal-devices.com"
+            ],
+            "model": [
+                "ISY994i Series"
+            ],
+            "icon": [
+                "/web/udlogo.jpg"
+            ],
+            "archive": [
+                "/web/insteon.jar"
+            ],
+            "chart": [
+                "/web/chart.jar"
+            ],
+            "queryOnInit": [
+                "true"
+            ],
+            "oneNodeAtATime": [
+                "true"
+            ],
+            "baseProtocolOptional": [
+                "false"
+            ]
+        }],
+        "upnpSpecs": [{
+            "upnpDevice": [{
+                "utype": [
+                    "X_Insteon_Lighting_Device"
+                ],
+                "version": [
+                    "1"
+                ]
+            }],
+            "upnpService": [{
+                "utype": [
+                    "X_Insteon_Lighting_Service"
+                ],
+                "version": [
+                    "1"
+                ]
+            }]
+        }],
+        "controls": [{
+            "control": [{
+                    "name": [
+                        "QUERY"
+                    ],
+                    "label": [
+                        "Query Device"
+                    ]
+                },
+                {
+                    "name": [
+                        "ST"
+                    ],
+                    "label": [
+                        "Status"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "OL"
+                    ],
+                    "label": [
+                        "On Level"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "RR"
+                    ],
+                    "label": [
+                        "Ramp Rate"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "DON"
+                    ],
+                    "label": [
+                        "On"
+                    ]
+                },
+                {
+                    "name": [
+                        "DFON"
+                    ],
+                    "label": [
+                        "Fast On"
+                    ]
+                },
+                {
+                    "name": [
+                        "DOF"
+                    ],
+                    "label": [
+                        "Off"
+                    ]
+                },
+                {
+                    "name": [
+                        "DFOF"
+                    ],
+                    "label": [
+                        "Fast Off"
+                    ]
+                },
+                {
+                    "name": [
+                        "BRT"
+                    ],
+                    "label": [
+                        "Brighten"
+                    ]
+                },
+                {
+                    "name": [
+                        "DIM"
+                    ],
+                    "label": [
+                        "Dim"
+                    ]
+                },
+                {
+                    "name": [
+                        "BMAN"
+                    ],
+                    "label": [
+                        "Deprecated - Use FDUP or FDDOWN"
+                    ]
+                },
+                {
+                    "name": [
+                        "SMAN"
+                    ],
+                    "label": [
+                        "Deprecated - Use FDSTOP"
+                    ]
+                },
+                {
+                    "name": [
+                        "FDUP"
+                    ],
+                    "label": [
+                        "Fade Up"
+                    ]
+                },
+                {
+                    "name": [
+                        "FDDOWN"
+                    ],
+                    "label": [
+                        "Fade Down"
+                    ]
+                },
+                {
+                    "name": [
+                        "FDSTOP"
+                    ],
+                    "label": [
+                        "Fade Stop"
+                    ]
+                },
+                {
+                    "name": [
+                        "BEEP"
+                    ],
+                    "label": [
+                        "Beep"
+                    ]
+                },
+                {
+                    "name": [
+                        "RESET"
+                    ],
+                    "label": [
+                        "Reset values"
+                    ]
+                },
+                {
+                    "name": [
+                        "ERR"
+                    ],
+                    "label": [
+                        "Error"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLITEMP"
+                    ],
+                    "label": [
+                        "Current Temperature"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "F"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLISPH"
+                    ],
+                    "label": [
+                        "Heat Setpoint"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "F"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLISPC"
+                    ],
+                    "label": [
+                        "Cool Setpoint"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "F"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLIFS"
+                    ],
+                    "label": [
+                        "Fan Setting"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "7"
+                                ],
+                                "label": [
+                                    "On"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "8"
+                                ],
+                                "label": [
+                                    "Auto"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "CLIFSO"
+                    ],
+                    "label": [
+                        "Fan Setting Override"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLIFRS"
+                    ],
+                    "label": [
+                        "Fan Running State"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLIMD"
+                    ],
+                    "label": [
+                        "Thermostat Mode"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "0"
+                                ],
+                                "label": [
+                                    "Off"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Heat"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "2"
+                                ],
+                                "label": [
+                                    "Cool"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "3"
+                                ],
+                                "label": [
+                                    "Auto"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "4"
+                                ],
+                                "label": [
+                                    "Fan"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "5"
+                                ],
+                                "label": [
+                                    "Program Auto"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "6"
+                                ],
+                                "label": [
+                                    "Program Heat"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "7"
+                                ],
+                                "label": [
+                                    "Program Cool"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "CLISMD"
+                    ],
+                    "label": [
+                        "Schedule Mode"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "0"
+                                ],
+                                "label": [
+                                    "Hold"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Run"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "2"
+                                ],
+                                "label": [
+                                    "Away"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "CLIHUM"
+                    ],
+                    "label": [
+                        "Humidity"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "CLIHCS"
+                    ],
+                    "label": [
+                        "Heat/Cool State"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "0"
+                                ],
+                                "label": [
+                                    "Off"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Heat On"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "2"
+                                ],
+                                "label": [
+                                    "Cool On"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "CLIEMD"
+                    ],
+                    "label": [
+                        "Energy Mode"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "UOM"
+                    ],
+                    "label": [
+                        "Unit"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Celsius"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "2"
+                                ],
+                                "label": [
+                                    "Fahrenheit"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "CV"
+                    ],
+                    "label": [
+                        "Current Voltage"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "V"
+                    ]
+                },
+                {
+                    "name": [
+                        "CC"
+                    ],
+                    "label": [
+                        "Current Current"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "A"
+                    ]
+                },
+                {
+                    "name": [
+                        "PPW"
+                    ],
+                    "label": [
+                        "Polarized Power Used"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "W"
+                    ]
+                },
+                {
+                    "name": [
+                        "CPW"
+                    ],
+                    "label": [
+                        "Current Power Used"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "W"
+                    ]
+                },
+                {
+                    "name": [
+                        "TPW"
+                    ],
+                    "label": [
+                        "Total Power Used"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "kWs"
+                    ]
+                },
+                {
+                    "name": [
+                        "PF"
+                    ],
+                    "label": [
+                        "Power Factor"
+                    ],
+                    "readOnly": [
+                        "true"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "true"
+                    ],
+                    "numericUnit": [
+                        "%"
+                    ]
+                },
+                {
+                    "name": [
+                        "ADRPST"
+                    ],
+                    "label": [
+                        "Auto DR Processing State"
+                    ],
+                    "readOnly": [
+                        "false"
+                    ],
+                    "isQueryAble": [
+                        "true"
+                    ],
+                    "isNumeric": [
+                        "false"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "0"
+                                ],
+                                "label": [
+                                    "Auto Apply Off"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Auto Apply On"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "BATLVL"
+                    ],
+                    "label": [
+                        "Battery level"
+                    ]
+                },
+                {
+                    "name": [
+                        "UAC"
+                    ],
+                    "label": [
+                        "Valid user access code entered"
+                    ]
+                },
+                {
+                    "name": [
+                        "USRNUM"
+                    ],
+                    "label": [
+                        "The user access code that associated with the most recent Alarm"
+                    ]
+                },
+                {
+                    "name": [
+                        "ALARM"
+                    ],
+                    "label": [
+                        "An alarm occurred (values are different for each device type)"
+                    ]
+                },
+                {
+                    "name": [
+                        "SECMD"
+                    ],
+                    "label": [
+                        "Device secure mode"
+                    ],
+                    "actions": [{
+                        "action": [{
+                                "name": [
+                                    "0"
+                                ],
+                                "label": [
+                                    "Device operation is not secured"
+                                ]
+                            },
+                            {
+                                "name": [
+                                    "1"
+                                ],
+                                "label": [
+                                    "Device operation is secured"
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "name": [
+                        "BUSY"
+                    ],
+                    "label": [
+                        "Device is Busy"
+                    ]
+                },
+                {
+                    "name": [
+                        "CTL"
+                    ],
+                    "label": [
+                        "Controller Action"
+                    ]
+                },
+                {
+                    "name": [
+                        "AWAKE"
+                    ],
+                    "label": [
+                        "Awake"
+                    ]
+                },
+                {
+                    "name": [
+                        "DON3"
+                    ],
+                    "label": [
+                        "On 3 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "DON4"
+                    ],
+                    "label": [
+                        "On 4 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "DON5"
+                    ],
+                    "label": [
+                        "On 5 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "DOF3"
+                    ],
+                    "label": [
+                        "Off 3 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "DOF4"
+                    ],
+                    "label": [
+                        "Off 4 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "DOF5"
+                    ],
+                    "label": [
+                        "Off 5 Key Presses"
+                    ]
+                },
+                {
+                    "name": [
+                        "HAIL"
+                    ],
+                    "label": [
+                        "Hail"
+                    ]
+                },
+                {
+                    "name": [
+                        "AIRFLOW"
+                    ],
+                    "label": [
+                        "Air Flow"
+                    ]
+                },
+                {
+                    "name": [
+                        "ATMPRES"
+                    ],
+                    "label": [
+                        "Atmospheric Pressure"
+                    ]
+                },
+                {
+                    "name": [
+                        "BARPRES"
+                    ],
+                    "label": [
+                        "Barometric Pressure"
+                    ]
+                },
+                {
+                    "name": [
+                        "ANGLPOS"
+                    ],
+                    "label": [
+                        "Angle Position"
+                    ]
+                },
+                {
+                    "name": [
+                        "CO2LVL"
+                    ],
+                    "label": [
+                        "CO2 Level"
+                    ]
+                },
+                {
+                    "name": [
+                        "DELAY"
+                    ],
+                    "label": [
+                        "Delay"
+                    ]
+                },
+                {
+                    "name": [
+                        "DEWPT"
+                    ],
+                    "label": [
+                        "Dew Point"
+                    ]
+                },
+                {
+                    "name": [
+                        "DISTANC"
+                    ],
+                    "label": [
+                        "Distance"
+                    ]
+                },
+                {
+                    "name": [
+                        "DUR"
+                    ],
+                    "label": [
+                        "Duration"
+                    ]
+                },
+                {
+                    "name": [
+                        "ELECCON"
+                    ],
+                    "label": [
+                        "Electrical Conductivity"
+                    ]
+                },
+                {
+                    "name": [
+                        "ELECRES"
+                    ],
+                    "label": [
+                        "Electrical Resistivity"
+                    ]
+                },
+                {
+                    "name": [
+                        "GPV"
+                    ],
+                    "label": [
+                        "General Purpose Value"
+                    ]
+                },
+                {
+                    "name": [
+                        "GVOL"
+                    ],
+                    "label": [
+                        "Water Volume"
+                    ]
+                },
+                {
+                    "name": [
+                        "LUMIN"
+                    ],
+                    "label": [
+                        "Luminance"
+                    ]
+                },
+                {
+                    "name": [
+                        "MODE"
+                    ],
+                    "label": [
+                        "Mode"
+                    ]
+                },
+                {
+                    "name": [
+                        "MOIST"
+                    ],
+                    "label": [
+                        "Moisture"
+                    ]
+                },
+                {
+                    "name": [
+                        "PULSCNT"
+                    ],
+                    "label": [
+                        "Pulse Count"
+                    ]
+                },
+                {
+                    "name": [
+                        "RAINRT"
+                    ],
+                    "label": [
+                        "Rain Rate"
+                    ]
+                },
+                {
+                    "name": [
+                        "ROTATE"
+                    ],
+                    "label": [
+                        "Rotation"
+                    ]
+                },
+                {
+                    "name": [
+                        "SEISINT"
+                    ],
+                    "label": [
+                        "Seismic Intensity"
+                    ]
+                },
+                {
+                    "name": [
+                        "SEISMAG"
+                    ],
+                    "label": [
+                        "Seismic Magnitude"
+                    ]
+                },
+                {
+                    "name": [
+                        "SOILT"
+                    ],
+                    "label": [
+                        "Soil Temperature"
+                    ]
+                },
+                {
+                    "name": [
+                        "SOLRAD"
+                    ],
+                    "label": [
+                        "Solar Radiation"
+                    ]
+                },
+                {
+                    "name": [
+                        "SPEED"
+                    ],
+                    "label": [
+                        "Velocity"
+                    ]
+                },
+                {
+                    "name": [
+                        "SVOL"
+                    ],
+                    "label": [
+                        "Sound Volume"
+                    ]
+                },
+                {
+                    "name": [
+                        "TANKCAP"
+                    ],
+                    "label": [
+                        "Tank Capacity"
+                    ]
+                },
+                {
+                    "name": [
+                        "TIDELVL"
+                    ],
+                    "label": [
+                        "Tide Level"
+                    ]
+                },
+                {
+                    "name": [
+                        "TIMEREM"
+                    ],
+                    "label": [
+                        "Time remaining"
+                    ]
+                },
+                {
+                    "name": [
+                        "UV"
+                    ],
+                    "label": [
+                        "Ultraviolet"
+                    ]
+                },
+                {
+                    "name": [
+                        "VOCLVL"
+                    ],
+                    "label": [
+                        "Volatile Organic Compound (VOC) level"
+                    ]
+                },
+                {
+                    "name": [
+                        "WATERT"
+                    ],
+                    "label": [
+                        "Water Temperature"
+                    ]
+                },
+                {
+                    "name": [
+                        "WEIGHT"
+                    ],
+                    "label": [
+                        "Weight"
+                    ]
+                },
+                {
+                    "name": [
+                        "WINDDIR"
+                    ],
+                    "label": [
+                        "Wind Direction"
+                    ]
+                },
+                {
+                    "name": [
+                        "WVOL"
+                    ],
+                    "label": [
+                        "Water Volume"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV0"
+                    ],
+                    "label": [
+                        "Custom Control 0"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV1"
+                    ],
+                    "label": [
+                        "Custom Control 1"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV2"
+                    ],
+                    "label": [
+                        "Custom Control 2"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV3"
+                    ],
+                    "label": [
+                        "Custom Control 3"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV4"
+                    ],
+                    "label": [
+                        "Custom Control 4"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV5"
+                    ],
+                    "label": [
+                        "Custom Control 5"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV6"
+                    ],
+                    "label": [
+                        "Custom Control 6"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV7"
+                    ],
+                    "label": [
+                        "Custom Control 7"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV8"
+                    ],
+                    "label": [
+                        "Custom Control 8"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV9"
+                    ],
+                    "label": [
+                        "Custom Control 9"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV10"
+                    ],
+                    "label": [
+                        "Custom Control 10"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV11"
+                    ],
+                    "label": [
+                        "Custom Control 11"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV12"
+                    ],
+                    "label": [
+                        "Custom Control 12"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV13"
+                    ],
+                    "label": [
+                        "Custom Control 13"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV14"
+                    ],
+                    "label": [
+                        "Custom Control 14"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV15"
+                    ],
+                    "label": [
+                        "Custom Control 15"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV16"
+                    ],
+                    "label": [
+                        "Custom Control 16"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV17"
+                    ],
+                    "label": [
+                        "Custom Control 17"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV18"
+                    ],
+                    "label": [
+                        "Custom Control 18"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV19"
+                    ],
+                    "label": [
+                        "Custom Control 19"
+                    ]
+                },
+                {
+                    "name": [
+                        "GV20"
+                    ],
+                    "label": [
+                        "Custom Control 20"
+                    ]
+                }
+            ]
+        }],
+        "driver_timestamp": [
+            "2018-07-12-14:53:23"
+        ],
+        "app": [
+            "Insteon_UD994"
+        ],
+        "app_version": [
+            "5.0.13"
+        ],
+        "app_full_version": [
+            "5.0.13A"
+        ],
+        "platform": [
+            "ISY-C-994"
+        ],
+        "build_timestamp": [
+            "2018-07-12-14:53:23"
+        ],
+        "root": [{
+            "id": [
+                "00:21:b9:02:03:35"
+            ],
+            "name": [
+                "ISY"
+            ]
+        }],
+        "product": [{
+            "id": [
+                "1110"
+            ],
+            "desc": [
+                "ISY 994i 1024 IR"
+            ]
+        }],
+        "features": [{
+            "feature": [{
+                    "id": [
+                        "21010"
+                    ],
+                    "desc": [
+                        "OpenADR"
+                    ],
+                    "isInstalled": [
+                        "true"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21011"
+                    ],
+                    "desc": [
+                        "Electricity Monitor"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21012"
+                    ],
+                    "desc": [
+                        "Gas Meter"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "false"
+                    ]
+                },
+                {
+                    "id": [
+                        "21013"
+                    ],
+                    "desc": [
+                        "Xenon Module"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "false"
+                    ]
+                },
+                {
+                    "id": [
+                        "21020"
+                    ],
+                    "desc": [
+                        "Weather Information"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21030"
+                    ],
+                    "desc": [
+                        "URL"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "false"
+                    ]
+                },
+                {
+                    "id": [
+                        "21040"
+                    ],
+                    "desc": [
+                        "Networking Module"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21050"
+                    ],
+                    "desc": [
+                        "AMI Electricity Meter"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21051"
+                    ],
+                    "desc": [
+                        "SEP ESP"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "false"
+                    ]
+                },
+                {
+                    "id": [
+                        "21060"
+                    ],
+                    "desc": [
+                        "A10/X10 for INSTEON"
+                    ],
+                    "isInstalled": [
+                        "true"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21070"
+                    ],
+                    "desc": [
+                        "Portal Integration - Check-it.ca"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21014"
+                    ],
+                    "desc": [
+                        "Current Cost Meter"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "false"
+                    ]
+                },
+                {
+                    "id": [
+                        "21080"
+                    ],
+                    "desc": [
+                        "Broadband SEP Device"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21071"
+                    ],
+                    "desc": [
+                        "Portal Integration - GreenNet.com"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "22000"
+                    ],
+                    "desc": [
+                        "RCS Zigbee Device Support"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "23000"
+                    ],
+                    "desc": [
+                        "Irrigation/ETo Module"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21090"
+                    ],
+                    "desc": [
+                        "Elk Security System"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21072"
+                    ],
+                    "desc": [
+                        "Portal Integration - BestBuy.com"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "24000"
+                    ],
+                    "desc": [
+                        "NorthWrite NOC Module"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21073"
+                    ],
+                    "desc": [
+                        "Portal Integration - MobiLinc"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21100"
+                    ],
+                    "desc": [
+                        "Z-Wave"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "25000"
+                    ],
+                    "desc": [
+                        "NCD Device Support"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21074"
+                    ],
+                    "desc": [
+                        "Portal Integration - VantagePoint"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "21075"
+                    ],
+                    "desc": [
+                        "Portal Integration - UDI"
+                    ],
+                    "isInstalled": [
+                        "true"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                },
+                {
+                    "id": [
+                        "25100"
+                    ],
+                    "desc": [
+                        "EM3 Monitor - ISY Attached"
+                    ],
+                    "isInstalled": [
+                        "false"
+                    ],
+                    "isAvailable": [
+                        "true"
+                    ]
+                }
+            ]
+        }],
+        "triggers": [
+            "true"
+        ],
+        "maxTriggers": [
+            "2048"
+        ],
+        "variables": [
+            "true"
+        ],
+        "nodedefs": [
+            "true"
+        ],
+        "secsys": [{
+            "$": {
+                "type": "ELK",
+                "version": "2"
+            }
+        }],
+        "baseDriver": [{
+            "$": {
+                "type": "INSTEON",
+                "version": "2"
+            }
+        }],
+        "security": [{
+            "_": "SSL",
+            "$": {
+                "v": "3.3"
+            }
+        }],
+        "isDefaultCert": [
+            "false"
+        ],
+        "maxSSLStrength": [
+            "2048"
+        ]
+    }
+}
