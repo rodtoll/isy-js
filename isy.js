@@ -52,6 +52,7 @@ import {
 import {
     lookupService
 } from 'dns';
+import { getAsync } from './utils.js';
 
 export {
     ISYScene,
@@ -91,10 +92,11 @@ function isyTypeToTypeName(isyType, address) {
 }
 
 const parser = new Parser({
-    explicitArray: false
+    explicitArray: false,
+    mergeAttrs: true
 });
 
-export let Controls = {}
+export let Controls = {};
 
 export class ISY {
     constructor(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback, log) {
@@ -165,7 +167,10 @@ export class ISY {
         };
     }
 
-
+    callISY(url)
+    {
+         return getAsync.call(this,`${this.protocol}://${this.address}/rest/${url}/`,this.restlerOptions);
+    }
 
     getDeviceTypeBasedOnISYTable(deviceNode) {
         var familyId = 1;
@@ -276,7 +281,7 @@ export class ISY {
             if (mainType === 1 && subType === 1) { // Node Server Devices are reported as 1.1.0.0.
                 return this.buildDeviceInfoRecord(isyType, "NodeServer", DeviceTypes.polyNode);
             }
-            return this.buildDeviceInfoRecord(isyType, "NodeServer", DeviceTypes.unknown);
+            return this.buildDeviceInfoRecord(isyType, "Unknown", DeviceTypes.unknown);
         }
 
     }
@@ -293,12 +298,14 @@ export class ISY {
     getElkAlarmPanel() {
         return this.elkAlarmPanel;
     }
-    loadNodes(result) {
-        this.loadDevices(result);
-        this.loadScenes(result);
 
-
-
+    loadNodes() {
+        this.logger("Loading nodes");
+        var that = this;
+        return this.callISY('nodes').then(result => {
+            this.loadDevices(result);
+            this.loadScenes(result);
+        });
     }
 
     loadScenes(result) {
@@ -360,9 +367,12 @@ export class ISY {
                     } else if (deviceTypeInfo.deviceType == DeviceTypes.thermostat) {
                         newDevice = new InsteonThermostatDevice(this, device, deviceTypeInfo);
                     }
+                    
+                    this.logger(`Device ${newDevice.name} added as ${ newDevice.constructor.name}` );
+                    
                     // Support the device with a base device object
                 } else {
-                    this.logger(`Device: ${device.name} type: ${device.type} is not specifically supported, returning generic device object. `);
+                    this.logger(`Device ${device.name} with type: ${device.type} and nodedef: ${device.nodedefId} is not specifically supported, returning generic device object. `);
                     newDevice = new ISYDevice(this, device);
                 }
                 if (newDevice != null) {
@@ -417,6 +427,7 @@ export class ISY {
             }
         });
     }
+
     finishInitialize(success, initializeCompleted) {
         this.nodesLoaded = true;
         initializeCompleted();
@@ -473,20 +484,20 @@ export class ISY {
 
 
 
-    loadConfig() {
-        var that = this;
-
-        get(`${this.protocol}://${this.address}/rest/config`, this.restlerOptions).on('complete', result => {
+     loadConfig() {
+    
+        return this.callISY('config').then(result => {
             let controls = result.configuration.controls;
-
-            //that.logger(controls.control);
+            this.logger(controls.control);
             //var arr = new Array(controls.control);
             for (let ctl of controls.control) {
-                this.logger(ctl);
+                //this.logger(ctl);
                 Controls[ctl.name] = ctl;
+             
             }
             //that.logger(JSON.stringify(that));
         });
+ 
     }
 
     getVariableList() {
@@ -540,134 +551,108 @@ export class ISY {
         }
     }
 
-    updateProperties(device, callback) {
-        if (!device.initialized) {
-            var that = this;
-            get(`${that.protocol}://${that.address}/rest/nodes/${device.address}/`, that.restlerOptions).on('complete', result => {
-                var node = result.nodeInfo.properties;
+    getNodeDetail(device, callback) {
 
-                if (Array.isArray(node.property)) { //var properties = nodes[index].childrenNamed('property');
+        get(`${this.protocol}://${this.address}/rest/nodes/${device.address}/`, this.restlerOptions).on('complete', result => {
+            let nodeDetail = result.nodeInfo;
+            callback(nodeDetail);
+        }).on('error', (err, response) => {
+            this.logger("Error while contacting ISY" + err);
+            throw new Error("Error calling ISY" + err);
+        }).on('fail', (data, response) => {
+            this.logger("Error while contacting ISY -- failure");
+            throw new Error("Failed calling ISY");
+        }).on('abort', () => {
+            this.logger("Abort while contacting ISY");
+            throw new Error("Call to ISY was aborted");
+        }).on('timeout', ms => {
+            this.logger("Timed out contacting ISY");
+            throw new Error("Timeout contacting ISY");
+        });
+    }
 
-
+    refreshStatuses() {
+        var that = this;
+       return this.callISY('status').then( result => {
+            //this.logger(JSON.stringify(result.nodes.node));
+            for (let i = 0; i < result.nodes.node.length; i++) {
+                let node = result.nodes.node[i];
+                //this.logger(node);
+                let device = that.getDevice(node.id);
+                if (Array.isArray(node.property)) { 
                     for (var prop of node.property) {
-
                         device[prop.id] = Number(prop.value);
                         device.formatted[prop.id] = prop.formatted;
                         device.uom[prop.id] = prop.uom;
-                        that.logger(`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${device[prop.id]} (${device.formatted[prop.id]})`);
+                        device.logger(`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${device[prop.id]} (${device.formatted[prop.id]})`);
                     }
                 } else {
-
                     device[node.property.id] = Number(node.property.value);
                     device.formatted[node.property.id] = node.property.formatted;
                     device.uom[node.property.id] = node.property.uom;
-                    that.logger(`Property ${Controls[node.property.id].label} (${node.property.id}) initialized to: ${device[node.property.id]} (${device.formatted[node.property.id]})`);
+                    device.logger(`Property ${Controls[node.property.id].label} (${node.property.id}) initialized to: ${device[node.property.id]} (${device.formatted[node.property.id]})`);
                 }
-                device.initialized = true;
-                callback();
-            }).on('error', (err, response) => {
-                that.logger("Error while contacting ISY" + err);
-                throw new Error("Error calling ISY" + err);
-            }).on('fail', (data, response) => {
-                that.logger("Error while contacting ISY -- failure");
-                throw new Error("Failed calling ISY");
-            }).on('abort', () => {
-                that.logger("Abort while contacting ISY");
-                throw new Error("Call to ISY was aborted");
-            }).on('timeout', ms => {
-                that.logger("Timed out contacting ISY");
-                throw new Error("Timeout contacting ISY");
-            });
-        } else
-            callback();
+            }
+         
+        });
     }
 
 
-
     initialize(initializeCompleted) {
-        this.loadConfig();
+        
         var that = this;
         let options = {
             username: this.userName,
             password: this.password
         };
-        get(`${this.protocol}://${this.address}/rest/nodes`, this.restlerOptions).on('complete', result => {
-            that.logger(result);
-            that.loadNodes(result);
-            that.loadVariables(that.VARIABLE_TYPE_INTEGER, () => {
-                that.loadVariables(that.VARIABLE_TYPE_STATE, () => {
-                    if (that.elkEnabled) {
-                        get(that.protocol + '://' + that.address + '/rest/elk/get/topology', options).on('complete', (result, response) => {
-                            if (that.checkForFailure(response)) {
-                                that.logger('Error loading from elk: ' + result.message);
-                                throw new Error("Unable to contact the ELK to get the topology");
-                            } else {
-                                that.loadElkNodes(result);
-                                get(that.protocol + '://' + that.address + '/rest/elk/get/status', options).on('complete', (result, response) => {
-                                    if (that.checkForFailure(response)) {
-                                        that.logger('Error:' + result.message);
-                                        throw new Error("Unable to get the status from the elk");
-                                    } else {
-                                        that.loadElkInitialStatus(result);
-                                        that.finishInitialize(true, initializeCompleted);
-                                    }
-                                });
-                            }
-                        });
-                    } else {
-                        that.finishInitialize(true, initializeCompleted);
-                    }
+        
+        this.loadConfig().then(this.loadNodes.bind(this)).then(() =>
+            this.refreshStatuses().then(() => {
+                this.loadVariables(VariableTypes.integer, () => {
+                    this.loadVariables(VariableTypes.state, () => {
+                        if (this.elkEnabled) {
+                            get(`${this.protocol}://${that.address}/rest/elk/get/topology`, options).on('complete', (result, response) => {
+                                if (that.checkForFailure(response)) {
+                                    that.logger('Error loading from elk: ' + result.message);
+                                    throw new Error("Unable to contact the ELK to get the topology");
+                                } else {
+                                    that.loadElkNodes(result);
+                                    get(that.protocol + '://' + that.address + '/rest/elk/get/status', options).on('complete', (result, response) => {
+                                        if (that.checkForFailure(response)) {
+                                            that.logger('Error:' + result.message);
+                                            throw new Error("Unable to get the status from the elk");
+                                        } else {
+                                            that.loadElkInitialStatus(result);
+                                            that.finishInitialize(true, initializeCompleted);
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            this.finishInitialize(true, initializeCompleted);
+                        }
+                    });
                 });
-            });
-
-        }).on('error', (err, response) => {
-            that.logger(`Error while contacting ISY -- ${err}`);
-            throw new Error("Error calling ISY" + err);
-        }).on('fail', (data, response) => {
-            that.logger("Error while contacting ISY -- failure");
-            throw new Error("Failed calling ISY");
-        }).on('abort', () => {
-            that.logger("Abort while contacting ISY");
-            throw new Error("Call to ISY was aborted");
-        }).on('timeout', ms => {
-            that.logger("Timed out contacting ISY");
-            throw new Error("Timeout contacting ISY");
-        });
+            })).catch(reason => this.logger("Error calling ISY: " + reason));
     }
 
     handleWebSocketMessage(event) {
 
         this.lastActivity = new Date();
-        var p = new Parser({
-            explicitArray: false,
-            mergeAttrs: true
-        });
-        p.parseString(event.data, (err, res) => {
+       
+        parser.parseString(event.data, (err, res) => {
             if (err) throw err;
-
-            // Uncomment to print JSON to log for every event received.
-            //this.logger(JSON.stringify(res, undefined, 3));
-
             var evt = res.Event;
             if (evt === undefined || evt.control === undefined) {
                 return;
             }
-
-            var eventControl = evt.control;
-            if (eventControl.startsWith("GV")) {
-                eventControl = "GV";
-            } // Catch Generic Values ( GV##, Usually Node Servers)
-
             var actionValue = 0;
             if (evt.action instanceof Object) {
                 actionValue = evt.action._;
             } else if (evt.action instanceof Number || evt.action instanceof String) {
                 actionValue = Number(evt.action);
             }
-
-            var formatted = ("fmtAct" in evt) ? evt.fmtAct : actionValue;
-
-            switch (eventControl) {
+            switch (evt.control) {
 
                 case '_19':
                     if (actionValue === 2) {
@@ -725,17 +710,15 @@ export class ISY {
                     //     this.handleISYGenericPropertyUpdate(nodeName, eventValue, nodeEvent);
                     // }
                     break;
-                case 'GV':
-                    // this.logger(JSON.stringify(res, undefined, 3));
-                    this.handleISYStateUpdate(evt.node, actionValue, evt.control, formatted);
-                    // if ("fmtName" in evt && "fmtAct" in evt) {
-                    //     this.handleISYGenericPropertyUpdate(evt.node, evt.fmtAct, evt.fmtName);
-                    // }
-                    break;
+
                 default:
                     if (evt.node !== '' && evt.node !== undefined && evt.node !== null) {
                         //this.logger(JSON.stringify(res, undefined, 3));
-                        this.handleISYStateUpdate(evt.node, actionValue, evt.control, formatted);
+                        let impactedDevice = this.getDevice(evt.node);
+                        if (impactedDevice !== undefined && impactedDevice !== null) {
+                            impactedDevice.handleEvent(evt);
+                        }
+
                     }
                     break;
             }
@@ -755,7 +738,7 @@ export class ISY {
                     'Authorization': auth
                 },
                 ping: 10
-            });
+            },);
 
         this.lastActivity = new Date();
 
@@ -794,6 +777,8 @@ export class ISY {
     getSceneList() {
         return this.sceneList;
     }
+
+
 
     handleISYStateUpdate(address, state, propertyName, formattedState) {
 

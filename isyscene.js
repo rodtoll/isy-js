@@ -13,7 +13,6 @@ export class ISYScene extends ISYNode {
         this.type = '';
         this.connectionType = 'Insteon Wired';
         this.batteryOperated = false;
-    
         this.deviceType = DeviceTypes.scene;
         this.deviceFriendlyName = "ISY Scene";
         this.childDevices = new Map();

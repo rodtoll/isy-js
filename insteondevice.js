@@ -1,4 +1,4 @@
-import isy from './isy.js';
+
 import assert from 'assert';
 import {DeviceTypes, Families, Categories, States,Props, Commands} from "./isyconstants.js";
 import {ISYDevice} from './isydevice.js';
@@ -47,7 +47,7 @@ export const InsteonDimmableDevice = InsteonRelayDevice => class extends Insteon
     
         if(level != this.brightnessLevel)
         {
-            this.isy.sendRestCommand(this.address, Constants.cmd.on, pctToByte(level), resultHandler);
+            this.isy.sendRestCommand(this.address, Commands.on, pctToByte(level), resultHandler);
         }
     }
 };
@@ -142,9 +142,9 @@ export class InsteonLockDevice extends InsteonBaseDevice {
 
     sendNonSecureLockCommand(lockState, resultHandler) {
         if (lockState) {
-            this.isy.sendRestCommand(this.address, Constants.cmd.lock.lock, null, resultHandler);
+            this.isy.sendRestCommand(this.address, Commands.lock.lock, null, resultHandler);
         } else {
-            this.isy.sendRestCommand(this.address, Constants.cmd.lock.unlock, null, resultHandler);
+            this.isy.sendRestCommand(this.address, Commands.lock.unlock, null, resultHandler);
         }
     }
     sendSecureLockCommand(lockState, resultHandler) {
@@ -174,25 +174,36 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
         this._isMotionDetected = false;
     }
 
-
-
-    handleIsyUpdate(actionValue, propertyName, formattedValue, subAddress) {
-        if(propertyName == Commands.on)
+    handleEvent(event)
+    {
+        this.logger("handle event entered");
+        if(!super.handleEvent(event))
         {
-            this._isMotionDetected = true;
-            this.propertyChanged.emit('','motionDetected',actionValue,formattedValue);
-            
-            return true;
+            if(event.control == Commands.on)
+            {
+                this.logger("motion detected.");
+                this._isMotionDetected = true;
+                
+                this.propertyChanged.once('','motionDetected',true,true);
+                
+                setTimeout(() => 
+                {
+                    this.logger("no motion detected in last 30 seconds.")
+                    this._isMotionDetected = false;
+                    this.propertyChanged.
+                    this.propertyChanged.emit('','motionDetected',false,false);
+                },30000);
+                
+            }
+            else if (event.control === Commands.off)
+            {
+                this._isMotionDetected = false;
+                this.logger("no motion detected.")
+                this.propertyChanged.emit('','motionDetected',false,false);
+                
+            }
         }
-        else if (propertyName == Commands.off)
-        {
-            this._isMotionDetected = false;
-            this.propertyChanged.emit('','motionDetected',actionValue,formattedValue);
-            
-        }
-        else
-            return super.handleIsyUpdate(actionValue,propertyName,formattedValue,subAddress);
-
+        return true;
     }
 
     get isMotionDetected() {
@@ -252,7 +263,7 @@ export class InsteonOutletDevice extends InsteonRelayDevice {
     }
 
     get CurrentOutletState() {
-        return (this.ST > 0) ? true : false;
+        return (this.status > 0) ? true : false;
     }
     updateOutletState(outletState, resultHandler) {
         this.isy.sendRestCommand(this.address, (outletState) ? Commands.on : Commands.off, null, resultHandler);

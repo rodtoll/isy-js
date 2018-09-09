@@ -9,6 +9,7 @@ import {
     Controls
 } from "./isy";
 
+export const = 
 
 export class ISYDevice extends ISYNode {
     constructor(isy, node) {
@@ -68,13 +69,12 @@ export class ISYDevice extends ISYNode {
         return this._parentDevice;
     }
 
-    handleIsyUpdate(actionValue, propertyName, formattedValue, subAddress) {
+    handlePropertyChange(propertyName,value,formattedValue) {
         var changed = false;
-
         try {
-            if (this[propertyName] != Number(actionValue)) {
-                this.logger(`Property ${Controls[propertyName].label} (${propertyName}) updated to: ${actionValue} (${formattedValue})`);
-                this[propertyName] = Number(actionValue);
+            if (this[propertyName] != value) {
+                this.logger(`Property ${Controls[propertyName].label} (${propertyName}) updated to: ${value} (${formattedValue})`);
+                this[propertyName] = Number(value);
                 this.formatted[propertyName] = formattedValue;
                 this.lastChanged = new Date();
                 changed = true;
@@ -83,12 +83,9 @@ export class ISYDevice extends ISYNode {
             }
             if (changed) {
 
-                this.propertyChanged.emit(propertyName, propertyName, actionValue, formattedValue);
-                this.propertyChanged.emit('', propertyName, actionValue, formattedValue);
-                //this.propertyChanged.forEach(callback => callback(propertyName, actionValue, formattedValue));
-                // if (this._propertyChangeCallback !== null && this._propertyChangeCallback !== undefined)
-                //     this._propertyChangeCallback(propertyName, actionValue, formattedValue);
-                this.scenes.forEach(element => {
+                this.propertyChanged.emit(propertyName, propertyName, value, formattedValue);
+                this.propertyChanged.emit('', propertyName, value, formattedValue);
+                  this.scenes.forEach(element => {
                     element.recalculateState();
                 });
             }
