@@ -3,13 +3,12 @@ import {
 } from "./ISYNode";
 
 import {
-    NodeTypes
+    NodeTypes, Commands
 } from "./isyconstants";
 import {
     Controls
 } from "./isy";
 
-export const = 
 
 export class ISYDevice extends ISYNode {
     constructor(isy, node) {
@@ -30,20 +29,31 @@ export class ISYDevice extends ISYNode {
             this._parentDevice = isy.getDevice(this._parentAddress);
         if (Array.isArray(node.property)) { 
             for (var prop of node.property) {
-                this[prop.id] = Number(prop.value);
+                this[prop.id] = this.convertFrom(Number(prop.value),prop.uom);
                 this.formatted[prop.id] = prop.formatted;
                 this.uom[prop.id] = prop.uom;
                 this.logger(`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${this[prop.id]} (${this.formatted[prop.id]})`);
             }
         } else {
-            this[node.property.id] = Number(node.property.value);
+            this[node.property.id] = this.convertFrom(Number(node.property.value),node.property.uom);
             this.formatted[node.property.id] = node.property.formatted;
             this.uom[node.property.id] = node.property.uom;
             this.logger(`Property ${Controls[node.property.id].label} (${node.property.id}) initialized to: ${this[node.property.id]} (${this.formatted[node.property.id]})`);
         }
     }
 
+    convertTo(value,uom)
+    {
+        return value;
+    }
+
+    convertFrom(value,uom)
+    {
+        return value;
+    }
+
     addLink(isyScene) {
+      
         this.scenes.push(isyScene);
     }
     get nodeType() {
@@ -69,12 +79,26 @@ export class ISYDevice extends ISYNode {
         return this._parentDevice;
     }
 
+    updateProperty(propertyName,value,resultHandler)
+    {
+        
+        let val = this.convertTo(value,this.uom[propertyName]);
+        this.logger("Updating property " + Controls[propertyName].label + ". incoming value: " + value + " outgoing value: " + val);
+        this.isy.sendISYCommand(`nodes/${this.address}/set/${propertyName}/${val}`, resultHandler);
+    }
+
+    sendCommand(command,resultHandler,...parameters)
+    {
+        this.isy.sendRestCommand(this.address, command, parameters, resultHandler);
+    }
+
     handlePropertyChange(propertyName,value,formattedValue) {
         var changed = false;
         try {
-            if (this[propertyName] != value) {
-                this.logger(`Property ${Controls[propertyName].label} (${propertyName}) updated to: ${value} (${formattedValue})`);
-                this[propertyName] = Number(value);
+            let val = this.convertFrom(Number(value),this.uom[propertyName]);
+            if (this[propertyName] != val) {
+                this.logger(`Property ${Controls[propertyName].label} (${propertyName}) updated to: ${val} (${formattedValue})`);
+                this[propertyName] = val;
                 this.formatted[propertyName] = formattedValue;
                 this.lastChanged = new Date();
                 changed = true;
@@ -83,9 +107,10 @@ export class ISYDevice extends ISYNode {
             }
             if (changed) {
 
-                this.propertyChanged.emit(propertyName, propertyName, value, formattedValue);
-                this.propertyChanged.emit('', propertyName, value, formattedValue);
-                  this.scenes.forEach(element => {
+                this.propertyChanged.emit(propertyName, propertyName, val, formattedValue);
+                this.propertyChanged.emit('', propertyName, val, formattedValue);
+                this.scenes.forEach(element => {
+                    this.logger("Recalulating " + element.name);
                     element.recalculateState();
                 });
             }
@@ -94,4 +119,45 @@ export class ISYDevice extends ISYNode {
             return changed;
         }
     }
+
+    
 }
+
+    export const ISYBinaryStateDevice = ISYDevice => class extends ISYDevice
+    {
+   
+        get state()
+        {
+            return this.ST > 0;
+        }
+
+        updateState(state,resultHandler)
+        {
+            if(state != this.status)
+            {
+                this.sendCommand((state) ? Commands.On : Commands.Off, resultHandler);
+            }
+        }
+
+    };
+
+    export const ISYLevelDevice = ISYDevice => class extends ISYDevice
+    {
+   
+        get level()
+        {
+            return this.ST;
+        }
+
+        updateLevel(level, resultHandler) {
+    
+            if(level != this.level)
+            {
+                
+                if(level > 0)
+                    this.sendCommand(Commands.On,resultHandler,this.convertTo(level,100));
+                else
+                    this.sendCommand(Commands.Off,resultHandler);
+            }            
+        }
+    };

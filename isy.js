@@ -17,6 +17,7 @@ import isyDeviceTypeList, {
 import {
     InsteonOutletDevice,
     InsteonRelayDevice,
+    InsteonRelaySwitchDevice,
     InsteonDimmableDevice,
     InsteonDimmerSwitchDevice,
     InsteonSwitchDevice,
@@ -150,7 +151,7 @@ export class ISY {
         }
         this.logger = (msg) => {
             if (this.debugLogEnabled || (process.env.ISYJSDEBUG != undefined && process.env.ISYJSDEBUG != null)) {
-                // var timeStamp = new Date();
+             
                 log(msg);
             }
         };
@@ -300,8 +301,7 @@ export class ISY {
     }
 
     loadNodes() {
-        this.logger("Loading nodes");
-        var that = this;
+      
         return this.callISY('nodes').then(result => {
             this.loadDevices(result);
             this.loadScenes(result);
@@ -350,7 +350,7 @@ export class ISY {
                 }
                 if (deviceTypeInfo != null) {
                     if (deviceTypeInfo.deviceType == DeviceTypes.light)
-                        newDevice = new InsteonSwitchDevice(this, device, deviceTypeInfo);
+                        newDevice = new InsteonRelaySwitchDevice(this, device, deviceTypeInfo);
                     else if (deviceTypeInfo.deviceType == DeviceTypes.dimmableLight)
                         newDevice = new InsteonDimmerSwitchDevice(this, device, deviceTypeInfo);
                     else if (deviceTypeInfo.deviceType == DeviceTypes.doorWindowSensor) {
@@ -368,11 +368,11 @@ export class ISY {
                         newDevice = new InsteonThermostatDevice(this, device, deviceTypeInfo);
                     }
                     
-                    this.logger(`Device ${newDevice.name} added as ${ newDevice.constructor.name}` );
+                    this.logger(`Device ${newDevice.name} added as ${ newDevice.constructor.name}.` );
                     
                     // Support the device with a base device object
                 } else {
-                    this.logger(`Device ${device.name} with type: ${device.type} and nodedef: ${device.nodedefId} is not specifically supported, returning generic device object. `);
+                    this.logger(`Device ${device.name} with type: ${device.type} and nodedef: ${device.nodeDefId} is not specifically supported, returning generic device object. `);
                     newDevice = new ISYDevice(this, device);
                 }
                 if (newDevice != null) {
@@ -713,10 +713,14 @@ export class ISY {
 
                 default:
                     if (evt.node !== '' && evt.node !== undefined && evt.node !== null) {
-                        //this.logger(JSON.stringify(res, undefined, 3));
+                        //
                         let impactedDevice = this.getDevice(evt.node);
                         if (impactedDevice !== undefined && impactedDevice !== null) {
                             impactedDevice.handleEvent(evt);
+                        }
+                        else
+                        {
+                            this.logger(JSON.stringify(evt));
                         }
 
                     }
@@ -738,7 +742,7 @@ export class ISY {
                     'Authorization': auth
                 },
                 ping: 10
-            },);
+            });
 
         this.lastActivity = new Date();
 
@@ -778,23 +782,6 @@ export class ISY {
         return this.sceneList;
     }
 
-
-
-    handleISYStateUpdate(address, state, propertyName, formattedState) {
-
-        var deviceToUpdate = this.getDevice(address);
-
-        var subAddress = address[address.length - 1];
-        if (deviceToUpdate != undefined && deviceToUpdate != null) {
-            this.updateProperties(deviceToUpdate, () => {
-                if (propertyName in deviceToUpdate) {
-                    if (deviceToUpdate.handleIsyUpdate(state, propertyName, formattedState, subAddress)) {
-                        this.nodeChangedHandler(deviceToUpdate, propertyName);
-                    }
-                }
-            });
-        }
-    }
 
     sendISYCommand(path, handleResult) {
         var uriToUse = `${this.protocol}://${this.address}/rest/${path}`;

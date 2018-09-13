@@ -19,6 +19,7 @@ export class ISYScene extends ISYNode {
         this.isDimmable = false;
         if (Array.isArray(scene.members.link)) {
             for (let node of scene.members.link) {
+                this.logger(JSON.stringify(node));
                 if ("_" in node) {
                     //childDevices.push(node._);
                     //childDevices.push(object)
@@ -31,6 +32,7 @@ export class ISYScene extends ISYNode {
             }
         } else if (scene.members.link !== undefined) {
             if ("_" in scene.members.link) {
+                this.logger(JSON.stringify(node));
                 //childDevices.push(node._);
                 //childDevices.push(object)
                 let s= scene.members.link._;
@@ -103,7 +105,7 @@ export class ISYScene extends ISYNode {
     }
 
     sendLightCommand(lightState, resultHandler) {
-        this.isy.sendRestCommand(this.address, (lightState) ? Commands.on : Commands.off, null, resultHandler);
+        this.isy.sendRestCommand(this.address, (lightState) ? Commands.On : Commands.Off, null, resultHandler);
     }
 
     getAreAllLightsInSpecifiedState(state) {

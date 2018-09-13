@@ -8,8 +8,9 @@ export class ISYNode {
        
         this.isy = isy;
         this._nodeType = 0;
-        this.flag = node["@flag"];
-        this.nodeDefId = node["@nodeDefId"];
+        this.flag = node["flag"];
+        this.nodeDefId = node["nodeDefId"];
+        
         this.address = node.address;
         this.name = node.name;
         this.family = node.family;
@@ -20,6 +21,7 @@ export class ISYNode {
         this.logger = (msg) => {
             return isy.logger(`${this.name} (${this.address}): ${msg}`);
         };
+        this.logger(this.nodeDefId);
         this.lastChanged = new Date();
     }
 
@@ -39,47 +41,26 @@ export class ISYNode {
             actionValue = Number(event.action);
         }
 
-        // if(this.nodeDetail === undefined)
-        // {
-        //     var that = this;
-        //     this.isy.getNodeDetail(this, (nodeDetail) => {
-                
-        //         that.nodeDetail = nodeDetail;
-        //         let node = nodeDetail.properties;
-        //         if (Array.isArray(node.property)) {
-        //             //var properties = nodes[index].childrenNamed('property');
-        //             for (var prop of node.property) {
-        //                 this[prop.id] = Number(prop.value);
-        //                 this.formatted[prop.id] = prop.formatted;
-        //                 this.uom[prop.id] = prop.uom;
-        //                 this.logger(`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${this[prop.id]} (${this.formatted[prop.id]})`);
-        //             }
-        //         } else {
-
-        //             this[node.property.id] = Number(node.property.value);
-        //             this.formatted[node.property.id] = node.property.formatted;
-        //             this.uom[node.property.id] = node.property.uom;
-        //             this.logger(`Property ${Controls[node.property.id].label} (${node.property.id}) initialized to: ${this[node.property.id]} (${this.formatted[node.property.id]})`);
-        //         }
-        //         if (event.control in this) {
-        //             var formatted = ("fmtAct" in event) ? event.fmtAct : actionValue;
-        //             this.handlePropertyChange(event.control,actionValue,formatted);
-        //         }
-        //     });
-        // }
-        // else
-        // {
             if (event.control in this) { //property not command
                 var formatted = ("fmtAct" in event) ? event.fmtAct : actionValue;
                 return this.handlePropertyChange(event.control,actionValue,formatted);
             }
             else
             {
-                this.logger(`Command ${Controls[event.control].label} (${event.control}) triggered`);
+                //this.logger(event.control);
+                var e = event.control;
+                var dispName= Controls[e];
+                if(dispName !== undefined && dispName !== null)
+                {
+                    this.logger(`Command ${dispName.label} (${e}) triggered.`);
+                }
+                else
+                {
+                    this.logger(`Command ${e} triggered.`);
+                }
                 return false;
             }
-            
-        //}
+      
     }
 
     onPropertyChanged(propertyName,callback)

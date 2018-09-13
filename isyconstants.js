@@ -1,130 +1,123 @@
 export const ISYConstants = {
-  states: {
-    lock: {
-      locked: 1,
-      unlocked: 0
+  States: {
+    Lock: {
+      Locked: 1,
+      Unlocked: 0
     },
-    secureLock: {
-      secured: 1,
-      notSecured: 0
+    SecureLock: {
+      Secured: 1,
+      NotSecured: 0
     },
-    doorWindow: {
-      closed: 0,
-      open: 255
+    DoorWindow: {
+      Closed: 0,
+      Open: 100//255
     },
-    motionSensor: {
-      on: 255,
-      off: 0
+    MotionSensor: {
+      Triggered: 100,//255,
+      NotTriggered: 0
     },
-    dimLevel: {
-      min: 0,
-      max: 100
+    DimLevel: {
+      Min: 0,
+      Max: 100
     },
-    leakSensor: {
-      dry: "Dry",
-      wet: "Wet",
-      heartbeat: "hb"
+    LeakSensor: {
+      Dry: "Dry",
+      Wet: "Wet",
+      Heartbeat: "hb"
     },
-    fan: {
-      off: "DOF",
-      on: "DON",
-      low: 63,
-      medium: 191,
-      high: 255
+    Fan: {
+      Off: "DOF",
+      On: "DON",
+      Low: 25,//63,
+      Medium: 75,//191,
+      High: 100//255
     },
-    climate: {
-      fanMode: {
+    Climate: {
+      FanMode: {
         on: 7,
         auto: 8
       },
-      mode: {
-        off: 0,
-        heat: 1,
-        cool: 2,
-        auto: 3,
-        fan: 4,
-        programAuto: 5,
-        programHeat: 6,
-        programCool: 7
+      Mode: {
+        Off: 0,
+        Heat: 1,
+        Cool: 2,
+        Auto: 3,
+        Fan: 4,
+        ProgramAuto: 5,
+        ProgramHeat: 6,
+        ProgramCool: 7
       },
-      scheduleMode: {
-        hold: 0,
-        run: 1,
-        away: 2
+      ScheduleMode: {
+        Hold: 0,
+        Run: 1,
+        Away: 2
       },
-      operatingMode: {
-        idle: 0,
-        heating: 1,
-        cooling: 2
+      OperatingMode: {
+        Idle: 0,
+        Heating: 1,
+        Cooling: 2
       },
-      unitOfMeasure: {
-        celcius: 1,
-        fahrenheit: 2
+      UnitOfMeasure: {
+        Celcius: 1,
+        Fahrenheit: 2
       }
 
     }
   },
-  cmds: {
-    on: "DON",
-    off: "DOF",
-    dimmable: {
-      fastOn: "DFON",
-      fastOff: "DFOF",
-      brighten: "BRT",
-      dim: "DIM",
-      fadeUp: "FDUP",
-      fadeDown: "FDDOWN",
-      fadeStop: "FDSTOP"
+  Cmds: {
+    On: "DON",
+    Off: "DOF",
+    Dimmable: {
+      FastOn: "DFON",
+      FastOff: "DFOF",
+      Brighten: "BRT",
+      Dim: "DIM",
+      FadeUp: "FDUP",
+      FadeDown: "FDDOWN",
+      FadeStop: "FDSTOP"
     },
-    light: {
-      on: "DON",
-      off: "DOF",
+    Lock: {
+      Lock: "DON",
+      Unlock: "DOF"
     },
-    lock: {
-      lock: "DON",
-      unlock: "DOF"
-    },
-    fan: {
-      on: "DON",
-      off: "OFF"
-    }
+    Query:"Query"
   },
-  props: {
-    status: "ST",
-    rampRate: "RR",
-    onLevel: "OL",
-    batteryLevel: "BATLVL",
-    secureLock: {
-      mode: "SECMD"
+  Props: {
+    Status: "ST",
+    RampRate: "RR",
+    OnLevel: "OL",
+    BatteryLevel: "BATLVL",
+    SecureLock: {
+      Mode: "SECMD"
     },
-    fan: {
+    Fan: {
       off: "off",
       "low": "low",
       "medium": "medium",
       "high": "high"
     },
-    zWave: {
-      lockAlarm: "ALARM",
-      lockAccess: "USRNUM",
-      lockStatus: "ST",
-      energyPowerFactor: "PF",
-      energyPowerPolarizedPower: "PPW",
-      energyPowerCurrent: "CC",
-      energyPowerTotalPower: "TPW",
-      energyPowerVoltage: "CV"
+    ZWave: {
+      LockAlarm: "ALARM",
+      LockAccess: "USRNUM",
+      LockStatus: "ST",
+      EnergyPowerFactor: "PF",
+      EnergyPowerPolarizedPower: "PPW",
+      EnergyPowerCurrent: "CC",
+      EnergyPowerTotalPower: "TPW",
+      EnergyPowerVoltage: "CV"
     },
-    climate: {
-      temperature: "CLITEMP",
-      humidity: "CLIHUM",
-      operatingMode: "CLIHCS",
-      mode: "CLIMD",
-      fanMode: "CLIFS",
-      fanState: "CLIFRS",
-      coolSetPoint: "CLISPC",
-      heatSetPoint: "CLISPH",
-      scheduleMode: "CLISMD",
-      energyMode: "CLIEMD",
-      unitOfMeasure: "UOM"
+    Climate: {
+      Temperature: "CLITEMP",
+      Humidity: "CLIHUM",
+      OperatingMode: "CLIHCS",
+      Mode: "CLIMD",
+      FanMode: "CLIFS",
+      FanState: "CLIFRS",
+      CoolSetPoint: "CLISPC",
+      HeatSetPoint: "CLISPH",
+      ScheduleMode: "CLISMD",
+      EnergyMode: "CLIEMD",
+      UnitOfMeasure: "UOM"
     }
   },
   deviceTypes: {
@@ -146,58 +139,58 @@ export const ISYConstants = {
     thermostat: "Thermostat",
     polyNode: "PolyNode"
   },
-  variableTypes: {
-    integer: 1,
-    state: 2
+  VariableTypes: {
+    Integer: 1,
+    State: 2
   },
-  nodeTypes: {
-    device: 1,
-    scene: 2,
-    x10a10: 4
+  NodeTypes: {
+    Device: 1,
+    Scene: 2,
+    X10A10: 4
   },
-  families: {
-    insteon: 1,
-    upb: 2,
-    zigBee: 3,
-    zWave: 4,
-    poly: 10
+  Families: {
+    Insteon: 1,
+    UPB: 2,
+    ZigBee: 3,
+    ZWave: 4,
+    Poly: 10
   },
-  updateTypes: {
+  UpdateTypes: {
     elk: "ELK_UPDATE",
     zone: "ZONE_UPDATE",
     property: "PROPERTY_UPDATE",
     generic: "GENERIC_UPDATE"
   },
-  categories: {
-    controller: 0,
-    dimmableControl: 1,
-    relayControl: 2,
-    networkBridge: 3,
-    irrigationControl: 4,
-    climateControl: 5,
-    poolControl: 6,
-    sensorActuator: 7,
-    homeEntertainment: 8,
-    energyManagement: 9,
-    applianceControl: 10,
-    windowShadeControl: 14,
-    accessControl: 15,
-    securityHealthSafety: 16,
-    a10x10: 113,
-    virtual: 127,
-    unknown: 254
+  Categories: {
+    Controller: 0,
+    DimmableControl: 1,
+    RelayControl: 2,
+    NetworkBridge: 3,
+    IrrigationControl: 4,
+    ClimateControl: 5,
+    PoolControl: 6,
+    SensorActuator: 7,
+    HomeEntertainment: 8,
+    EnergyManagement: 9,
+    ApplianceControl: 10,
+    WindowShadeControl: 14,
+    AccessControl: 15,
+    SecurityHealthSafety: 16,
+    A10X10: 113,
+    Virtual: 127,
+    Unknown: 254
   }
 };
 
 
 
 export default ISYConstants;
-export const Props = ISYConstants.props;
-export const States = ISYConstants.states;
-export const Commands = ISYConstants.cmds;
+export const Props = ISYConstants.Props;
+export const States = ISYConstants.States;
+export const Commands = ISYConstants.Cmds;
 export const DeviceTypes = ISYConstants.deviceTypes;
-export const Families = ISYConstants.families;
-export const VariableTypes = ISYConstants.variableTypes;
-export const UpdateTypes = ISYConstants.updateTypes;
-export const NodeTypes = ISYConstants.nodeTypes;
-export const Categories = ISYConstants.categories;
+export const Families = ISYConstants.Families;
+export const VariableTypes = ISYConstants.VariableTypes;
+export const UpdateTypes = ISYConstants.UpdateTypes;
+export const NodeTypes = ISYConstants.NodeTypes;
+export const Categories = ISYConstants.Categories;

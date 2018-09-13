@@ -2,10 +2,11 @@ import { Categories } from "./isyconstants";
 import * as rest from "restler";
 
 export function byteToPct(value) {
-    return Math.floor(value * 100 / 255);
+    
+    return Math.round(value * 100 / 255);
 }
 export function pctToByte(value) {
-    return Math.ceil(value * 255 / 100);
+    return Math.round(value * 255 / 100);
 }
 
 export function byteToDegree(value)
