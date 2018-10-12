@@ -1,4 +1,4 @@
-[
+export default [
   {
     "type": "1.0.51.0",
     "address": "",

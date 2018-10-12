@@ -1,7 +1,7 @@
 export const ISYConstants = {
   States: {
     Lock: {
-      Locked: 1,
+      Locked: 100,
       Unlocked: 0
     },
     SecureLock: {
@@ -16,7 +16,7 @@ export const ISYConstants = {
       Triggered: 100,//255,
       NotTriggered: 0
     },
-    DimLevel: {
+    Level: {
       Min: 0,
       Max: 100
     },

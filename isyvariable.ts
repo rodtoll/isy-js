@@ -1,7 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class ISYVariable {
-    constructor(isy, id, name, type) {
+
+import {ISY} from "./isy";
+
+export class ISYVariable {
+    isy: ISY;
+    id: any;
+    name: any;
+    value: any;
+    init: any;
+    type: any;
+    lastChanged: Date;
+    constructor(isy :ISY, id, name, type) {
         this.isy = isy;
         this.id = id;
         this.name = name;
@@ -19,4 +27,3 @@ class ISYVariable {
         });
     }
 }
-exports.ISYVariable = ISYVariable;

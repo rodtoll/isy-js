@@ -9,7 +9,7 @@
     },
     "scripts": {
         "test": "mocha",
-        "prepare": "babel *.js -d lib/ -x .js"
+        "prepare": "babel *.*s -d lib/ -x .js"
     },
     "keywords": [
         "isy",
@@ -22,10 +22,9 @@
         "fake-isy-994i": ""
     },
     "dependencies": {
-        "@types/restler": "^3.1.5",
+        "@types/node": "^10.11.6",
         "babel-preset-env": "^1.7.0",
         "faye-websocket": "",
-        
         "restler": "^3.4.0",
         "restler-base": "^3.4.6",
         "xml2js": "^0.4.19",

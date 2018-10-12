@@ -1,5 +1,5 @@
 import { Categories } from "./isyconstants";
-import * as rest from "restler";
+import {get} from "restler";
 
 export function byteToPct(value) {
     
@@ -14,9 +14,11 @@ export function byteToDegree(value)
     return Math.fround(value/2);
 }
 
-export function  getAsync(url,options)
+let lastrequest = Promise.resolve();
+
+export async function getAsync(url :string,options) : Promise<any>
 {
-    return new Promise((resolve,reject) => rest.get(url,options).on('complete',result =>
+    let p = new Promise<any>((resolve,reject) => get(url,options).on('complete',result =>
     {
         resolve(result);
     }).on('error', (err, response) => {
@@ -29,6 +31,11 @@ export function  getAsync(url,options)
     }).on('timeout', ms => {
         reject(ms);
     }));
+    await lastrequest;
+
+    lastrequest = p;
+    
+    return p;
 }
 
 export function getCategory(device) {
@@ -37,7 +44,7 @@ export function getCategory(device) {
         return Number(s[0]);
     }
     catch (err) {
-        return Categories.unknown;
+        return Categories.Unknown;
     }
 }
 export function getSubcategory(device) {
@@ -46,6 +53,6 @@ export function getSubcategory(device) {
         return Number(s[1]);
     }
     catch (err) {
-        return Categories.unknown;
+        return Categories.Unknown;
     }
 }

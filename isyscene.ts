@@ -1,30 +1,42 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const isynode_1 = require("./isynode");
-const isy_1 = require("./isy");
-const insteondevice_1 = require("./insteondevice");
-const isyconstants_1 = require("./isyconstants");
-class ISYScene extends isynode_1.ISYNode {
+
+
+import {ISYNode} from "./isynode";
+
+import { ISYDevice,InsteonRelayDevice } from "./isy";
+import { InsteonDimmableDevice } from "./insteondevice";
+import { Commands, DeviceTypes } from "./isyconstants";
+
+export class ISYScene extends ISYNode {
+    type: string;
+    connectionType: string;
+    batteryOperated: boolean;
+    deviceType: any;
+    deviceFriendlyName: string;
+    childDevices: ISYDevice[];
+    isDimmable: boolean;
+    typeCode: string;
     constructor(isy, scene) {
         super(isy, scene);
         //this.logger(JSON.stringify(scene));
         this.typeCode = '';
         this.connectionType = 'Insteon Wired';
         this.batteryOperated = false;
-        this.deviceType = isyconstants_1.DeviceTypes.scene;
+        this.deviceType = DeviceTypes.scene;
         this.deviceFriendlyName = "ISY Scene";
         this.childDevices = [];
         this.isDimmable = false;
         if (Array.isArray(scene.members.link)) {
             for (let node of scene.members.link) {
+                
                 if ("_" in node) {
                     //childDevices.push(node._);
                     //childDevices.push(object)
                     let s = node._;
                     let d = isy.getDevice(s);
+
                     if (d !== null && d !== undefined)
                         d.addLink(this);
-                    if (d instanceof insteondevice_1.InsteonDimmableDevice && node.type != '16')
+                    if (d instanceof InsteonDimmableDevice && node.type != '16')
                         this.isDimmable = true;
                     this.childDevices[s] = d;
                 }
@@ -40,7 +52,7 @@ class ISYScene extends isynode_1.ISYNode {
                 let d = isy.getDevice(s);
                 if (d !== null && d !== undefined)
                     d.addLink(this);
-                if ((d.isDimmable && node.type != '16') || this.isDimmable)
+                if ((d.isDimmable && node.type != '16')|| this.isDimmable)
                     this.isDimmable = true;
                 this.childDevices[s] = d;
             }
@@ -51,7 +63,7 @@ class ISYScene extends isynode_1.ISYNode {
     // Get the current light state
     get isOn() {
         for (let device of this.childDevices) {
-            if (device instanceof isy_1.InsteonRelayDevice) {
+            if (device instanceof InsteonRelayDevice) {
                 if (device.isOn) {
                     return true;
                 }
@@ -63,11 +75,11 @@ class ISYScene extends isynode_1.ISYNode {
         var lightDeviceCount = 0;
         var blevel = 0;
         for (let device of this.childDevices)
-            if (device instanceof insteondevice_1.InsteonDimmableDevice) {
+            if (device instanceof InsteonDimmableDevice) {
                 lightDeviceCount++;
                 blevel += device.brightnessLevel;
             }
-            else if (device instanceof isy_1.InsteonRelayDevice) {
+            else if (device instanceof InsteonRelayDevice) {
                 lightDeviceCount++;
                 blevel += device.isOn ? 100 : 0;
             }
@@ -93,14 +105,14 @@ class ISYScene extends isynode_1.ISYNode {
         }
     }
     updateIsOn(lightState) {
-        return this.isy.sendNodeCommand(this, (lightState) ? isyconstants_1.Commands.On : isyconstants_1.Commands.Off);
+        return this.isy.sendNodeCommand(this, (lightState) ? Commands.On : Commands.Off);
     }
     updateBrightnessLevel(level) {
-        return this.isy.sendNodeCommand(this, (level > 0) ? isyconstants_1.Commands.On : isyconstants_1.Commands.Off, level);
+        return this.isy.sendNodeCommand(this, (level > 0) ? Commands.On : Commands.Off, level);
     }
     getAreAllLightsInSpecifiedState(state) {
         for (let device of this.childDevices) {
-            if (device instanceof isy_1.InsteonRelayDevice) {
+            if (device instanceof InsteonRelayDevice) {
                 if (device.isOn !== state) {
                     return false;
                 }
@@ -109,4 +121,3 @@ class ISYScene extends isynode_1.ISYNode {
         return true;
     }
 }
-exports.ISYScene = ISYScene;
