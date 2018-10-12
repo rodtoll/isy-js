@@ -1,0 +1,22 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended"
+        
+    ],
+    "jsRules": {},
+    "rules": {"no-return-await":true,
+        "member-ordering":true,
+        "variable-name":false,
+        "triple-equals":true,
+        "indent":[true,"tabs"],
+        "max-classes-per-file":false,
+        "max-line-length":false,
+        "quotemark":[true,"single"],
+        "prefer-template": true,
+        "interface-name": false,
+        "trailing-comma": false
+    },
+    
+    "rulesDirectory": []
+}

@@ -1,17 +1,26 @@
 import { Client } from 'faye-websocket';
-import { InsteonBaseDevice, InsteonDimmerSwitchDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonSwitchDevice, InsteonThermostatDevice, InsteonDimmableDevice } from './insteondevice';
-import { Categories, DeviceTypes, Families, States, NodeTypes, Props } from './isyconstants';
-import { ISYNode } from './isynode';
+import { InsteonBaseDevice, InsteonDimmableDevice, InsteonDimmerSwitchDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonSwitchDevice, InsteonThermostatDevice } from './insteondevice';
+import { Categories, DeviceTypes, Families, NodeTypes, Props, States } from './isyconstants';
 import { ISYDevice } from './isydevice';
+import { ISYNode } from './isynode';
+import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
 import { ISYScene } from './isyscene';
 import { ISYVariable } from './isyvariable';
-import { ElkAlarmSensorDevice, ELKAlarmPanelDevice } from './elkdevice';
 export { ISYScene, States, Families, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeTypes, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
+interface ProductInfoEntry {
+    type: string;
+    address: string;
+    name: string;
+    deviceType: string;
+    connectionType: string;
+    batteryOperated: boolean;
+}
 export declare class ISY {
     readonly deviceList: Map<string, ISYDevice>;
     readonly deviceMap: Map<string, string[]>;
     readonly sceneList: Map<string, ISYScene>;
+    productInfoList: Map<string, ProductInfoEntry>;
     webSocket: Client;
     zoneMap: any;
     protocol: any;
@@ -46,23 +55,9 @@ export declare class ISY {
         connectionType: any;
         batteryOperated: boolean;
     };
-    isyTypeToTypeName(isyType: any, address: any): {
-        "type": string;
-        "address": string;
-        "name": string;
-        "deviceType": string;
-        "connectionType": string;
-        "batteryOperated": boolean;
-    };
+    private isyTypeToTypeName;
     callISY(url: any): Promise<any>;
-    getDeviceTypeBasedOnISYTable(deviceNode: any): {
-        type: any;
-        address: string;
-        name: string;
-        deviceType: any;
-        connectionType: any;
-        batteryOperated: boolean;
-    };
+    private getDeviceTypeBasedOnISYTable;
     nodeChangedHandler(node: any, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;
     loadNodes(): Promise<void>;

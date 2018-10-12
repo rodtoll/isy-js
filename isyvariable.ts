@@ -1,15 +1,15 @@
 
-import {ISY} from "./isy";
+import {ISY} from './isy';
 
 export class ISYVariable {
-    isy: ISY;
-    id: any;
-    name: any;
-    value: any;
-    init: any;
-    type: any;
-    lastChanged: Date;
-    constructor(isy :ISY, id, name, type) {
+    public isy: ISY;
+    public id: any;
+    public name: any;
+    public value: any;
+    public init: any;
+    public type: any;
+    public lastChanged: Date;
+    constructor(isy: ISY, id, name, type) {
         this.isy = isy;
         this.id = id;
         this.name = name;
@@ -18,11 +18,11 @@ export class ISYVariable {
         this.type = type;
         this.lastChanged = new Date();
     }
-    markAsChanged() {
+    public markAsChanged() {
         this.lastChanged = new Date();
     }
-    sendSetValue(value, onComplete) {
-        this.isy.sendSetVariable(this.id, this.type, value, function (success) {
+    public sendSetValue(value, onComplete) {
+        this.isy.sendSetVariable(this.id, this.type, value, function(success) {
             onComplete(success);
         });
     }

@@ -1,22 +1,22 @@
-import { Controls, ISY } from './isy';
 import { EventEmitter } from 'events';
+import { Controls, ISY } from './isy';
 
 export class ISYNode {
-	readonly isy: ISY;
-	readonly flag: any;
-	readonly nodeDefId: string;
-	readonly address: string;
+	public readonly isy: ISY;
+	public readonly flag: any;
+	public readonly nodeDefId: string;
+	public readonly address: string;
 	[x: string]: any;
-	name: string;
-	family: any;
-	parent: any;
-	readonly elkId: string;
-	nodeType: number;
-	propertyChanged: EventEmitter;
-	propsInitialized: boolean;
-	logger: (msg: any) => void;
-	lastChanged: Date;
-	enabled: boolean;
+	public name: string;
+	public family: any;
+	public parent: any;
+	public readonly elkId: string;
+	public nodeType: number;
+	public propertyChanged: EventEmitter;
+	public propsInitialized: boolean;
+	public logger: (msg: any) => void;
+	public lastChanged: Date;
+	public enabled: boolean;
 	constructor(isy: ISY, node) {
 		this.isy = isy;
 		this.nodeType = 0;
@@ -37,12 +37,12 @@ export class ISYNode {
 		this.lastChanged = new Date();
 	}
 
-	handlePropertyChange(propertyName, value, formattedValue): boolean {
+	public handlePropertyChange(propertyName, value, formattedValue): boolean {
 		this.lastChanged = new Date();
 		return true;
 	}
 
-	handleEvent(event) {
+	public handleEvent(event) {
 		let actionValue = null;
 		if (event.action instanceof Object) {
 			actionValue = event.action._;
@@ -51,13 +51,13 @@ export class ISYNode {
 		}
 
 		if (event.control in this) {
-			//property not command
-			var formatted = 'fmtAct' in event ? event.fmtAct : actionValue;
+			// property not command
+			const formatted = 'fmtAct' in event ? event.fmtAct : actionValue;
 			return this.handlePropertyChange(event.control, actionValue, formatted);
 		} else {
-			//this.logger(event.control);
-			var e = event.control;
-			var dispName = Controls[e];
+			// this.logger(event.control);
+			const e = event.control;
+			const dispName = Controls[e];
 			if (dispName !== undefined && dispName !== null) {
 				this.logger(`Command ${dispName.label} (${e}) triggered.`);
 			} else {
@@ -67,9 +67,9 @@ export class ISYNode {
 		}
 	}
 
-	onPropertyChanged(propertyName = null, callback) {
+	public onPropertyChanged(propertyName = null, callback) {
 		if (propertyName === null) {
 			this.propertyChanged.addListener('', callback);
-		} else this.propertyChanged.addListener(propertyName, callback);
+		} else { this.propertyChanged.addListener(propertyName, callback); }
 	}
 }

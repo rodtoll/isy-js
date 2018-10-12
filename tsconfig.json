@@ -6,7 +6,8 @@
         //"allowJs": true,
         "outDir": "lib",
         "declaration": true,
-        "declarationDir": "lib"
+        "declarationDir": "lib",
+        "resolveJsonModule": true
     },
     "exclude": [
         "./lib/*",
