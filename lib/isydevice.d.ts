@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { ISYNode } from "./isynode";
-import { ISYScene } from "./isyscene";
-import { ISY } from "./isy";
+import { ISYNode } from './isynode';
+import { ISYScene } from './isyscene';
+import { ISY } from './isy';
 export declare class ISYDevice extends ISYNode {
     readonly typeCode: string;
     readonly deviceClass: any;
@@ -14,12 +14,13 @@ export declare class ISYDevice extends ISYNode {
     readonly formatted: any[string];
     readonly uom: any[string];
     constructor(isy: ISY, node: any);
-    convertTo(value: any, uom: Number): any;
-    convertFrom(value: any, uom: Number): any;
+    convertTo(value: any, uom: number): any;
+    convertFrom(value: any, uom: number): any;
     addLink(isyScene: ISYScene): void;
     readonly parentDevice: ISYDevice;
     updateProperty(propertyName: any, value: any): Promise<any>;
     sendCommand(command: any, ...parameters: any[]): Promise<any>;
+    refresh(): Promise<any>;
     handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
 }
 declare type Constructor<T> = new (...args: any[]) => T;
@@ -38,12 +39,13 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -78,12 +80,13 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;

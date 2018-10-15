@@ -186,7 +186,9 @@ export class ISY {
 	}
 
 	public async callISY(url): Promise<any> {
-		return getAsync(`${this.protocol}://${this.address}/rest/${url}/`, this.restlerOptions);
+		url = `${this.protocol}://${this.address}/rest/${url}/`;
+		this.logger(`Sending request: ${url}`);
+		return getAsync(url, this.restlerOptions);
 	}
 
 	private getDeviceTypeBasedOnISYTable(deviceNode) {
@@ -493,20 +495,18 @@ export class ISY {
 		});
 	}
 
-	public loadConfig() {
-		return this.callISY('config').then((result) => {
-			const controls = result.configuration.controls;
-			// this.logger(result.configuration);
-			if (controls !== undefined) {
-				// this.logger(controls.control);
-				// var arr = new Array(controls.control);
-				for (const ctl of controls.control) {
-					// this.logger(ctl);
-					Controls[ctl.name] = ctl;
-				}
+	public async loadConfig() {
+		const result = await this.callISY('config');
+		const controls = result.configuration.controls;
+		// this.logger(result.configuration);
+		if (controls !== undefined) {
+			// this.logger(controls.control);
+			// var arr = new Array(controls.control);
+			for (const ctl of controls.control) {
+				// this.logger(ctl);
+				Controls[ctl.name] = ctl;
 			}
-			// that.logger(JSON.stringify(that));
-		});
+		}
 	}
 
 	public getVariableList() {
@@ -561,6 +561,7 @@ export class ISY {
 	}
 
 	public getNodeDetail(device, callback) {
+
 		get(`${this.protocol}://${this.address}/rest/nodes/${device.address}/`, this.restlerOptions)
 			.on('complete', (result) => {
 				const nodeDetail = result.nodeInfo;
@@ -778,19 +779,19 @@ export class ISY {
 	}
 
 	public async sendISYCommand(path): Promise<any> {
-		const uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
-		this.logger('Sending command...' + uriToUse);
+		// const uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
+		this.logger('Sending command...' + path);
 
-		return getAsync(uriToUse, this.restlerOptions);
+		return this.callISY(path);
 	}
 
 	public async sendNodeCommand(node: ISYNode, command: String, ...parameters: any[]): Promise<any> {
-		let uriToUse = `${this.protocol}://${this.address}/rest/nodes/${node.address}/cmd/${command}`;
-		if (parameters !== null) {
+		let uriToUse = `nodes/${node.address}/cmd/${command}`;
+		if (parameters !== null && parameters !== undefined && parameters.length > 0) {
 			uriToUse += `/${parameters.join('/')}`;
 		}
 		this.logger(`${node.name}: sending ${command} command: ${uriToUse}`);
-		return getAsync(uriToUse, this.restlerOptions);
+		return this.callISY(uriToUse);
 	}
 
 	public sendGetVariable(id, type, handleResult) {

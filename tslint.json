@@ -9,7 +9,7 @@
         "member-ordering":true,
         "variable-name":false,
         "triple-equals":true,
-        "indent":[true,"tabs"],
+        "indent":[true,"tabs",2],
         "max-classes-per-file":false,
         "max-line-length":false,
         "quotemark":[true,"single"],

@@ -1,11 +1,11 @@
 /// <reference types="node" />
-import { ISYDevice } from './isydevice';
 import { ISY } from './isy';
+import { ISYDevice } from './isydevice';
 export declare class InsteonBaseDevice extends ISYDevice {
     constructor(isy: ISY, node: any, productInfo: any);
-    convertFrom(value: any, uom: Number): any;
-    convertTo(value: any, uom: Number): any;
-    sendBeep(level?: Number): Promise<any>;
+    convertFrom(value: any, uom: number): any;
+    convertTo(value: any, uom: number): any;
+    sendBeep(level?: number): Promise<any>;
 }
 export declare const InsteonLampDevice: (InsteonBaseDevice: any) => {
     new (isy: any, node: any, productInfo: any): {
@@ -38,12 +38,13 @@ declare const InsteonRelayDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -83,12 +84,13 @@ declare const InsteonDimmableDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -154,12 +156,13 @@ declare const InsteonLockDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -204,12 +207,13 @@ declare const InsteonDoorWindowSensorDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -269,12 +273,13 @@ declare const InsteonFanDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;
@@ -308,12 +313,13 @@ declare const InsteonFanDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
-        convertTo(value: any, uom: Number): any;
-        convertFrom(value: any, uom: Number): any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
         updateProperty(propertyName: any, value: any): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
         handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
         readonly isy: ISY;
         readonly flag: any;

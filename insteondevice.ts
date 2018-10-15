@@ -1,9 +1,9 @@
-import { AssertionError} from 'assert';
-import { DeviceTypes, Families, Categories, States, Props, Commands } from './isyconstants';
-import { ISYBinaryStateDevice, ISYLevelDevice, ISYDevice } from './isydevice';
-import { byteToPct, pctToByte, byteToDegree } from './utils';
+import { AssertionError } from 'assert';
 import { get } from 'https';
 import { ISY } from './isy';
+import { Categories, Commands, DeviceTypes, Families, Props, States } from './isyconstants';
+import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from './isydevice';
+import { byteToDegree, byteToPct, pctToByte } from './utils';
 
 export class InsteonBaseDevice extends ISYDevice {
 	constructor(isy: ISY, node, productInfo) {
@@ -11,28 +11,25 @@ export class InsteonBaseDevice extends ISYDevice {
 		this.family = Families.Insteon;
 		this.productName = productInfo.name;
 		this.deviceType = productInfo.deviceType;
-		this.batteryOperated = this.deviceType == DeviceTypes.motionSensor;
+		this.batteryOperated = this.deviceType === DeviceTypes.motionSensor;
 		this.connectionType = productInfo.connectionType;
 		this.deviceFriendlyName = this.deviceType;
-        this.childDevices = {};
-        
+		this.childDevices = {};
 	}
 
-
-	convertFrom(value: any, uom: Number): any {
-
+	public convertFrom(value: any, uom: number): any {
 		switch (uom) {
 			case 101:
 				return byteToDegree(value);
 			case 100:
 				return byteToPct(value);
 			default:
-				return super.convertFrom(value,uom);
+				return super.convertFrom(value, uom);
 		}
 	}
 
-	convertTo(value: any, uom: Number): any {
-		let nuom = super.convertTo(value, uom);
+	public convertTo(value: any, uom: number): any {
+		const nuom = super.convertTo(value, uom);
 		switch (uom) {
 			case 101:
 				return nuom * 2;
@@ -41,17 +38,14 @@ export class InsteonBaseDevice extends ISYDevice {
 			default:
 				return nuom;
 		}
-    }
-    
-    async sendBeep(level : Number = 100) : Promise<any> {
-        
-         return  this.isy.sendNodeCommand(this,'BEEP');
-        
-    }
+	}
+
+	public async sendBeep(level: number = 100): Promise<any> {
+		return this.isy.sendNodeCommand(this, 'BEEP');
+	}
 }
 
-
-export const InsteonLampDevice = InsteonBaseDevice =>
+export const InsteonLampDevice = (InsteonBaseDevice) =>
 	class extends InsteonBaseDevice {
 		constructor(isy, node, productInfo) {
 			super(isy, node, productInfo);
@@ -62,13 +56,13 @@ export const InsteonLampDevice = InsteonBaseDevice =>
 			return byteToPct(this.status);
 		}
 
-		updateBrightnessLevel(level, resultHandler) {
-			if (level != this.brightnessLevel) {
+		public updateBrightnessLevel(level, resultHandler) {
+			if (level !== this.brightnessLevel) {
 				this.isy.sendRestCommand(this.address, Commands.On, pctToByte(level), resultHandler);
 			}
 		}
 	};
-export const InsteonSwitchDevice = InsteonBaseDevice =>
+export const InsteonSwitchDevice = (InsteonBaseDevice) =>
 	class extends InsteonBaseDevice {
 		constructor(isy, node, productInfo) {
 			super(isy, node, productInfo);
@@ -79,43 +73,41 @@ export const InsteonSwitchDevice = InsteonBaseDevice =>
 			return byteToPct(this.status);
 		}
 
-		updateBrightnessLevel(level, resultHandler) {
-			if (level != this.brightnessLevel) {
+		public updateBrightnessLevel(level, resultHandler) {
+			if (level !== this.brightnessLevel) {
 				this.sendCommand(Commands.On, pctToByte(level), resultHandler);
 			}
 		}
 	};
 
 export class InsteonRelayDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
-	constructor(isy :ISY, node, productInfo) {
+	constructor(isy: ISY, node, productInfo) {
 		super(isy, node, productInfo);
 	}
 
 	get isOn() {
-    
 		return this.state;
 	}
 
-	async updateIsOn(isOn :boolean) : Promise<any> {
+	public async updateIsOn(isOn: boolean): Promise<any> {
 		return super.updateState(isOn);
 	}
 }
 
 export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {
-    constructor(isy, node, productInfo) {
-        super(isy, node,productInfo);
-        this.isDimmable = true;
-    }
+	constructor(isy, node, productInfo) {
+		super(isy, node, productInfo);
+		this.isDimmable = true;
+	}
 
-    get brightnessLevel() {
-        return this.level;
-    }
+	get brightnessLevel() {
+		return this.level;
+	}
 
-    async updateBrightnessLevel(level) : Promise<{}>{
-        return super.updateLevel(level);
-    }
+	public async updateBrightnessLevel(level): Promise<{}> {
+		return super.updateLevel(level);
+	}
 }
-
 
 export class InsteonRelaySwitchDevice extends InsteonSwitchDevice(InsteonRelayDevice) {
 	constructor(isy, deviceNode, productInfo) {
@@ -134,9 +126,7 @@ export class InsteonDimmerOutletDevice extends InsteonDimmableDevice {
 	}
 }
 
-export class InsteonDimmerSwitchDevice extends InsteonDimmableDevice
-{
-	
+export class InsteonDimmerSwitchDevice extends InsteonDimmableDevice {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
 	}
@@ -159,13 +149,13 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 		super(isy, deviceNode, productInfo);
 	}
 
-	sendLockCommand(lockState, resultHandler) {
-		if (this.deviceType == DeviceTypes.lock) {
+	public sendLockCommand(lockState, resultHandler) {
+		if (this.deviceType === DeviceTypes.lock) {
 			this.sendNonSecureLockCommand(lockState);
-		} else if (this.deviceType == DeviceTypes.secureLock) {
+		} else if (this.deviceType === DeviceTypes.secureLock) {
 			this.sendSecureLockCommand(lockState);
 		} else {
-			//assert(false, 'Should not ever have lock which is not one of the known lock types');
+			// assert(false, 'Should not ever have lock which is not one of the known lock types');
 		}
 	}
 
@@ -173,41 +163,36 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 		return this.state;
 	}
 
-	getCurrentLockState() {
-		if (this.deviceType == DeviceTypes.lock) {
+	public getCurrentLockState() {
+		if (this.deviceType === DeviceTypes.lock) {
 			return this.getCurrentNonSecureLockState();
-		} else if (this.deviceType == DeviceTypes.secureLock) {
+		} else if (this.deviceType === DeviceTypes.secureLock) {
 			return this.getCurrentSecureLockState();
 		} else {
-			//assert(false, 'Should not ever have lock which is not one of the known lock types');
+			// assert(false, 'Should not ever have lock which is not one of the known lock types');
 		}
 	}
 
-	getCurrentNonSecureLockState() {
-		return this.ST != States.Lock.Locked;
+	public getCurrentNonSecureLockState() {
+		return this.ST !== States.Lock.Locked;
 	}
 
-	getCurrentSecureLockState() {
+	public getCurrentSecureLockState() {
 		return this.ST > 0;
 	}
 
-	async sendNonSecureLockCommand(lockState) {
+	public async sendNonSecureLockCommand(lockState) {
 		if (lockState) {
 			return this.isy.sendNodeCommand(this, Commands.Lock.Lock);
 		} else {
 			return this.isy.sendNodeCommand(this, Commands.Lock.Unlock);
 		}
 	}
-	async sendSecureLockCommand(lockState) {
+	public async sendSecureLockCommand(lockState) {
 		if (lockState) {
 			return this.isy.sendNodeCommand(this, Commands.On, States.SecureLock.Secured);
 		} else {
-			return this.isy.sendNodeCommand(
-				this,
-				Commands.On,
-				States.SecureLock.NotSecured
-				
-			);
+			return this.isy.sendNodeCommand(this, Commands.On, States.SecureLock.NotSecured);
 		}
 	}
 }
@@ -228,9 +213,9 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
 		this._isMotionDetected = false;
 	}
 
-	handleEvent(event) {
+	public handleEvent(event) {
 		if (!super.handleEvent(event)) {
-			if (event.control == Commands.On) {
+			if (event.control === Commands.On) {
 				this.logger('Motion detected.');
 				this._isMotionDetected = true;
 
@@ -279,19 +264,19 @@ export class InsteonThermostatDevice extends InsteonBaseDevice {
 	get fanMode() {
 		return this[Props.Climate.FanMode];
 	}
-    get humidity(){
+	get humidity() {
 		return this[Props.Climate.Humidity];
 	}
 
-	async updateCoolSetPoint(value) {
+	public async updateCoolSetPoint(value) {
 		return this.updateProperty(Props.Climate.CoolSetPoint, value);
 	}
 
-	async updateHeatSetPoint(value) {
+	public async updateHeatSetPoint(value) {
 		return this.updateProperty(Props.Climate.HeatSetPoint, value);
 	}
 
-	async updateMode(value) {
+	public async updateMode(value) {
 		return this.updateProperty(Props.Climate.Mode, value);
 	}
 }
@@ -315,19 +300,15 @@ export class InsteonFanDevice extends ISYLevelDevice(ISYBinaryStateDevice(Insteo
 		return this.level;
 	}
 
-	async updateFanSpeed(level) {
+	public async updateFanSpeed(level) {
 		return this.updateLevel(level);
 	}
 
-	async updateIsOn(isOn) {
-        if(!isOn)
-        {
-            this.updateLevel(States.Level.Min);
-        }
-        else
-        {
-            this.updateLevel(States.Level.Max);
-        }
-		
+	public async updateIsOn(isOn) {
+		if (!isOn) {
+			this.updateLevel(States.Level.Min);
+		} else {
+			this.updateLevel(States.Level.Max);
+		}
 	}
 }
