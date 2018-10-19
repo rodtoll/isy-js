@@ -1,9 +1,11 @@
 import { get } from 'restler';
+
 import { Categories } from './isyconstants';
 
 export function byteToPct(value) {
 	return Math.round((value * 100) / 255);
 }
+
 export function pctToByte(value) {
 	return Math.round((value * 255) / 100);
 }
@@ -16,7 +18,7 @@ let lastrequest = Promise.resolve();
 
 export async function getAsync(url: string, options): Promise<any> {
 	const p = new Promise<any>((resolve, reject) => {
-		console.log('Calling: ' + url);
+		//console.log('Calling: ' + url);
 		get(url, options)
 			.on('complete', (result) => {
 				resolve(result);

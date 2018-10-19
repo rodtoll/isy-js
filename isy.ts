@@ -2,29 +2,25 @@ import { Client } from 'faye-websocket';
 import { get, parsers } from 'restler';
 import { Parser } from 'xml2js';
 import { XmlDocument } from 'xmldoc';
-import {
-	InsteonBaseDevice,
-	InsteonDimmableDevice,
-	InsteonDimmerSwitchDevice,
-	InsteonDoorWindowSensorDevice,
-	InsteonFanDevice,
-	InsteonLockDevice,
-	InsteonMotionSensorDevice,
-	InsteonOutletDevice,
-	InsteonRelayDevice,
-	InsteonRelaySwitchDevice,
-	InsteonSwitchDevice,
-	InsteonThermostatDevice
-} from './insteondevice';
 
+import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
+import {
+    InsteonBaseDevice,
+    InsteonDimmableDevice,
+    InsteonDimmerSwitchDevice,
+    InsteonDoorWindowSensorDevice,
+    InsteonFanDevice,
+    InsteonLockDevice,
+    InsteonMotionSensorDevice,
+    InsteonOutletDevice,
+    InsteonRelayDevice,
+    InsteonSwitchDevice,
+    InsteonThermostatDevice,
+} from './insteondevice';
 import { Categories, DeviceTypes, Families, NodeTypes, Props, States, VariableTypes } from './isyconstants';
 import { ISYDevice } from './isydevice';
 import { ISYNode } from './isynode';
 import * as ProductInfoData from './isyproductinfo.json';
-
-import { stringify } from 'querystring';
-import { isNullOrUndefined } from 'util';
-import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
 import { ISYScene } from './isyscene';
 import { ISYVariable } from './isyvariable';
 import { getAsync } from './utils';
@@ -99,7 +95,7 @@ export class ISY {
 	public log: (msg: any) => void;
 	public logger: (msg: any) => void;
 	public lastActivity: any;
-	constructor(address, username, password, elkEnabled, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback, log) {
+	constructor(address :string, username :string, password :string, elkEnabled :boolean, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback, log) {
 		this.address = address;
 		this.userName = username;
 		this.password = password;
@@ -353,7 +349,7 @@ export class ISY {
 		// this.logger(JSON.stringify(deviceTypeInfo));
 
 			const enabled = device.enabled;
-			if (enabled !== 'false') {
+			if (`${enabled !== 'false'}`) {
 				// Try fallback to new generic device identification when not specifically identified.
 				if (deviceTypeInfo === null || deviceTypeInfo === undefined) {
 					deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(device);
@@ -381,7 +377,7 @@ export class ISY {
 
 					// Support the device with a base device object
 				} else {
-					this.logger(`Device ${device.name} with type: ${device.type} and nodedef: ${device.nodeDefId} is not specifically supported, returning generic device object. `);
+					this.logger('Device ' + device.name + ' with type: ' + device.type + ' and nodedef: ' + device.nodeDefId + ' is not specifically supported, returning generic device object. ');
 					newDevice = new ISYDevice(this, device);
 				}
 				if (newDevice !== null) {
