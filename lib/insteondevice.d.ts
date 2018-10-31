@@ -237,6 +237,96 @@ export declare class InsteonDoorWindowSensorDevice extends InsteonDoorWindowSens
     constructor(isy: any, deviceNode: any, productInfo: any);
     readonly isOpen: boolean;
 }
+declare const InsteonLeakSensorDevice_base: {
+    new (...args: any[]): {
+        [x: string]: any;
+        readonly state: boolean;
+        updateState(state: boolean): Promise<any>;
+        readonly typeCode: string;
+        readonly deviceClass: any;
+        readonly parentAddress: any;
+        readonly category: number;
+        readonly subCategory: number;
+        readonly type: any;
+        _parentDevice: ISYDevice;
+        readonly scenes: import("./isyscene").ISYScene[];
+        readonly formatted: any;
+        readonly uom: any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
+        addLink(isyScene: import("./isyscene").ISYScene): void;
+        readonly parentDevice: ISYDevice;
+        updateProperty(propertyName: any, value: any): Promise<any>;
+        sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
+        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        readonly isy: ISY;
+        readonly flag: any;
+        readonly nodeDefId: string;
+        readonly address: string;
+        name: string;
+        family: any;
+        parent: any;
+        readonly elkId: string;
+        nodeType: number;
+        propertyChanged: import("events").EventEmitter;
+        propsInitialized: boolean;
+        logger: (msg: any) => void;
+        lastChanged: Date;
+        enabled: boolean;
+        handleEvent(event: any): boolean;
+        onPropertyChanged(propertyName: any, callback: any): void;
+    };
+} & typeof InsteonBaseDevice;
+export declare class InsteonLeakSensorDevice extends InsteonLeakSensorDevice_base {
+    constructor(isy: any, deviceNode: any, productInfo: any);
+    readonly leakDetected: boolean;
+}
+declare const InsteonCOSensorDevice_base: {
+    new (...args: any[]): {
+        [x: string]: any;
+        readonly state: boolean;
+        updateState(state: boolean): Promise<any>;
+        readonly typeCode: string;
+        readonly deviceClass: any;
+        readonly parentAddress: any;
+        readonly category: number;
+        readonly subCategory: number;
+        readonly type: any;
+        _parentDevice: ISYDevice;
+        readonly scenes: import("./isyscene").ISYScene[];
+        readonly formatted: any;
+        readonly uom: any;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
+        addLink(isyScene: import("./isyscene").ISYScene): void;
+        readonly parentDevice: ISYDevice;
+        updateProperty(propertyName: any, value: any): Promise<any>;
+        sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
+        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        readonly isy: ISY;
+        readonly flag: any;
+        readonly nodeDefId: string;
+        readonly address: string;
+        name: string;
+        family: any;
+        parent: any;
+        readonly elkId: string;
+        nodeType: number;
+        propertyChanged: import("events").EventEmitter;
+        propsInitialized: boolean;
+        logger: (msg: any) => void;
+        lastChanged: Date;
+        enabled: boolean;
+        handleEvent(event: any): boolean;
+        onPropertyChanged(propertyName: any, callback: any): void;
+    };
+} & typeof InsteonBaseDevice;
+export declare class InsteonCOSensorDevice extends InsteonCOSensorDevice_base {
+    constructor(isy: any, deviceNode: any, productInfo: any);
+    readonly monoxideDetected: boolean;
+}
 export declare class InsteonMotionSensorDevice extends InsteonBaseDevice {
     constructor(isy: any, deviceNode: any, productInfo: any);
     handleEvent(event: any): boolean;

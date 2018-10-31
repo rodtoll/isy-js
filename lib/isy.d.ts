@@ -1,9 +1,9 @@
 import { Client } from 'faye-websocket';
+import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
 import { InsteonBaseDevice, InsteonDimmableDevice, InsteonDimmerSwitchDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonSwitchDevice, InsteonThermostatDevice } from './insteondevice';
 import { Categories, DeviceTypes, Families, NodeTypes, Props, States } from './isyconstants';
 import { ISYDevice } from './isydevice';
 import { ISYNode } from './isynode';
-import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
 import { ISYScene } from './isyscene';
 import { ISYVariable } from './isyvariable';
 export { ISYScene, States, Families, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeTypes, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
@@ -46,7 +46,7 @@ export declare class ISY {
     log: (msg: any) => void;
     logger: (msg: any) => void;
     lastActivity: any;
-    constructor(address: any, username: any, password: any, elkEnabled: any, changeCallback: any, useHttps: any, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: any);
+    constructor(address: string, username: string, password: string, elkEnabled: boolean, changeCallback: any, useHttps: any, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: any);
     buildDeviceInfoRecord(isyType: any, connectionType: any, deviceType: any): {
         type: any;
         address: string;

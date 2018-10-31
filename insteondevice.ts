@@ -1,7 +1,5 @@
-import { AssertionError } from 'assert';
-import { get } from 'https';
 import { ISY } from './isy';
-import { Categories, Commands, DeviceTypes, Families, Props, States } from './isyconstants';
+import { Commands, DeviceTypes, Families, Props, States } from './isyconstants';
 import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from './isydevice';
 import { byteToDegree, byteToPct, pctToByte } from './utils';
 
@@ -58,7 +56,12 @@ export const InsteonLampDevice = (InsteonBaseDevice) =>
 
 		public updateBrightnessLevel(level, resultHandler) {
 			if (level !== this.brightnessLevel) {
-				this.isy.sendRestCommand(this.address, Commands.On, pctToByte(level), resultHandler);
+				this.isy.sendRestCommand(
+					this.address,
+					Commands.On,
+					pctToByte(level),
+					resultHandler
+				);
 			}
 		}
 	};
@@ -80,7 +83,9 @@ export const InsteonSwitchDevice = (InsteonBaseDevice) =>
 		}
 	};
 
-export class InsteonRelayDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
+export class InsteonRelayDevice extends ISYBinaryStateDevice(
+	InsteonBaseDevice
+) {
 	constructor(isy: ISY, node, productInfo) {
 		super(isy, node, productInfo);
 	}
@@ -109,7 +114,9 @@ export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {
 	}
 }
 
-export class InsteonRelaySwitchDevice extends InsteonSwitchDevice(InsteonRelayDevice) {
+export class InsteonRelaySwitchDevice extends InsteonSwitchDevice(
+	InsteonRelayDevice
+) {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
 	}
@@ -190,19 +197,53 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 	}
 	public async sendSecureLockCommand(lockState) {
 		if (lockState) {
-			return this.isy.sendNodeCommand(this, Commands.On, States.SecureLock.Secured);
+			return this.isy.sendNodeCommand(
+				this,
+				Commands.On,
+				States.SecureLock.Secured
+			);
 		} else {
-			return this.isy.sendNodeCommand(this, Commands.On, States.SecureLock.NotSecured);
+			return this.isy.sendNodeCommand(
+				this,
+				Commands.On,
+				States.SecureLock.NotSecured
+			);
 		}
 	}
 }
 
-export class InsteonDoorWindowSensorDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
+export class InsteonDoorWindowSensorDevice extends ISYBinaryStateDevice(
+	InsteonBaseDevice
+) {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
 	}
 
 	get isOpen() {
+		return this.state;
+	}
+}
+
+export class InsteonLeakSensorDevice extends ISYBinaryStateDevice(
+	InsteonBaseDevice
+) {
+	constructor(isy, deviceNode, productInfo) {
+		super(isy, deviceNode, productInfo);
+	}
+
+	get leakDetected() {
+		return this.state;
+	}
+}
+
+export class InsteonCOSensorDevice extends ISYBinaryStateDevice(
+	InsteonBaseDevice
+) {
+	constructor(isy, deviceNode, productInfo) {
+		super(isy, deviceNode, productInfo);
+	}
+
+	get monoxideDetected() {
 		return this.state;
 	}
 }
@@ -287,7 +328,9 @@ export class InsteonOutletDevice extends InsteonRelayDevice {
 	}
 }
 
-export class InsteonFanDevice extends ISYLevelDevice(ISYBinaryStateDevice(InsteonBaseDevice)) {
+export class InsteonFanDevice extends ISYLevelDevice(
+	ISYBinaryStateDevice(InsteonBaseDevice)
+) {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
 	}

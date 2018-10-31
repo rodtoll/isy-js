@@ -1,5 +1,5 @@
+import { ISY } from './isy';
 
-import {ISY} from './isy';
 
 export class ISYVariable {
     public isy: ISY;
@@ -26,4 +26,11 @@ export class ISYVariable {
             onComplete(success);
         });
     }
+    public async updateValue(value) : Promise<void>
+    {
+         const p = await this.isy.callISY(`vars\\${this.type}\\${this.id}\\${value}`);
+        this.value = value;
+        return p;
+    }
+
 }

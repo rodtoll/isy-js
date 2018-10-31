@@ -10,4 +10,5 @@ export declare class ISYVariable {
     constructor(isy: ISY, id: any, name: any, type: any);
     markAsChanged(): void;
     sendSetValue(value: any, onComplete: any): void;
+    updateValue(value: any): Promise<void>;
 }

@@ -1,5 +1,7 @@
-export declare const ISYConstants: {
+declare const ISYConstants: {
     States: {
+        Off: number;
+        On: number;
         Lock: {
             Locked: number;
             Unlocked: number;
@@ -12,7 +14,8 @@ export declare const ISYConstants: {
             Closed: number;
             Open: number;
         };
-        MotionSensor: {
+        Siren: {};
+        Sensor: {
             Triggered: number;
             NotTriggered: number;
         };
@@ -21,21 +24,19 @@ export declare const ISYConstants: {
             Max: number;
         };
         LeakSensor: {
-            Dry: string;
-            Wet: string;
+            Dry: number;
+            Wet: number;
             Heartbeat: string;
         };
         Fan: {
-            Off: string;
-            On: string;
             Low: number;
             Medium: number;
             High: number;
         };
         Climate: {
             FanMode: {
-                on: number;
-                auto: number;
+                On: number;
+                Auto: number;
             };
             Mode: {
                 Off: number;
@@ -79,6 +80,10 @@ export declare const ISYConstants: {
             Lock: string;
             Unlock: string;
         };
+        Thermostat: {
+            SetpointUp: string;
+            SetpointDown: string;
+        };
         Query: string;
     };
     Props: {
@@ -88,12 +93,6 @@ export declare const ISYConstants: {
         BatteryLevel: string;
         SecureLock: {
             Mode: string;
-        };
-        Fan: {
-            off: string;
-            "low": string;
-            "medium": string;
-            "high": string;
         };
         ZWave: {
             LockAlarm: string;
@@ -116,8 +115,9 @@ export declare const ISYConstants: {
             HeatSetPoint: string;
             ScheduleMode: string;
             EnergyMode: string;
-            UnitOfMeasure: string;
         };
+        Error: string;
+        UnitOfMeasure: string;
     };
     deviceTypes: {
         lock: string;
@@ -152,6 +152,7 @@ export declare const ISYConstants: {
         UPB: number;
         ZigBee: number;
         ZWave: number;
+        UDI: number;
         Poly: number;
     };
     UpdateTypes: {
@@ -189,12 +190,6 @@ export declare const Props: {
     SecureLock: {
         Mode: string;
     };
-    Fan: {
-        off: string;
-        "low": string;
-        "medium": string;
-        "high": string;
-    };
     ZWave: {
         LockAlarm: string;
         LockAccess: string;
@@ -216,10 +211,13 @@ export declare const Props: {
         HeatSetPoint: string;
         ScheduleMode: string;
         EnergyMode: string;
-        UnitOfMeasure: string;
     };
+    Error: string;
+    UnitOfMeasure: string;
 };
 export declare const States: {
+    Off: number;
+    On: number;
     Lock: {
         Locked: number;
         Unlocked: number;
@@ -232,7 +230,8 @@ export declare const States: {
         Closed: number;
         Open: number;
     };
-    MotionSensor: {
+    Siren: {};
+    Sensor: {
         Triggered: number;
         NotTriggered: number;
     };
@@ -241,21 +240,19 @@ export declare const States: {
         Max: number;
     };
     LeakSensor: {
-        Dry: string;
-        Wet: string;
+        Dry: number;
+        Wet: number;
         Heartbeat: string;
     };
     Fan: {
-        Off: string;
-        On: string;
         Low: number;
         Medium: number;
         High: number;
     };
     Climate: {
         FanMode: {
-            on: number;
-            auto: number;
+            On: number;
+            Auto: number;
         };
         Mode: {
             Off: number;
@@ -299,6 +296,10 @@ export declare const Commands: {
         Lock: string;
         Unlock: string;
     };
+    Thermostat: {
+        SetpointUp: string;
+        SetpointDown: string;
+    };
     Query: string;
 };
 export declare const DeviceTypes: {
@@ -325,6 +326,7 @@ export declare const Families: {
     UPB: number;
     ZigBee: number;
     ZWave: number;
+    UDI: number;
     Poly: number;
 };
 export declare const VariableTypes: {

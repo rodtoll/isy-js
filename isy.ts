@@ -10,6 +10,7 @@ import {
     InsteonDimmerSwitchDevice,
     InsteonDoorWindowSensorDevice,
     InsteonFanDevice,
+    InsteonLeakSensorDevice,
     InsteonLockDevice,
     InsteonMotionSensorDevice,
     InsteonOutletDevice,
@@ -95,7 +96,18 @@ export class ISY {
 	public log: (msg: any) => void;
 	public logger: (msg: any) => void;
 	public lastActivity: any;
-	constructor(address :string, username :string, password :string, elkEnabled :boolean, changeCallback, useHttps, scenesInDeviceList, enableDebugLogging, variableCallback, log) {
+	constructor(
+		address: string,
+		username: string,
+		password: string,
+		elkEnabled: boolean,
+		changeCallback,
+		useHttps,
+		scenesInDeviceList,
+		enableDebugLogging,
+		variableCallback,
+		log
+	) {
 		this.address = address;
 		this.userName = username;
 		this.password = password;
@@ -123,8 +135,10 @@ export class ISY {
 		this.elkEnabled = elkEnabled;
 		this.zoneMap = {};
 
-		this.debugLogEnabled = enableDebugLogging === undefined ? false : enableDebugLogging;
-		this.scenesInDeviceList = scenesInDeviceList === undefined ? false : scenesInDeviceList;
+		this.debugLogEnabled =
+			enableDebugLogging === undefined ? false : enableDebugLogging;
+		this.scenesInDeviceList =
+			scenesInDeviceList === undefined ? false : scenesInDeviceList;
 		this.guardianTimer = null;
 
 		if (this.elkEnabled) {
@@ -134,13 +148,20 @@ export class ISY {
 		if (log === undefined) {
 			this.log = (msg) => {
 				const timeStamp = new Date();
-				console.log(`${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}#${timeStamp.getHours()}:${timeStamp.getMinutes()}:${timeStamp.getSeconds()}- ${msg}`);
+				// tslint:disable-next-line:no-console
+				console.log(
+					`${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}#${timeStamp.getHours()}:${timeStamp.getMinutes()}:${timeStamp.getSeconds()}- ${msg}`
+				);
 			};
 		} else {
 			this.log = log;
 		}
 		this.logger = (msg) => {
-			if (this.debugLogEnabled || (process.env.ISYJSDEBUG !== undefined && process.env.ISYJSDEBUG !== null)) {
+			if (
+				this.debugLogEnabled ||
+				(process.env.ISYJSDEBUG !== undefined &&
+					process.env.ISYJSDEBUG !== null)
+			) {
 				this.log(msg);
 			}
 		};
@@ -151,7 +172,6 @@ export class ISY {
 			} else {
 				this.productInfoList.set(p.type, p);
 			}
-
 		}
 
 		this.logger(JSON.stringify(this.productInfoList.size));
@@ -168,9 +188,11 @@ export class ISY {
 		};
 	}
 
-	private isyTypeToTypeName(isyType: string, address: string): ProductInfoEntry {
+	private isyTypeToTypeName(
+		isyType: string,
+		address: string
+	): ProductInfoEntry {
 		if (this.productInfoList.has(isyType)) {
-
 			const t = this.productInfoList.get(isyType);
 			this.logger(JSON.stringify(t));
 			return t;
@@ -184,7 +206,8 @@ export class ISY {
 	public async callISY(url): Promise<any> {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
 		this.logger(`Sending request: ${url}`);
-		return getAsync(url, this.restlerOptions);
+		const p = await getAsync(url, this.restlerOptions);
+		return p;
 	}
 
 	private getDeviceTypeBasedOnISYTable(deviceNode) {
@@ -212,29 +235,57 @@ export class ISY {
 			if (mainType === Categories.DimmableControl) {
 				// Special case fanlinc has a fan element
 				if (subType === 46 && subAddress === 2) {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.fan);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.fan
+					);
 				} else {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.dimmableLight);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.dimmableLight
+					);
 				}
 			} else if (mainType === Categories.RelayControl) {
 				// Special case appliance Lincs into outlets
 				if (subType in [6, 7, 12, 23]) {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.outlet);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.outlet
+					);
 					// Outlet lincs
 				} else if (subType === 8 || subType === 33) {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.outlet);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.outlet
+					);
 					// Dual outlets
 				} else if (subType === 57) {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.outlet);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.outlet
+					);
 				} else {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.light);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.light
+					);
 				}
 				// Sensors
 			} else if (mainType === Categories.SensorActuator) {
 				// I/O Lincs
 				if (subType === 0) {
 					if (subAddress === 1) {
-						return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.doorWindowSensor);
+						return this.buildDeviceInfoRecord(
+							isyType,
+							'Insteon',
+							DeviceTypes.doorWindowSensor
+						);
 					} else {
 						return this.buildDeviceInfoRecord(isyType, 'Insteon', 'outlet');
 					}
@@ -256,24 +307,44 @@ export class ISY {
 				// Motion sensors
 				if (subType === 1 || subType === 3) {
 					if (subAddress === 1) {
-						return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.motionSensor);
+						return this.buildDeviceInfoRecord(
+							isyType,
+							'Insteon',
+							DeviceTypes.motionSensor
+						);
 						// Ignore battery level sensor and daylight sensor
 					}
 				} else if (subType === 2 || subType === 9 || subType === 17) {
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.doorWindowSensor);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.doorWindowSensor
+					);
 					// Smoke, leak sensors, don't yet know how to support
 				}
 				// No idea how to test or support
 			} else if (mainType === Categories.ClimateControl) {
 				// Thermostats
-				return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.thermostat);
+				return this.buildDeviceInfoRecord(
+					isyType,
+					'Insteon',
+					DeviceTypes.thermostat
+				);
 			} else if (mainType === 6) {
 				// Leak Sensors
-				return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.leakSensor);
+				return this.buildDeviceInfoRecord(
+					isyType,
+					'Insteon',
+					DeviceTypes.leakSensor
+				);
 			} else if (mainType === Categories.Controller) {
 				if (subType === 6 || subType === 8) {
 					// Insteon Remote
-					return this.buildDeviceInfoRecord(isyType, 'Insteon', DeviceTypes.remote);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'Insteon',
+						DeviceTypes.remote
+					);
 				}
 			}
 			// Z-Wave Device Family
@@ -282,13 +353,21 @@ export class ISY {
 			if (mainType === 4) {
 				// Identified by user zwave on/off switch
 				if (subType === 16) {
-					return this.buildDeviceInfoRecord(isyType, 'ZWave', DeviceTypes.light);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'ZWave',
+						DeviceTypes.light
+					);
 					// Identified by user door lock
 				} else if (subType === 111) {
 					return this.buildDeviceInfoRecord(isyType, 'ZWave', DeviceTypes.lock);
 					// This is a guess based on the naming in the ISY SDK
 				} else if (subType === 109) {
-					return this.buildDeviceInfoRecord(isyType, 'ZWave', DeviceTypes.dimmableLight);
+					return this.buildDeviceInfoRecord(
+						isyType,
+						'ZWave',
+						DeviceTypes.dimmableLight
+					);
 					// Otherwise we don't know how to handle
 				}
 			}
@@ -296,9 +375,17 @@ export class ISY {
 			// Node Server Node
 			if (mainType === 1 && subType === 1) {
 				// Node Server Devices are reported as 1.1.0.0.
-				return this.buildDeviceInfoRecord(isyType, 'NodeServer', DeviceTypes.polyNode);
+				return this.buildDeviceInfoRecord(
+					isyType,
+					'NodeServer',
+					DeviceTypes.polyNode
+				);
 			}
-			return this.buildDeviceInfoRecord(isyType, 'Unknown', DeviceTypes.unknown);
+			return this.buildDeviceInfoRecord(
+				isyType,
+				'Unknown',
+				DeviceTypes.unknown
+			);
 		}
 	}
 
@@ -344,12 +431,12 @@ export class ISY {
 			} else {
 				this.deviceMap[device.pnode].push(device.address);
 			}
-			let newDevice = null;
+			let newDevice: ISYDevice = null;
 			let deviceTypeInfo = this.isyTypeToTypeName(device.type, device.address);
-		// this.logger(JSON.stringify(deviceTypeInfo));
+			// this.logger(JSON.stringify(deviceTypeInfo));
 
-			const enabled = device.enabled;
-			if (`${enabled !== 'false'}`) {
+			const enabled = Boolean(device.enabled);
+			if (enabled) {
 				// Try fallback to new generic device identification when not specifically identified.
 				if (deviceTypeInfo === null || deviceTypeInfo === undefined) {
 					deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(device);
@@ -359,25 +446,58 @@ export class ISY {
 						newDevice = new InsteonRelayDevice(this, device, deviceTypeInfo);
 					} else if (deviceTypeInfo.deviceType === DeviceTypes.dimmableLight) {
 						newDevice = new InsteonDimmableDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.doorWindowSensor) {
-						newDevice = new InsteonDoorWindowSensorDevice(this, device, deviceTypeInfo);
+					} else if (
+						deviceTypeInfo.deviceType === DeviceTypes.doorWindowSensor
+					) {
+						newDevice = new InsteonDoorWindowSensorDevice(
+							this,
+							device,
+							deviceTypeInfo
+						);
 					} else if (deviceTypeInfo.deviceType === DeviceTypes.motionSensor) {
-						newDevice = new InsteonMotionSensorDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
+						newDevice = new InsteonMotionSensorDevice(
+							this,
+							device,
+							deviceTypeInfo
+						);
+					} else if (deviceTypeInfo.deviceType === DeviceTypes.leakSensor) {
+						newDevice = new InsteonLeakSensorDevice(
+							this,
+							device,
+							deviceTypeInfo
+						);
+					}  else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
 						newDevice = new InsteonFanDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.lock || deviceTypeInfo.deviceType === DeviceTypes.secureLock) {
+					} else if (
+						deviceTypeInfo.deviceType === DeviceTypes.lock ||
+						deviceTypeInfo.deviceType === DeviceTypes.secureLock
+					) {
 						newDevice = new InsteonLockDevice(this, device, deviceTypeInfo);
 					} else if (deviceTypeInfo.deviceType === DeviceTypes.outlet) {
 						newDevice = new InsteonOutletDevice(this, device, deviceTypeInfo);
 					} else if (deviceTypeInfo.deviceType === DeviceTypes.thermostat) {
-						newDevice = new InsteonThermostatDevice(this, device, deviceTypeInfo);
+						newDevice = new InsteonThermostatDevice(
+							this,
+							device,
+							deviceTypeInfo
+						);
 					}
 
-					this.logger(`Device ${newDevice.name} added as ${newDevice.constructor.name}.`);
+					this.logger(
+						`Device ${newDevice.name} added as ${newDevice.constructor.name}.`
+					);
 
 					// Support the device with a base device object
 				} else {
-					this.logger('Device ' + device.name + ' with type: ' + device.type + ' and nodedef: ' + device.nodeDefId + ' is not specifically supported, returning generic device object. ');
+					this.logger(
+						'Device ' +
+							device.name +
+							' with type: ' +
+							device.type +
+							' and nodedef: ' +
+							device.nodeDefId +
+							' is not specifically supported, returning generic device object. '
+					);
 					newDevice = new ISYDevice(this, device);
 				}
 				if (newDevice !== null) {
@@ -390,7 +510,7 @@ export class ISY {
 			}
 		}
 
-		this.logger('Devices: ' + this.deviceList.entries.length);
+		this.logger('Devices: ' + this.deviceList.entries.length + ' added.');
 	}
 
 	public loadElkNodes(result) {
@@ -403,7 +523,15 @@ export class ISY {
 			const id = nodes[index].attr.id;
 			const name = nodes[index].attr.name;
 			const alarmDef = nodes[index].attr.alarmDef;
-			const newDevice = new ElkAlarmSensorDevice(this, name, 1, id, alarmDef === 17 ? DeviceTypes.alarmDoorWindowSensor : DeviceTypes.coSensor);
+			const newDevice = new ElkAlarmSensorDevice(
+				this,
+				name,
+				1,
+				id,
+				alarmDef === 17
+					? DeviceTypes.alarmDoorWindowSensor
+					: DeviceTypes.coSensor
+			);
 			this.zoneMap[newDevice.zone] = newDevice;
 		}
 	}
@@ -426,7 +554,10 @@ export class ISY {
 				const zoneDevice = this.zoneMap[id];
 				if (zoneDevice !== null) {
 					zoneDevice.setFromZoneUpdate(nodes);
-					if (this.deviceList[zoneDevice.address] === null && zoneDevice.isPresent()) {
+					if (
+						this.deviceList[zoneDevice.address] === null &&
+						zoneDevice.isPresent()
+					) {
 						this.deviceList[zoneDevice.address] = zoneDevice;
 						// this.deviceIndex[zoneDevice.address] = zoneDevice;
 					}
@@ -452,7 +583,9 @@ export class ISY {
 		const timeNow = new Date();
 
 		if (Number(timeNow) - Number(this.lastActivity) > 60000) {
-			this.logger('Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets');
+			this.logger(
+				'Guardian: Detected no activity in more then 60 seconds. Reinitializing web sockets'
+			);
 			this.initializeWebSocket();
 		}
 	}
@@ -464,7 +597,11 @@ export class ISY {
 		}
 	}
 	public checkForFailure(response) {
-		return response === null || response instanceof Error || response.statusCode !== 200;
+		return (
+			response === null ||
+			response instanceof Error ||
+			response.statusCode !== 200
+		);
 	}
 	public loadVariables(type, done) {
 		const that = this;
@@ -472,13 +609,21 @@ export class ISY {
 			username: this.userName,
 			password: this.password
 		};
-		get(that.protocol + '://' + that.address + '/rest/vars/definitions/' + type, options).on('complete', (result, response) => {
+		get(
+			that.protocol + '://' + that.address + '/rest/vars/definitions/' + type,
+			options
+		).on('complete', (result, response) => {
 			if (that.checkForFailure(response)) {
-				that.logger('Error loading variables from isy. Device likely doesn\'t have any variables defined. Safe to ignore.');
+				that.logger(
+					'Error loading variables from isy. Device likely doesn\'t have any variables defined. Safe to ignore.'
+				);
 				done();
 			} else {
 				that.createVariables(type, result);
-				get(that.protocol + '://' + that.address + '/rest/vars/get/' + type, options).on('complete', (result, response) => {
+				get(
+					that.protocol + '://' + that.address + '/rest/vars/get/' + type,
+					options
+				).on('complete', (result, response) => {
 					if (that.checkForFailure(response)) {
 						that.logger('Error loading variables from isy: ' + result.message);
 						throw new Error('Unable to load variables from the ISY');
@@ -510,7 +655,10 @@ export class ISY {
 	}
 	public getVariable(type, id) {
 		const key = this.createVariableKey(type, id);
-		if (this.variableIndex[key] !== null && this.variableIndex[key] !== undefined) {
+		if (
+			this.variableIndex[key] !== null &&
+			this.variableIndex[key] !== undefined
+		) {
 			return this.variableIndex[key];
 		}
 		return null;
@@ -557,8 +705,10 @@ export class ISY {
 	}
 
 	public getNodeDetail(device, callback) {
-
-		get(`${this.protocol}://${this.address}/rest/nodes/${device.address}/`, this.restlerOptions)
+		get(
+			`${this.protocol}://${this.address}/rest/nodes/${device.address}/`,
+			this.restlerOptions
+		)
 			.on('complete', (result) => {
 				const nodeDetail = result.nodeInfo;
 				callback(nodeDetail);
@@ -586,7 +736,6 @@ export class ISY {
 		const result = await this.callISY('status');
 		// this.logger(JSON.stringify(result.nodes.node));
 		for (const node of result.nodes.node) {
-
 			// this.logger(node);
 			const device = that.getDevice(node.id);
 			if (Array.isArray(node.property)) {
@@ -594,13 +743,23 @@ export class ISY {
 					device[prop.id] = Number(prop.value);
 					device.formatted[prop.id] = prop.formatted;
 					device.uom[prop.id] = prop.uom;
-					device.logger(`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${device[prop.id]} (${device.formatted[prop.id]})`);
+					device.logger(
+						`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${
+							device[prop.id]
+						} (${device.formatted[prop.id]})`
+					);
 				}
 			} else {
 				device[node.property.id] = Number(node.property.value);
 				device.formatted[node.property.id] = node.property.formatted;
 				device.uom[node.property.id] = node.property.uom;
-				device.logger(`Property ${Controls[node.property.id].label} (${node.property.id}) initialized to: ${device[node.property.id]} (${device.formatted[node.property.id]})`);
+				device.logger(
+					`Property ${Controls[node.property.id].label} (${
+						node.property.id
+					}) initialized to: ${device[node.property.id]} (${
+						device.formatted[node.property.id]
+					})`
+				);
 			}
 		}
 	}
@@ -619,16 +778,29 @@ export class ISY {
 					this.loadVariables(VariableTypes.Integer, () => {
 						this.loadVariables(VariableTypes.State, () => {
 							if (this.elkEnabled) {
-								get(`${this.protocol}://${that.address}/rest/elk/get/topology`, options).on('complete', (result, response) => {
+								get(
+									`${this.protocol}://${that.address}/rest/elk/get/topology`,
+									options
+								).on('complete', (result, response) => {
 									if (that.checkForFailure(response)) {
 										that.logger('Error loading from elk: ' + result.message);
-										throw new Error('Unable to contact the ELK to get the topology');
+										throw new Error(
+											'Unable to contact the ELK to get the topology'
+										);
 									} else {
 										that.loadElkNodes(result);
-										get(that.protocol + '://' + that.address + '/rest/elk/get/status', options).on('complete', (result, response) => {
+										get(
+											that.protocol +
+												'://' +
+												that.address +
+												'/rest/elk/get/status',
+											options
+										).on('complete', (result, response) => {
 											if (that.checkForFailure(response)) {
 												that.logger('Error:' + result.message);
-												throw new Error('Unable to get the status from the elk');
+												throw new Error(
+													'Unable to get the status from the elk'
+												);
 											} else {
 												that.loadElkInitialStatus(result);
 												that.finishInitialize(true, initializeCompleted);
@@ -721,15 +893,27 @@ export class ISY {
 
 	public initializeWebSocket() {
 		const that = this;
-		const auth = 'Basic ' + new Buffer(this.userName + ':' + this.password).toString('base64');
-		that.logger('Connecting to: ' + this.wsprotocol + '://' + this.address + '/rest/subscribe');
-		this.webSocket = new Client(`${this.wsprotocol}://${this.address}/rest/subscribe`, ['ISYSUB'], {
-			headers: {
-				Origin: 'com.universal-devices.websockets.isy',
-				Authorization: auth
-			},
-			ping: 10
-		});
+		const auth =
+			'Basic ' +
+			new Buffer(this.userName + ':' + this.password).toString('base64');
+		that.logger(
+			'Connecting to: ' +
+				this.wsprotocol +
+				'://' +
+				this.address +
+				'/rest/subscribe'
+		);
+		this.webSocket = new Client(
+			`${this.wsprotocol}://${this.address}/rest/subscribe`,
+			['ISYSUB'],
+			{
+				headers: {
+					Origin: 'com.universal-devices.websockets.isy',
+					Authorization: auth
+				},
+				ping: 10
+			}
+		);
 
 		this.lastActivity = new Date();
 
@@ -750,7 +934,9 @@ export class ISY {
 				throw new Error('Call to ISY was aborted');
 			})
 			.on('timeout', (ms) => {
-				that.logger('Websocket subscription timed out after ' + ms + ' milliseconds.');
+				that.logger(
+					'Websocket subscription timed out after ' + ms + ' milliseconds.'
+				);
 				throw new Error('Timeout contacting ISY');
 			});
 	}
@@ -762,7 +948,11 @@ export class ISY {
 				return this.deviceList[address.substr(0, address.length - 1) + '1'];
 			}
 		} else {
-			while (s.parentAddress !== undefined && s.parentAddress !== s.address && s.parentAddress !== null) {
+			while (
+				s.parentAddress !== undefined &&
+				s.parentAddress !== s.address &&
+				s.parentAddress !== null
+			) {
 				s = this.deviceList[s.parentAddress];
 			}
 		}
@@ -781,9 +971,17 @@ export class ISY {
 		return this.callISY(path);
 	}
 
-	public async sendNodeCommand(node: ISYNode, command: String, ...parameters: any[]): Promise<any> {
+	public async sendNodeCommand(
+		node: ISYNode,
+		command: String,
+		...parameters: any[]
+	): Promise<any> {
 		let uriToUse = `nodes/${node.address}/cmd/${command}`;
-		if (parameters !== null && parameters !== undefined && parameters.length > 0) {
+		if (
+			parameters !== null &&
+			parameters !== undefined &&
+			parameters.length > 0
+		) {
 			uriToUse += `/${parameters.join('/')}`;
 		}
 		this.logger(`${node.name}: sending ${command} command: ${uriToUse}`);
@@ -791,7 +989,9 @@ export class ISY {
 	}
 
 	public sendGetVariable(id, type, handleResult) {
-		const uriToUse = `${this.protocol}://${this.address}/rest/vars/get/${type}/${id}`;
+		const uriToUse = `${this.protocol}://${
+			this.address
+		}/rest/vars/get/${type}/${id}`;
 		this.logger(`Sending ISY command...${uriToUse}`);
 		const options = {
 			username: this.userName,
@@ -807,7 +1007,9 @@ export class ISY {
 		});
 	}
 	public sendSetVariable(id, type, value, handleResult) {
-		const uriToUse = `${this.protocol}://${this.address}/rest/vars/set/${type}/${id}/${value}`;
+		const uriToUse = `${this.protocol}://${
+			this.address
+		}/rest/vars/set/${type}/${id}/${value}`;
 		this.logger(`Sending ISY command...${uriToUse}`);
 		const options = {
 			username: this.userName,
