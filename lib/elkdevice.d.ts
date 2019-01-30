@@ -1,6 +1,6 @@
 import { ISYDevice } from './isydevice.js';
 export declare class ELKAlarmPanelDevice extends ISYDevice {
-    constructor(isy: any, area: any);
+    constructor(isy: any, area: any, node: any);
     sendSetAlarmModeCommand(alarmState: any): Promise<any>;
     clearAllBypasses(): Promise<any>;
     getAlarmStatusAsText(): string;

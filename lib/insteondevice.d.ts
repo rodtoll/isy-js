@@ -38,6 +38,7 @@ declare const InsteonRelayDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -84,6 +85,7 @@ declare const InsteonDimmableDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -156,6 +158,7 @@ declare const InsteonLockDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -207,6 +210,7 @@ declare const InsteonDoorWindowSensorDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -252,6 +256,7 @@ declare const InsteonLeakSensorDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -297,6 +302,7 @@ declare const InsteonCOSensorDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -363,6 +369,7 @@ declare const InsteonFanDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
@@ -403,6 +410,7 @@ declare const InsteonFanDevice_base: {
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;

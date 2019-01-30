@@ -85,7 +85,7 @@ export declare class ISY {
     getDevice(address: string, parentsOnly?: boolean): any;
     getScene(address: any): any;
     sendISYCommand(path: any): Promise<any>;
-    sendNodeCommand(node: ISYNode, command: String, ...parameters: any[]): Promise<any>;
+    sendNodeCommand(node: ISYNode, command: string, ...parameters: any[]): Promise<any>;
     sendGetVariable(id: any, type: any, handleResult: any): void;
     sendSetVariable(id: any, type: any, value: any, handleResult: any): void;
 }

@@ -1,4 +1,5 @@
 import { Client } from 'faye-websocket';
+import { writeFile } from 'fs';
 import { get, parsers } from 'restler';
 import { Parser } from 'xml2js';
 import { XmlDocument } from 'xmldoc';
@@ -142,7 +143,7 @@ export class ISY {
 		this.guardianTimer = null;
 
 		if (this.elkEnabled) {
-			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1);
+			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1, null);
 		}
 		this.changeCallback = changeCallback;
 		if (log === undefined) {
@@ -194,10 +195,10 @@ export class ISY {
 	): ProductInfoEntry {
 		if (this.productInfoList.has(isyType)) {
 			const t = this.productInfoList.get(isyType);
-			this.logger(JSON.stringify(t));
+			//this.logger(JSON.stringify(t));
 			return t;
 		} else {
-			this.logger(JSON.stringify(isyType));
+			//this.logger(JSON.stringify(isyType));
 			return this.productInfoList.get(isyType + ' ' + address.split(' ')[3]);
 		}
 		return null;
@@ -222,7 +223,7 @@ export class ISY {
 		const mainType = Number(typeElements[0]);
 		let subType = Number(typeElements[1]);
 		const subAddress = Number(addressElements[3]);
-		this.logger(JSON.stringify(deviceNode));
+		// this.logger(JSON.stringify(deviceNode));
 		// ZWave nodes identify themselves with devtype node
 		if (deviceNode.devtype !== null && deviceNode.devtype !== undefined) {
 			if (deviceNode.devtype.cat !== null) {
@@ -405,6 +406,9 @@ export class ISY {
 
 	public loadNodes() {
 		return this.callISY('nodes').then((result) => {
+			if (this.debugLogEnabled) {
+				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
+			}
 			this.loadDevices(result);
 			this.loadScenes(result);
 		});
@@ -466,7 +470,7 @@ export class ISY {
 							device,
 							deviceTypeInfo
 						);
-					}  else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
+					} else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
 						newDevice = new InsteonFanDevice(this, device, deviceTypeInfo);
 					} else if (
 						deviceTypeInfo.deviceType === DeviceTypes.lock ||
@@ -490,13 +494,9 @@ export class ISY {
 					// Support the device with a base device object
 				} else {
 					this.logger(
-						'Device ' +
-							device.name +
-							' with type: ' +
-							device.type +
-							' and nodedef: ' +
-							device.nodeDefId +
-							' is not specifically supported, returning generic device object. '
+						`Device ${device.name} with type: ${device.type} and nodedef: ${
+							device.nodeDefId
+						} is not specifically supported, returning generic device object. `
 					);
 					newDevice = new ISYDevice(this, device);
 				}
@@ -638,6 +638,10 @@ export class ISY {
 
 	public async loadConfig() {
 		const result = await this.callISY('config');
+		if (this.debugLogEnabled) {
+			writeFile('ISYConfigDump.json', JSON.stringify(result), this.logger);
+		}
+
 		const controls = result.configuration.controls;
 		// this.logger(result.configuration);
 		if (controls !== undefined) {
@@ -973,7 +977,7 @@ export class ISY {
 
 	public async sendNodeCommand(
 		node: ISYNode,
-		command: String,
+		command: string,
 		...parameters: any[]
 	): Promise<any> {
 		let uriToUse = `nodes/${node.address}/cmd/${command}`;

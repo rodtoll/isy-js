@@ -1,7 +1,7 @@
 /// <reference types="node" />
+import { ISY } from './isy';
 import { ISYNode } from './isynode';
 import { ISYScene } from './isyscene';
-import { ISY } from './isy';
 export declare class ISYDevice extends ISYNode {
     readonly typeCode: string;
     readonly deviceClass: any;
@@ -13,6 +13,7 @@ export declare class ISYDevice extends ISYNode {
     readonly scenes: ISYScene[];
     readonly formatted: any[string];
     readonly uom: any[string];
+    readonly pending: any[string];
     constructor(isy: ISY, node: any);
     convertTo(value: any, uom: number): any;
     convertFrom(value: any, uom: number): any;
@@ -39,6 +40,7 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
@@ -80,6 +82,7 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
+        readonly pending: any;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;

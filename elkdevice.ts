@@ -1,15 +1,13 @@
+import { ISYDevice } from './isydevice.js';
 
-import {ISYDevice} from './isydevice.js';
-import xmldoc from 'xmldoc';
-import { Commands } from './isyconstants.js';
 
 /////////////////////////////
 // ELKAlarmPanelDevice
 //
 export class ELKAlarmPanelDevice extends ISYDevice
 {
-	constructor(isy, area) {
-		super(isy,area)
+	constructor(isy, area, node) {
+		super(isy,node)
 
 		this.area = area;
 		this.alarmTripState = this.ALARM_TRIP_STATE_DISARMED;

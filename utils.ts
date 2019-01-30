@@ -43,9 +43,16 @@ export async function getAsync(url: string, options): Promise<any> {
 	return p;
 }
 
+export enum Family
+{
+	Insteon = 1,
+	UPB = 7
+}
+
 export function getCategory(device) {
 	try {
 		const s = device.type.split('.');
+		
 		return Number(s[0]);
 	} catch (err) {
 		return Categories.Unknown;
@@ -59,3 +66,4 @@ export function getSubcategory(device) {
 		return Categories.Unknown;
 	}
 }
+
