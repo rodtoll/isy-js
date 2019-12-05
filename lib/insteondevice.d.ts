@@ -43,10 +43,11 @@ declare const InsteonRelayDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -62,7 +63,7 @@ declare const InsteonRelayDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonRelayDevice extends InsteonRelayDevice_base {
@@ -90,10 +91,11 @@ declare const InsteonDimmableDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -109,12 +111,11 @@ declare const InsteonDimmableDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonRelayDevice;
 export declare class InsteonDimmableDevice extends InsteonDimmableDevice_base {
     constructor(isy: any, node: any, productInfo: any);
-    readonly brightnessLevel: number;
     updateBrightnessLevel(level: any): Promise<{}>;
 }
 declare const InsteonRelaySwitchDevice_base: {
@@ -163,10 +164,11 @@ declare const InsteonLockDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -182,7 +184,7 @@ declare const InsteonLockDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonLockDevice extends InsteonLockDevice_base {
@@ -190,6 +192,7 @@ export declare class InsteonLockDevice extends InsteonLockDevice_base {
     sendLockCommand(lockState: any, resultHandler: any): void;
     readonly isLocked: boolean;
     getCurrentLockState(): boolean;
+    updateIsLocked(isLocked: boolean): Promise<any>;
     getCurrentNonSecureLockState(): boolean;
     getCurrentSecureLockState(): boolean;
     sendNonSecureLockCommand(lockState: any): Promise<any>;
@@ -215,10 +218,11 @@ declare const InsteonDoorWindowSensorDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -234,7 +238,7 @@ declare const InsteonDoorWindowSensorDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonDoorWindowSensorDevice extends InsteonDoorWindowSensorDevice_base {
@@ -261,10 +265,11 @@ declare const InsteonLeakSensorDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -280,7 +285,7 @@ declare const InsteonLeakSensorDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonLeakSensorDevice extends InsteonLeakSensorDevice_base {
@@ -307,10 +312,11 @@ declare const InsteonCOSensorDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -326,7 +332,7 @@ declare const InsteonCOSensorDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonCOSensorDevice extends InsteonCOSensorDevice_base {
@@ -374,10 +380,11 @@ declare const InsteonFanDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -393,7 +400,7 @@ declare const InsteonFanDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & {
     new (...args: any[]): {
@@ -415,10 +422,11 @@ declare const InsteonFanDevice_base: {
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -434,7 +442,7 @@ declare const InsteonFanDevice_base: {
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonFanDevice extends InsteonFanDevice_base {

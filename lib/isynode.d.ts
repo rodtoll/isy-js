@@ -18,7 +18,7 @@ export declare class ISYNode {
     lastChanged: Date;
     enabled: boolean;
     constructor(isy: ISY, node: any);
-    handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+    handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
     handleEvent(event: any): boolean;
-    onPropertyChanged(propertyName: any, callback: any): void;
+    onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
 }

@@ -18,15 +18,18 @@ let lastrequest = Promise.resolve();
 
 export async function getAsync(url: string, options): Promise<any> {
 	const p = new Promise<any>((resolve, reject) => {
-		//console.log('Calling: ' + url);
+		// console.log('Calling: ' + url);
 		get(url, options)
 			.on('complete', (result) => {
+
 				resolve(result);
 			})
 			.on('error', (err, response) => {
+			
 				reject(err);
 			})
 			.on('fail', (data, response) => {
+			
 				reject(data);
 			})
 			.on('abort', () => {
@@ -43,8 +46,7 @@ export async function getAsync(url: string, options): Promise<any> {
 	return p;
 }
 
-export enum Family
-{
+export enum Family {
 	Insteon = 1,
 	UPB = 7
 }
@@ -52,7 +54,7 @@ export enum Family
 export function getCategory(device) {
 	try {
 		const s = device.type.split('.');
-		
+
 		return Number(s[0]);
 	} catch (err) {
 		return Categories.Unknown;
@@ -66,4 +68,3 @@ export function getSubcategory(device) {
 		return Categories.Unknown;
 	}
 }
-

@@ -88,7 +88,11 @@ export class ISYDevice extends ISYNode {
 		return this._parentDevice;
 	}
 
-	public async updateProperty(propertyName, value): Promise<any> {
+	public async refreshProperty(propertyName) {
+
+	}
+
+	public async updateProperty(propertyName: string, value: string): Promise<any> {
 		const val = this.convertTo(Number(value), Number(this.uom[propertyName]));
 		this.logger(
 			'Updating property ' +
@@ -132,16 +136,12 @@ export class ISYDevice extends ISYNode {
 			device.formatted[node.property.id] = node.property.formatted;
 			device.uom[node.property.id] = node.property.uom;
 			device.logger(
-				`Property ${Controls[node.property.id].label} (${
-					node.property.id
-				}) initialized to: ${device[node.property.id]} (${
-					device.formatted[node.property.id]
-				})`
+				'Property ' + Controls[node.property.id].label + ' (' + node.property.id + ') initialized to: ' + device[node.property.id] + ' (' + device.formatted[node.property.id] + ')'
 			);
 		}
 	}
 
-	public handlePropertyChange(propertyName, value, formattedValue) {
+	public handlePropertyChange(propertyName: string, value: any, formattedValue: string) {
 		let changed = false;
 		try {
 			const val = this.convertFrom(

@@ -19,10 +19,11 @@ export declare class ISYDevice extends ISYNode {
     convertFrom(value: any, uom: number): any;
     addLink(isyScene: ISYScene): void;
     readonly parentDevice: ISYDevice;
-    updateProperty(propertyName: any, value: any): Promise<any>;
+    refreshProperty(propertyName: any): Promise<void>;
+    updateProperty(propertyName: string, value: string): Promise<any>;
     sendCommand(command: any, ...parameters: any[]): Promise<any>;
     refresh(): Promise<any>;
-    handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+    handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
 }
 declare type Constructor<T> = new (...args: any[]) => T;
 export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Base: T) => {
@@ -45,10 +46,11 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -64,7 +66,7 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & T;
 export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T) => {
@@ -87,10 +89,11 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
         readonly parentDevice: ISYDevice;
-        updateProperty(propertyName: any, value: any): Promise<any>;
+        refreshProperty(propertyName: any): Promise<void>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
-        handlePropertyChange(propertyName: any, value: any, formattedValue: any): boolean;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
         readonly isy: ISY;
         readonly flag: any;
         readonly nodeDefId: string;
@@ -106,7 +109,7 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         lastChanged: Date;
         enabled: boolean;
         handleEvent(event: any): boolean;
-        onPropertyChanged(propertyName: any, callback: any): void;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & T;
 export {};

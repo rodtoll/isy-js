@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+
 import { Controls, ISY } from './isy';
 
 export class ISYNode {
@@ -37,7 +38,7 @@ export class ISYNode {
 		this.lastChanged = new Date();
 	}
 
-	public handlePropertyChange(propertyName, value, formattedValue): boolean {
+	public handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean {
 		this.lastChanged = new Date();
 		return true;
 	}
@@ -67,7 +68,7 @@ export class ISYNode {
 		}
 	}
 
-	public onPropertyChanged(propertyName = null, callback) {
+	public onPropertyChanged(propertyName = null, callback: (...args) => void) {
 		if (propertyName === null) {
 			this.propertyChanged.addListener('', callback);
 		} else { this.propertyChanged.addListener(propertyName, callback); }

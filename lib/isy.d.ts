@@ -46,46 +46,70 @@ export declare class ISY {
     log: (msg: any) => void;
     logger: (msg: any) => void;
     lastActivity: any;
-    constructor(address: string, username: string, password: string, elkEnabled: boolean, changeCallback: any, useHttps: any, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: any);
-    buildDeviceInfoRecord(isyType: any, connectionType: any, deviceType: any): {
+    constructor(address: string, username: string, password: string, elkEnabled: boolean, changeCallback: any, useHttps: boolean, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: (msg: any) => void);
+    buildDeviceInfoRecord(isyType: any, connectionType: string, deviceType: string): {
         type: any;
         address: string;
         name: string;
-        deviceType: any;
-        connectionType: any;
+        deviceType: string;
+        connectionType: string;
         batteryOperated: boolean;
     };
     private isyTypeToTypeName;
-    callISY(url: any): Promise<any>;
+    callISY(url: string): Promise<any>;
     private getDeviceTypeBasedOnISYTable;
-    nodeChangedHandler(node: any, propertyName?: any): void;
+    nodeChangedHandler(node: ELKAlarmPanelDevice, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;
     loadNodes(): Promise<void>;
-    loadScenes(result: any): void;
-    loadDevices(obj: any): void;
+    loadScenes(result: {
+        nodes: {
+            group: any;
+        };
+    }): void;
+    loadDevices(obj: {
+        nodes: {
+            node: any;
+        };
+    }): void;
     loadElkNodes(result: any): void;
     loadElkInitialStatus(result: any): void;
-    finishInitialize(success: any, initializeCompleted: any): void;
+    finishInitialize(success: boolean, initializeCompleted: () => void): void;
     guardian(): void;
-    variableChangedHandler(variable: any): void;
+    variableChangedHandler(variable: {
+        id: string;
+        type: string;
+    }): void;
     checkForFailure(response: any): boolean;
-    loadVariables(type: any, done: any): void;
+    loadVariables(type: string | number, done: {
+        (): void;
+        (): void;
+        (): void;
+        (): void;
+    }): void;
     loadConfig(): Promise<void>;
     getVariableList(): any[];
     getVariable(type: any, id: any): any;
-    handleISYVariableUpdate(id: any, type: any, value: any, ts: any): void;
-    createVariableKey(type: any, id: any): string;
+    handleISYVariableUpdate(id: any, type: any, value: number, ts: Date): void;
+    createVariableKey(type: string, id: string): string;
     createVariables(type: any, result: any): void;
     setVariableValues(result: any): void;
-    getNodeDetail(device: any, callback: any): void;
+    getNodeDetail(device: {
+        address: any;
+    }, callback: (arg0: any) => void): void;
     refreshStatuses(): Promise<void>;
     initialize(initializeCompleted: any): void;
-    handleWebSocketMessage(event: any): void;
+    handleWebSocketMessage(event: {
+        data: any;
+    }): void;
     initializeWebSocket(): void;
     getDevice(address: string, parentsOnly?: boolean): any;
-    getScene(address: any): any;
-    sendISYCommand(path: any): Promise<any>;
+    getScene(address: string | number): any;
+    sendISYCommand(path: string): Promise<any>;
     sendNodeCommand(node: ISYNode, command: string, ...parameters: any[]): Promise<any>;
-    sendGetVariable(id: any, type: any, handleResult: any): void;
-    sendSetVariable(id: any, type: any, value: any, handleResult: any): void;
+    sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void): void;
+    sendSetVariable(id: any, type: any, value: any, handleResult: {
+        (success: any): void;
+        (arg0: boolean): void;
+        (arg0: boolean): void;
+    }): void;
 }

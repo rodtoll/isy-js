@@ -102,12 +102,12 @@ export class ISY {
 		username: string,
 		password: string,
 		elkEnabled: boolean,
-		changeCallback,
-		useHttps,
-		scenesInDeviceList,
-		enableDebugLogging,
-		variableCallback,
-		log
+		changeCallback: any,
+		useHttps: boolean,
+		scenesInDeviceList: any,
+		enableDebugLogging: any,
+		variableCallback: any,
+		log: (msg: any) => void
 	) {
 		this.address = address;
 		this.userName = username;
@@ -169,7 +169,7 @@ export class ISY {
 		for (const p of ProductInfo) {
 			this.logger(p);
 			if (p.address !== '' && p.address !== undefined && p.address !== null) {
-				this.productInfoList.set(p.type + ' ' + String(p.address), p);
+				this.productInfoList.set(`${p.type} ${String(p.address)}`, p);
 			} else {
 				this.productInfoList.set(p.type, p);
 			}
@@ -178,7 +178,7 @@ export class ISY {
 		this.logger(JSON.stringify(this.productInfoList.size));
 	}
 
-	public buildDeviceInfoRecord(isyType, connectionType, deviceType) {
+	public buildDeviceInfoRecord(isyType: any, connectionType: string, deviceType: string) {
 		return {
 			type: isyType,
 			address: '',
@@ -199,19 +199,27 @@ export class ISY {
 			return t;
 		} else {
 			//this.logger(JSON.stringify(isyType));
-			return this.productInfoList.get(isyType + ' ' + address.split(' ')[3]);
+			return this.productInfoList.get(`${isyType} ${address.split(' ')[3]}`);
 		}
 		return null;
 	}
 
-	public async callISY(url): Promise<any> {
+	public async callISY(url: string): Promise<any> {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
 		this.logger(`Sending request: ${url}`);
-		const p = await getAsync(url, this.restlerOptions);
+		const p = await getAsync(url, this.restlerOptions).then((response) => {
+		
+			if(this.checkForFailure(response))
+			{
+				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
+				return Promise.reject(response);
+			}
+			return response;
+		});
 		return p;
 	}
 
-	private getDeviceTypeBasedOnISYTable(deviceNode) {
+	private getDeviceTypeBasedOnISYTable(deviceNode: { family: any; type: any; address: any; devtype: { cat: any; }; }) {
 		let familyId = 1;
 		if (deviceNode.family !== null) {
 			familyId = Number(deviceNode.family);
@@ -390,7 +398,7 @@ export class ISY {
 		}
 	}
 
-	public nodeChangedHandler(node, propertyName = null) {
+	public nodeChangedHandler(node: ELKAlarmPanelDevice, propertyName = null) {
 		const that = this;
 		if (this.nodesLoaded) {
 			// this.logger(`Node: ${node.address} changed`);
@@ -414,7 +422,7 @@ export class ISY {
 		});
 	}
 
-	public loadScenes(result) {
+	public loadScenes(result: { nodes: { group: any; }; }) {
 		for (const scene of result.nodes.group) {
 			if (scene.name === 'ISY' || scene.name === 'Auto DR') {
 				continue;
@@ -425,7 +433,7 @@ export class ISY {
 		}
 	}
 
-	public loadDevices(obj) {
+	public loadDevices(obj: { nodes: { node: any; }; }) {
 		for (const device of obj.nodes.node) {
 			if (!this.deviceMap.has(device.pnode)) {
 				const address = device.address;
@@ -510,10 +518,10 @@ export class ISY {
 			}
 		}
 
-		this.logger('Devices: ' + this.deviceList.entries.length + ' added.');
+		this.logger(`Devices: ${this.deviceList.entries.length} added.`);
 	}
 
-	public loadElkNodes(result) {
+	public loadElkNodes(result: any) {
 		const document = new XmlDocument(result);
 		const nodes = document
 			.childNamed('areas')
@@ -536,12 +544,12 @@ export class ISY {
 		}
 	}
 
-	public loadElkInitialStatus(result) {
+	public loadElkInitialStatus(result: any) {
 		const p = new Parser({
 			explicitArray: false,
 			mergeAttrs: true
 		});
-		p.parseString(result, (err, res) => {
+		p.parseString(result, (err: any, res: { ae: any; ze: any; }) => {
 			if (err) {
 				throw err;
 			}
@@ -566,7 +574,7 @@ export class ISY {
 		});
 	}
 
-	public finishInitialize(success, initializeCompleted) {
+	public finishInitialize(success: boolean, initializeCompleted: () => void) {
 		this.nodesLoaded = true;
 		initializeCompleted();
 		if (success) {
@@ -590,29 +598,31 @@ export class ISY {
 		}
 	}
 
-	public variableChangedHandler(variable) {
-		this.logger('Variable:' + variable.id + ' (' + variable.type + ') changed');
+	public variableChangedHandler(variable: { id: string; type: string; }) {
+		this.logger(`Variable:${variable.id} (${variable.type}) changed`);
 		if (this.variableCallback !== null && this.variableCallback !== undefined) {
 			this.variableCallback(this, variable);
 		}
 	}
-	public checkForFailure(response) {
+	public checkForFailure(response: any) {
+		
 		return (
 			response === null ||
 			response instanceof Error ||
-			response.statusCode !== 200
+			response.RestResponse !== undefined && response.RestResponse.status !== 200
 		);
 	}
-	public loadVariables(type, done) {
+	public loadVariables(type: string | number, done: { (): void; (): void; (): void; (): void; }) {
 		const that = this;
 		const options = {
 			username: this.userName,
+
 			password: this.password
 		};
 		get(
-			that.protocol + '://' + that.address + '/rest/vars/definitions/' + type,
+			`${that.protocol}://${that.address}/rest/vars/definitions/${type}`,
 			options
-		).on('complete', (result, response) => {
+		).on('complete', (result: any, response: any) => {
 			if (that.checkForFailure(response)) {
 				that.logger(
 					'Error loading variables from isy. Device likely doesn\'t have any variables defined. Safe to ignore.'
@@ -621,11 +631,11 @@ export class ISY {
 			} else {
 				that.createVariables(type, result);
 				get(
-					that.protocol + '://' + that.address + '/rest/vars/get/' + type,
+					`${that.protocol}://${that.address}/rest/vars/get/${type}`,
 					options
-				).on('complete', (result, response) => {
+				).on('complete', (result: { message: string; }, response: any) => {
 					if (that.checkForFailure(response)) {
-						that.logger('Error loading variables from isy: ' + result.message);
+						that.logger(`Error loading variables from isy: ${result.message}`);
 						throw new Error('Unable to load variables from the ISY');
 					} else {
 						that.setVariableValues(result);
@@ -657,7 +667,7 @@ export class ISY {
 	public getVariableList() {
 		return this.variableList;
 	}
-	public getVariable(type, id) {
+	public getVariable(type: any, id: any) {
 		const key = this.createVariableKey(type, id);
 		if (
 			this.variableIndex[key] !== null &&
@@ -667,7 +677,7 @@ export class ISY {
 		}
 		return null;
 	}
-	public handleISYVariableUpdate(id, type, value, ts) {
+	public handleISYVariableUpdate(id: any, type: any, value: number, ts: Date) {
 		const variableToUpdate = this.getVariable(type, id);
 		if (variableToUpdate !== null) {
 			variableToUpdate.value = value;
@@ -675,10 +685,10 @@ export class ISY {
 			this.variableChangedHandler(variableToUpdate);
 		}
 	}
-	public createVariableKey(type, id) {
+	public createVariableKey(type: string, id: string) {
 		return type + ':' + id;
 	}
-	public createVariables(type, result) {
+	public createVariables(type: any, result: any) {
 		const document = new XmlDocument(result);
 		const variables = document.childrenNamed('e');
 		for (let index = 0; index < variables.length; index++) {
@@ -689,7 +699,7 @@ export class ISY {
 			this.variableIndex[this.createVariableKey(type, id)] = newVariable;
 		}
 	}
-	public setVariableValues(result) {
+	public setVariableValues(result: any) {
 		const document = new XmlDocument(result);
 		const variables = document.childrenNamed('var');
 		for (let index = 0; index < variables.length; index++) {
@@ -708,20 +718,20 @@ export class ISY {
 		}
 	}
 
-	public getNodeDetail(device, callback) {
+	public getNodeDetail(device: { address: any; }, callback: (arg0: any) => void) {
 		get(
 			`${this.protocol}://${this.address}/rest/nodes/${device.address}/`,
 			this.restlerOptions
 		)
-			.on('complete', (result) => {
+			.on('complete', (result: { nodeInfo: any; }) => {
 				const nodeDetail = result.nodeInfo;
 				callback(nodeDetail);
 			})
-			.on('error', (err, response) => {
+			.on('error', (err: string, response: any) => {
 				this.logger('Error while contacting ISY' + err);
 				throw new Error('Error calling ISY' + err);
 			})
-			.on('fail', (data, response) => {
+			.on('fail', (data: any, response: any) => {
 				this.logger('Error while contacting ISY -- failure');
 				throw new Error('Failed calling ISY');
 			})
@@ -729,7 +739,7 @@ export class ISY {
 				this.logger('Abort while contacting ISY');
 				throw new Error('Call to ISY was aborted');
 			})
-			.on('timeout', (ms) => {
+			.on('timeout', (ms: any) => {
 				this.logger('Timed out contacting ISY');
 				throw new Error('Timeout contacting ISY');
 			});
@@ -768,7 +778,7 @@ export class ISY {
 		}
 	}
 
-	public initialize(initializeCompleted) {
+	public initialize(initializeCompleted: any) {
 		const that = this;
 		const options = {
 			username: this.userName,
@@ -785,7 +795,7 @@ export class ISY {
 								get(
 									`${this.protocol}://${that.address}/rest/elk/get/topology`,
 									options
-								).on('complete', (result, response) => {
+								).on('complete', (result: { message: string; }, response: any) => {
 									if (that.checkForFailure(response)) {
 										that.logger('Error loading from elk: ' + result.message);
 										throw new Error(
@@ -794,14 +804,11 @@ export class ISY {
 									} else {
 										that.loadElkNodes(result);
 										get(
-											that.protocol +
-												'://' +
-												that.address +
-												'/rest/elk/get/status',
+											`${that.protocol}://${that.address}/rest/elk/get/status`,
 											options
-										).on('complete', (result, response) => {
+										).on('complete', (result: { message: string; }, response: any) => {
 											if (that.checkForFailure(response)) {
-												that.logger('Error:' + result.message);
+												that.logger(`Error:${result.message}`);
 												throw new Error(
 													'Unable to get the status from the elk'
 												);
@@ -819,13 +826,13 @@ export class ISY {
 					});
 				})
 			)
-			.catch((reason) => this.logger('Error calling ISY: ' + reason));
+			.catch((reason) => this.logger('Error calling ISY: ' + JSON.stringify(reason)));
 	}
 
-	public handleWebSocketMessage(event) {
+	public handleWebSocketMessage(event: { data: any; }) {
 		this.lastActivity = new Date();
 
-		parser.parseString(event.data, (err, res) => {
+		parser.parseString(event.data, (err: any, res: { Event: any; }) => {
 			if (err) {
 				throw err;
 			}
@@ -898,14 +905,9 @@ export class ISY {
 	public initializeWebSocket() {
 		const that = this;
 		const auth =
-			'Basic ' +
-			new Buffer(this.userName + ':' + this.password).toString('base64');
+		`Basic ${new Buffer(`${this.userName}:${this.password}`).toString('base64')}`;
 		that.logger(
-			'Connecting to: ' +
-				this.wsprotocol +
-				'://' +
-				this.address +
-				'/rest/subscribe'
+			`Connecting to: ${this.wsprotocol}://${this.address}/rest/subscribe`
 		);
 		this.webSocket = new Client(
 			`${this.wsprotocol}://${this.address}/rest/subscribe`,
@@ -922,24 +924,24 @@ export class ISY {
 		this.lastActivity = new Date();
 
 		this.webSocket
-			.on('message', (event) => {
+			.on('message', (event: any) => {
 				that.handleWebSocketMessage(event);
 			})
-			.on('error', (err, response) => {
-				that.logger('Websocket subscription error: ' + err);
+			.on('error', (err: string, response: any) => {
+				that.logger(`Websocket subscription error: ${err}`);
 				/// throw new Error('Error calling ISY' + err);
 			})
-			.on('fail', (data, response) => {
-				that.logger('Websocket subscription failure: ' + data);
+			.on('fail', (data: string, response: any) => {
+				that.logger(`Websocket subscription failure: ${data}`);
 				throw new Error('Failed calling ISY');
 			})
 			.on('abort', () => {
 				that.logger('Websocket subscription aborted.');
 				throw new Error('Call to ISY was aborted');
 			})
-			.on('timeout', (ms) => {
+			.on('timeout', (ms: string) => {
 				that.logger(
-					'Websocket subscription timed out after ' + ms + ' milliseconds.'
+					`Websocket subscription timed out after ${ms} milliseconds.`
 				);
 				throw new Error('Timeout contacting ISY');
 			});
@@ -949,7 +951,7 @@ export class ISY {
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {
-				return this.deviceList[address.substr(0, address.length - 1) + '1'];
+				return this.deviceList[`${address.substr(0, address.length - 1)}1`];
 			}
 		} else {
 			while (
@@ -964,13 +966,13 @@ export class ISY {
 		return s;
 	}
 
-	public getScene(address) {
+	public getScene(address: string | number) {
 		return this.sceneList[address];
 	}
 
-	public async sendISYCommand(path): Promise<any> {
+	public async sendISYCommand(path: string): Promise<any> {
 		// const uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
-		this.logger('Sending command...' + path);
+		this.logger(`Sending command...${path}`);
 
 		return this.callISY(path);
 	}
@@ -992,7 +994,7 @@ export class ISY {
 		return this.callISY(uriToUse);
 	}
 
-	public sendGetVariable(id, type, handleResult) {
+	public sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void) {
 		const uriToUse = `${this.protocol}://${
 			this.address
 		}/rest/vars/get/${type}/${id}`;
@@ -1001,7 +1003,7 @@ export class ISY {
 			username: this.userName,
 			password: this.password
 		};
-		get(uriToUse, options).on('complete', (result, response) => {
+		get(uriToUse, options).on('complete', (result: any, response: { statusCode: number; }) => {
 			if (response.statusCode === 200) {
 				const document = new XmlDocument(result);
 				const val = parseInt(document.childNamed('val').val);
@@ -1010,7 +1012,7 @@ export class ISY {
 			}
 		});
 	}
-	public sendSetVariable(id, type, value, handleResult) {
+	public sendSetVariable(id: any, type: any, value: any, handleResult: { (success: any): void; (arg0: boolean): void; (arg0: boolean): void; }) {
 		const uriToUse = `${this.protocol}://${
 			this.address
 		}/rest/vars/set/${type}/${id}/${value}`;
@@ -1019,7 +1021,7 @@ export class ISY {
 			username: this.userName,
 			password: this.password
 		};
-		get(uriToUse, options).on('complete', (result, response) => {
+		get(uriToUse, options).on('complete', (result: any, response: { statusCode: number; }) => {
 			if (response.statusCode === 200) {
 				handleResult(true);
 			} else {

@@ -105,9 +105,6 @@ export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {
 		this.isDimmable = true;
 	}
 
-	get brightnessLevel() {
-		return this.level;
-	}
 
 	public async updateBrightnessLevel(level): Promise<{}> {
 		return super.updateLevel(level);
@@ -151,6 +148,8 @@ export class InsteonDimmerKeypadDevice extends InsteonDimmableDevice {
 	}
 }
 
+
+
 export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
@@ -178,6 +177,11 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 		} else {
 			// assert(false, 'Should not ever have lock which is not one of the known lock types');
 		}
+	}
+
+	public async updateIsLocked(isLocked: boolean)
+	{
+		return super.updateState(isLocked);
 	}
 
 	public getCurrentNonSecureLockState() {
