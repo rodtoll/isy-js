@@ -622,7 +622,7 @@ export class ISY {
 		return (
 			response === null ||
 			response instanceof Error ||
-			response.RestResponse !== undefined && response.RestResponse.status !== 200
+			response.RestResponse !== undefined && response.RestResponse.status !== '200'
 		);
 	}
 	public loadVariables(type: string | number, done: { (): void; (): void; (): void; (): void; }) {
