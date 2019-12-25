@@ -29,13 +29,13 @@ export class ISYNode {
 		this.address = node.address;
 		this.name = node.name;
 		this.family = node.family;
+	
 		this.parent = node.parent;
 
 		if(!isNullOrUndefined(this.parent))
 		{
 			this.parentType = this.parent.type;
 		}
-		this.parentType = node.parent.type;
 		this.enabled = node.enabled;
 		this.elkId = node.ELK_ID;
 		this.propertyChanged = new EventEmitter();
