@@ -74,6 +74,7 @@ export class ISY {
 	public readonly deviceList: Map<string, ISYDevice> = new Map();
 	public readonly deviceMap: Map<string, string[]> = new Map();
 	public readonly sceneList: Map<string, ISYScene> = new Map();
+	public readonly folderMap: Map<string, string> = new Map();
 	public productInfoList: Map<string, ProductInfoEntry> = new Map();
 	public webSocket: Client;
 	public zoneMap: any;
@@ -417,9 +418,19 @@ export class ISY {
 			if (this.debugLogEnabled) {
 				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
 			}
+			this.loadFolders(result);
 			this.loadDevices(result);
 			this.loadScenes(result);
 		});
+	}
+
+	public loadFolders(result: { nodes: { folder: any; }; })
+	{
+		for (const folder of result.nodes.folder)
+		{
+			this.folderMap.set(folder.address,folder.name);
+			
+		}
 	}
 
 	public loadScenes(result: { nodes: { group: any; }; }) {

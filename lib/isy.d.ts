@@ -20,6 +20,7 @@ export declare class ISY {
     readonly deviceList: Map<string, ISYDevice>;
     readonly deviceMap: Map<string, string[]>;
     readonly sceneList: Map<string, ISYScene>;
+    readonly folderMap: Map<string, string>;
     productInfoList: Map<string, ProductInfoEntry>;
     webSocket: Client;
     zoneMap: any;
@@ -61,6 +62,11 @@ export declare class ISY {
     nodeChangedHandler(node: ELKAlarmPanelDevice, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;
     loadNodes(): Promise<void>;
+    loadFolders(result: {
+        nodes: {
+            folder: any;
+        };
+    }): void;
     loadScenes(result: {
         nodes: {
             group: any;

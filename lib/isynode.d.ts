@@ -9,7 +9,9 @@ export declare class ISYNode {
     [x: string]: any;
     name: string;
     family: any;
+    folder: string;
     parent: any;
+    parentType: number;
     readonly elkId: string;
     nodeType: number;
     propertyChanged: EventEmitter;

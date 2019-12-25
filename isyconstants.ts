@@ -18,7 +18,8 @@ const ISYConstants = {
 	Siren:
 		{
 
-    },
+	},
+
     Sensor:
     {
       Triggered: 100,
@@ -154,6 +155,7 @@ const ISYConstants = {
 	NodeTypes: {
 		Device: 1,
 		Scene: 2,
+		Folder: 3,
 		X10A10: 4
 	},
 	Families: {

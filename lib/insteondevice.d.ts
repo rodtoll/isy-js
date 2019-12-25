@@ -54,7 +54,9 @@ declare const InsteonRelayDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -102,7 +104,9 @@ declare const InsteonDimmableDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -175,7 +179,9 @@ declare const InsteonLockDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -229,7 +235,9 @@ declare const InsteonDoorWindowSensorDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -276,7 +284,9 @@ declare const InsteonLeakSensorDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -323,7 +333,9 @@ declare const InsteonCOSensorDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -391,7 +403,9 @@ declare const InsteonFanDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -433,7 +447,9 @@ declare const InsteonFanDevice_base: {
         readonly address: string;
         name: string;
         family: any;
+        folder: string;
         parent: any;
+        parentType: number;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;

@@ -145,6 +145,7 @@ declare const ISYConstants: {
     NodeTypes: {
         Device: number;
         Scene: number;
+        Folder: number;
         X10A10: number;
     };
     Families: {
@@ -342,6 +343,7 @@ export declare const UpdateTypes: {
 export declare const NodeTypes: {
     Device: number;
     Scene: number;
+    Folder: number;
     X10A10: number;
 };
 export declare const Categories: {
