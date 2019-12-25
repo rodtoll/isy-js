@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
+import { isNullOrUndefined } from 'util';
 
-import { Controls, ISY } from './isy';
+import { Controls, ISY, NodeTypes } from './isy';
 
 export class ISYNode {
 	public readonly isy: ISY;
@@ -20,7 +21,7 @@ export class ISYNode {
 	public logger: (msg: any) => void;
 	public lastChanged: Date;
 	public enabled: boolean;
-	constructor(isy: ISY, node) {
+	constructor(isy: ISY, node: any) {
 		this.isy = isy;
 		this.nodeType = 0;
 		this.flag = node.flag;
@@ -29,6 +30,11 @@ export class ISYNode {
 		this.name = node.name;
 		this.family = node.family;
 		this.parent = node.parent;
+
+		if(!isNullOrUndefined(this.parent))
+		{
+			this.parentType = this.parent.type;
+		}
 		this.parentType = node.parent.type;
 		this.enabled = node.enabled;
 		this.elkId = node.ELK_ID;
@@ -37,9 +43,9 @@ export class ISYNode {
 		this.logger = (msg) => {
 			return isy.logger(`${this.name} (${this.address}): ${msg}`);
 		};
-		if(this.parentType === 3)
+		if(this.parentType === NodeTypes.Folder)
 		{
-			this.folder = isy.folderMap.get(this.parent);
+			this.folder = isy.folderMap.get(this.parent._);
 		}
 		this.logger(this.nodeDefId);
 		this.lastChanged = new Date();
