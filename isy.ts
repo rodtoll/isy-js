@@ -55,9 +55,7 @@ export {
 
 const parser = new Parser({
 	explicitArray: false,
-	mergeAttrs: true,
-	valueProcessors: [parseNumbers,parseBooleans],
-	attrValueProcessors: [parseNumbers, parseBooleans]
+	mergeAttrs: true
 });
 
 export let Controls = {};
