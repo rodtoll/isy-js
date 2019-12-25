@@ -196,10 +196,10 @@ export class ISY {
 	): ProductInfoEntry {
 		if (this.productInfoList.has(isyType)) {
 			const t = this.productInfoList.get(isyType);
-			//this.logger(JSON.stringify(t));
+			// this.logger(JSON.stringify(t));
 			return t;
 		} else {
-			//this.logger(JSON.stringify(isyType));
+			// this.logger(JSON.stringify(isyType));
 			return this.productInfoList.get(`${isyType} ${address.split(' ')[3]}`);
 		}
 		return null;
@@ -209,9 +209,8 @@ export class ISY {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
 		this.logger(`Sending request: ${url}`);
 		const p = await getAsync(url, this.restlerOptions).then((response) => {
-		
-			if(this.checkForFailure(response))
-			{
+
+			if (this.checkForFailure(response)) {
 				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
 				return Promise.reject(response);
 			}
@@ -424,16 +423,18 @@ export class ISY {
 		});
 	}
 
-	public loadFolders(result: { nodes: { folder: any; }; })
-	{
-		for (const folder of result.nodes.folder)
-		{
-			this.folderMap.set(folder.address,folder.name);
-			
+	public loadFolders(result: { nodes: { folder: any; }; }) {
+
+		this.logger('Loading Folders');
+		for (const folder of result.nodes.folder) {
+			this.logger(`Loading: ${JSON.stringify(folder)}`);
+			this.folderMap.set(folder.address, folder.name);
+
 		}
 	}
 
 	public loadScenes(result: { nodes: { group: any; }; }) {
+		this.logger('Loading Scenes');
 		for (const scene of result.nodes.group) {
 			if (scene.name === 'ISY' || scene.name === 'Auto DR') {
 				continue;
@@ -445,6 +446,7 @@ export class ISY {
 	}
 
 	public loadDevices(obj: { nodes: { node: any; }; }) {
+		this.logger('Loading Devices');
 		for (const device of obj.nodes.node) {
 			if (!this.deviceMap.has(device.pnode)) {
 				const address = device.address;
@@ -616,7 +618,7 @@ export class ISY {
 		}
 	}
 	public checkForFailure(response: any) {
-		
+
 		return (
 			response === null ||
 			response instanceof Error ||

@@ -45,6 +45,7 @@ export class ISYNode {
 		};
 		if(this.parentType === NodeTypes.Folder)
 		{
+			this.logger("Node is in folder" + this.parent);
 			this.folder = isy.folderMap.get(this.parent._);
 		}
 		this.logger(this.nodeDefId);
