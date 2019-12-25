@@ -1,7 +1,7 @@
 import { Client } from 'faye-websocket';
 import { writeFile } from 'fs';
 import { get, parsers } from 'restler';
-import { Parser } from 'xml2js';
+import { parseBooleans, parseNumbers, Parser } from 'xml2js';
 import { XmlDocument } from 'xmldoc';
 
 import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './elkdevice';
@@ -55,7 +55,9 @@ export {
 
 const parser = new Parser({
 	explicitArray: false,
-	mergeAttrs: true
+	mergeAttrs: true,
+	valueProcessors: [parseNumbers,parseBooleans],
+	attrValueProcessors: [parseNumbers, parseBooleans]
 });
 
 export let Controls = {};
@@ -123,7 +125,9 @@ export class ISY {
 			parser: parsers.xml,
 			xml2js: {
 				explicitArray: false,
-				mergeAttrs: true
+				mergeAttrs: true,
+				attrValueProcessors: [parseBooleans,parseNumbers],
+				valueProcessors: [parseNumbers, parseBooleans]
 			}
 		};
 
@@ -215,7 +219,7 @@ export class ISY {
 				return Promise.reject(response);
 			}
 			return response;
-		});
+		},Promise.reject);
 		return p;
 	}
 
@@ -619,6 +623,7 @@ export class ISY {
 	}
 	public checkForFailure(response: any) {
 
+		
 		return (
 			response === null ||
 			response instanceof Error ||
