@@ -11,7 +11,7 @@ export class ISYNode {
 	[x: string]: any;
 	public name: string;
 	public family: any;
-	public folder: string;
+	public folder: string = '';
 	public parent: any;
 	public parentType: number;
 	public readonly elkId: string;
@@ -34,7 +34,7 @@ export class ISYNode {
 
 		if(!isNullOrUndefined(this.parent))
 		{
-			this.parentType = this.parent.type;
+			this.parentType = Number(this.parent.type);
 		}
 		this.enabled = node.enabled;
 		this.elkId = node.ELK_ID;
@@ -45,7 +45,7 @@ export class ISYNode {
 		};
 		if(this.parentType === NodeTypes.Folder)
 		{
-			this.logger("Node is in folder" + this.parent);
+			this.logger("Node is in folder" + this.parent._);
 			this.folder = isy.folderMap.get(this.parent._);
 		}
 		this.logger(this.nodeDefId);
