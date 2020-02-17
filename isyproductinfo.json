@@ -2,6 +2,7 @@
     {
         "type": "1.0.51.0",
         "address": "",
+        "manufacturer": "Insteon",
         "name": "(2456D3) LampLinc v.33",
         "deviceType": "DimmableLight",
         "connectionType": "Insteon Wired",

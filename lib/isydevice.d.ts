@@ -18,7 +18,8 @@ export declare class ISYDevice extends ISYNode {
     convertTo(value: any, uom: number): any;
     convertFrom(value: any, uom: number): any;
     addLink(isyScene: ISYScene): void;
-    readonly parentDevice: ISYDevice;
+    addChild(childDevice: ISYDevice): void;
+    get parentDevice(): ISYDevice;
     refreshProperty(propertyName: any): Promise<void>;
     updateProperty(propertyName: string, value: string): Promise<any>;
     sendCommand(command: any, ...parameters: any[]): Promise<any>;
@@ -45,6 +46,7 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
+        addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
         refreshProperty(propertyName: any): Promise<void>;
         updateProperty(propertyName: string, value: string): Promise<any>;
@@ -56,6 +58,7 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly nodeDefId: string;
         readonly address: string;
         name: string;
+        displayName: string;
         family: any;
         folder: string;
         parent: any;
@@ -90,6 +93,7 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
+        addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
         refreshProperty(propertyName: any): Promise<void>;
         updateProperty(propertyName: string, value: string): Promise<any>;
@@ -101,6 +105,7 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly nodeDefId: string;
         readonly address: string;
         name: string;
+        displayName: string;
         family: any;
         folder: string;
         parent: any;

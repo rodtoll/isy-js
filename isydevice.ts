@@ -16,7 +16,7 @@ export class ISYDevice extends ISYNode {
 	public readonly uom: any[string] = {};
 	public readonly pending: any[string] = {};
 
-	constructor(isy: ISY, node) {
+	constructor (isy: ISY, node: any) {
 		super(isy, node);
 		this.nodeType = 1;
 		this.type = node.type;
@@ -33,6 +33,7 @@ export class ISYDevice extends ISYNode {
 			this.parentAddress !== undefined
 		) {
 			this._parentDevice = isy.getDevice(this.parentAddress);
+
 		}
 		if (Array.isArray(node.property)) {
 			for (const prop of node.property) {
@@ -74,6 +75,11 @@ export class ISYDevice extends ISYNode {
 		this.scenes.push(isyScene);
 	}
 
+	public addChild(childDevice: ISYDevice)
+	{
+
+	}
+
 	get parentDevice(): ISYDevice {
 		if (this._parentDevice === undefined) {
 			if (
@@ -89,18 +95,13 @@ export class ISYDevice extends ISYNode {
 	}
 
 	public async refreshProperty(propertyName) {
-
+		const result = await this.isy.callISY(`nodes/${this.address}/status/propertyName`);
 	}
 
 	public async updateProperty(propertyName: string, value: string): Promise<any> {
 		const val = this.convertTo(Number(value), Number(this.uom[propertyName]));
 		this.logger(
-			'Updating property ' +
-				Controls[propertyName].label +
-				'. incoming value: ' +
-				value +
-				' outgoing value: ' +
-				val
+			`Updating property ${Controls[propertyName].label}. incoming value: ${value} outgoing value: ${val}`
 		);
 		this.pending[propertyName] = value;
 		return this.isy
@@ -116,17 +117,18 @@ export class ISYDevice extends ISYNode {
 	}
 
 	public async refresh(): Promise<any> {
+		const device = this;
 		const result = await this.isy.callISY(`nodes/${this.address}/status`);
 		const node = result.node;
 		// this.logger(node);
-		const device = this;
+
 		if (Array.isArray(node.property)) {
 			for (const prop of node.property) {
 				device[prop.id] = Number(prop.value);
 				device.formatted[prop.id] = prop.formatted;
 				device.uom[prop.id] = prop.uom;
 				device.logger(
-					`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${
+					`Property ${Controls[prop.id].label} (${prop.id}) refreshed to: ${
 						device[prop.id]
 					} (${device.formatted[prop.id]})`
 				);
@@ -136,9 +138,10 @@ export class ISYDevice extends ISYNode {
 			device.formatted[node.property.id] = node.property.formatted;
 			device.uom[node.property.id] = node.property.uom;
 			device.logger(
-				'Property ' + Controls[node.property.id].label + ' (' + node.property.id + ') initialized to: ' + device[node.property.id] + ' (' + device.formatted[node.property.id] + ')'
+				'Property ' + Controls[node.property.id].label + ' (' + node.property.id + ') refreshed to: ' + device[node.property.id] + ' (' + device.formatted[node.property.id] + ')'
 			);
 		}
+		return result;
 	}
 
 	public handlePropertyChange(propertyName: string, value: any, formattedValue: string) {
@@ -215,6 +218,7 @@ export const ISYLevelDevice = <T extends Constructor<ISYDevice>>(base: T) =>
 
 		public async updateLevel(level: number): Promise<any> {
 			if (level !== this.ST || level !== this.pending.ST) {
+			
 				this.pending.ST = level;
 				if (level > 0) {
 					return this.sendCommand(

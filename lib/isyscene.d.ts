@@ -10,8 +10,8 @@ export declare class ISYScene extends ISYNode {
     isDimmable: boolean;
     typeCode: string;
     constructor(isy: any, scene: any);
-    readonly isOn: boolean;
-    readonly brightnessLevel: number;
+    get isOn(): boolean;
+    get brightnessLevel(): number;
     recalculateState(): boolean;
     markAsChanged(): void;
     updateIsOn(lightState: any): Promise<any>;

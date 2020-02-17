@@ -19,10 +19,10 @@
     ],
     "main": "./lib/isy.js",
     "devDependencies": {
-        "mocha": "",
+        "@types/node": "^10.17.15",
+        "babel-preset-env": "^1.7.0",
         "fake-isy-994i": "",
-        "@types/node": "^10.11.6",
-        "babel-preset-env": "^1.7.0"
+        "mocha": ""
     },
     "dependencies": {
         "faye-websocket": "",

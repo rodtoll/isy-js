@@ -8,6 +8,7 @@ export declare class ISYNode {
     readonly address: string;
     [x: string]: any;
     name: string;
+    displayName: string;
     family: any;
     folder: string;
     parent: any;

@@ -15,7 +15,8 @@
         "quotemark":[true,"single"],
         "prefer-template": true,
         "interface-name": false,
-        "trailing-comma": false
+        "trailing-comma": false,
+        "semicolon":true
     },
     
     "rulesDirectory": []

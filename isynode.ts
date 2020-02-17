@@ -8,8 +8,9 @@ export class ISYNode {
 	public readonly flag: any;
 	public readonly nodeDefId: string;
 	public readonly address: string;
-	[x: string]: any;
+	[x: string]: any
 	public name: string;
+	public displayName: string;
 	public family: any;
 	public folder: string = '';
 	public parent: any;
@@ -21,7 +22,8 @@ export class ISYNode {
 	public logger: (msg: any) => void;
 	public lastChanged: Date;
 	public enabled: boolean;
-	constructor(isy: ISY, node: any) {
+	constructor (isy: ISY, node: any) {
+	
 		this.isy = isy;
 		this.nodeType = 0;
 		this.flag = node.flag;
@@ -29,25 +31,36 @@ export class ISYNode {
 		this.address = node.address;
 		this.name = node.name;
 		this.family = node.family;
-	
-		this.parent = node.parent;
 
-		if(!isNullOrUndefined(this.parent))
-		{
+		this.parent = node.parent;
+		if (!isNullOrUndefined(this.parent)) {
 			this.parentType = Number(this.parent.type);
 		}
 		this.enabled = node.enabled;
 		this.elkId = node.ELK_ID;
 		this.propertyChanged = new EventEmitter();
 		this.propsInitialized = false;
-		this.logger = (msg) => {
-			return isy.logger(`${this.name} (${this.address}): ${msg}`);
-		};
-		if(this.parentType === NodeTypes.Folder)
-		{
-			this.logger("Node is in folder" + this.parent._);
+		let s = this.name.split('.');
+		if (s.length > 1)
+			s.shift();
+		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').trim();
+		if (this.parentType === NodeTypes.Folder) {
+
 			this.folder = isy.folderMap.get(this.parent._);
+			isy.logger(`${this.name} this node is in folder ${this.folder}`);
+			this.logger = (msg) => {
+				return isy.logger(`${this.folder} ${this.name} (${this.address}): ${msg}`);
+			};
+
+			this.displayName = `${this.folder} ${this.displayName}`;
 		}
+		else {
+			this.logger = (msg) => {
+				return isy.logger(`${this.name} (${this.address}): ${msg}`);
+			};
+		}
+
+
 		this.logger(this.nodeDefId);
 		this.lastChanged = new Date();
 	}
@@ -57,7 +70,7 @@ export class ISYNode {
 		return true;
 	}
 
-	public handleEvent(event) {
+	public handleEvent(event: any) {
 		let actionValue = null;
 		if (event.action instanceof Object) {
 			actionValue = event.action._;
@@ -81,6 +94,8 @@ export class ISYNode {
 			return false;
 		}
 	}
+
+	
 
 	public onPropertyChanged(propertyName = null, callback: (...args) => void) {
 		if (propertyName === null) {
