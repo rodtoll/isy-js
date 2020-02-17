@@ -43,7 +43,7 @@ export class ISYNode {
 		let s = this.name.split('.');
 		if (s.length > 1)
 			s.shift();
-		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').trim();
+		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').replace('  ',' ').trim();
 		if (this.parentType === NodeTypes.Folder) {
 
 			this.folder = isy.folderMap.get(this.parent._);
