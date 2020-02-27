@@ -44,7 +44,7 @@ export class InsteonBaseDevice extends ISYDevice {
 }
 
 export const InsteonLampDevice = (InsteonBaseDevice) =>
-	class extends InsteonBaseDevice {
+	class extends InsteonBaseDevice{
 		constructor(isy, node, productInfo) {
 			super(isy, node, productInfo);
 			this.isDimmable = true;
@@ -69,19 +69,22 @@ export const InsteonSwitchDevice = (InsteonBaseDevice) =>
 	class extends InsteonBaseDevice {
 		constructor(isy, node, productInfo) {
 			super(isy, node, productInfo);
-			this.isDimmable = true;
+			
 		}
 
-		get brightnessLevel() {
-			return byteToPct(this.status);
-		}
-
-		public updateBrightnessLevel(level, resultHandler) {
-			if (level !== this.brightnessLevel) {
-				this.sendCommand(Commands.On, pctToByte(level), resultHandler);
-			}
-		}
+		
 	};
+
+export const KeypadDevice = (InsteonBaseDevice) =>
+	class extends InsteonBaseDevice {
+		constructor (isy, node, productInfo) {
+			super(isy, node, productInfo)
+			
+		}
+
+		
+	};	
+
 
 export class InsteonRelayDevice extends ISYBinaryStateDevice(
 	InsteonBaseDevice
@@ -130,7 +133,7 @@ export class InsteonDimmerOutletDevice extends InsteonDimmableDevice {
 	}
 }
 
-export class InsteonDimmerSwitchDevice extends InsteonDimmableDevice {
+export class InsteonDimmerSwitchDevice extends InsteonSwitchDevice(InsteonDimmableDevice) {
 	constructor(isy, deviceNode, productInfo) {
 		super(isy, deviceNode, productInfo);
 	}
@@ -339,6 +342,8 @@ export class InsteonFanDevice extends ISYLevelDevice(
 		super(isy, deviceNode, productInfo);
 	}
 
+	public Light : InsteonDimmableDevice;
+
 	get isOn() {
 		return this.state;
 	}
@@ -347,11 +352,22 @@ export class InsteonFanDevice extends ISYLevelDevice(
 		return this.level;
 	}
 
-	public async updateFanSpeed(level) {
+	public addChild(childDevice)
+	{
+		super.addChild(childDevice);
+		if(childDevice instanceof InsteonDimmableDevice)
+		{
+			this.Light = childDevice;
+			
+		}
+
+	}
+
+	public async updateFanSpeed(level: number) {
 		return this.updateLevel(level);
 	}
 
-	public async updateIsOn(isOn) {
+	public async updateIsOn(isOn: boolean) {
 		if (!isOn) {
 			this.updateLevel(States.Level.Min);
 		} else {

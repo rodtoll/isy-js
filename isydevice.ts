@@ -2,6 +2,7 @@ import { Controls, ISY } from './isy';
 import { Commands, States } from './isyconstants';
 import { ISYNode } from './isynode';
 import { ISYScene } from './isyscene';
+import { isNullOrUndefined } from 'util'
 
 export class ISYDevice extends ISYNode {
 	public readonly typeCode: string;
@@ -11,6 +12,7 @@ export class ISYDevice extends ISYNode {
 	public readonly subCategory: number;
 	public readonly type: any;
 	public _parentDevice: ISYDevice;
+	public readonly children: ISYDevice[] = [];
 	public readonly scenes: ISYScene[] = [];
 	public readonly formatted: any[string] = {};
 	public readonly uom: any[string] = {};
@@ -33,6 +35,10 @@ export class ISYDevice extends ISYNode {
 			this.parentAddress !== undefined
 		) {
 			this._parentDevice = isy.getDevice(this.parentAddress);
+			if(!isNullOrUndefined(this._parentDevice))
+			{
+				this._parentDevice.addChild(this);
+			}
 
 		}
 		if (Array.isArray(node.property)) {
@@ -77,7 +83,7 @@ export class ISYDevice extends ISYNode {
 
 	public addChild(childDevice: ISYDevice)
 	{
-
+		this.children.push(childDevice);
 	}
 
 	get parentDevice(): ISYDevice {
@@ -88,6 +94,10 @@ export class ISYDevice extends ISYNode {
 				this.parentAddress !== undefined
 			) {
 				this._parentDevice = this.isy.getDevice(this.parentAddress);
+				if(this._parentDevice !== null)
+				{
+					this._parentDevice.addChild(this);
+				}
 			}
 			this._parentDevice = null;
 		}
@@ -176,6 +186,7 @@ export class ISYDevice extends ISYNode {
 					formattedValue
 				);
 				this.propertyChanged.emit('', propertyName, val, formattedValue);
+				
 				this.scenes.forEach((element) => {
 					this.logger('Recalulating ' + element.name);
 					element.recalculateState();
