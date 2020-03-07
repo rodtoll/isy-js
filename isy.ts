@@ -316,7 +316,7 @@ export class ISY {
 				}
 			} else if (mainType === Categories.SecurityHealthSafety) {
 				// Motion sensors
-				if (subType === 1 || subType === 3) {
+				if (subType === 1 || subType === 3 || subType === 22) {
 					if (subAddress === 1) {
 						return this.buildDeviceInfoRecord(
 							isyType,

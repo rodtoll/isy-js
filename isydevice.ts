@@ -3,6 +3,7 @@ import { Commands, States } from './isyconstants';
 import { ISYNode } from './isynode';
 import { ISYScene } from './isyscene';
 import { isNullOrUndefined } from 'util'
+import { timingSafeEqual } from 'crypto'
 
 export class ISYDevice extends ISYNode {
 	public readonly typeCode: string;
@@ -17,6 +18,7 @@ export class ISYDevice extends ISYNode {
 	public readonly formatted: any[string] = {};
 	public readonly uom: any[string] = {};
 	public readonly pending: any[string] = {};
+	public location: string;
 
 	constructor (isy: ISY, node: any) {
 		super(isy, node);
@@ -67,6 +69,7 @@ export class ISYDevice extends ISYNode {
 				})`
 			);
 		}
+		this.refreshNotes();
 	}
 
 	public convertTo(value: any, uom: number): any {
@@ -104,8 +107,29 @@ export class ISYDevice extends ISYNode {
 		return this._parentDevice;
 	}
 
-	public async refreshProperty(propertyName) {
-		const result = await this.isy.callISY(`nodes/${this.address}/status/propertyName`);
+	public async refreshProperty(propertyName : string) : Promise<any> {
+		return this.isy.callISY(`nodes/${this.address}/status/${propertyName}`);
+	}
+
+	public async refreshNotes() {
+		const result = await this.getNotes();
+		if(result !== null && result !== undefined)
+		{
+			this.location = result.location;
+			this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
+			this.logger('The friendly name updated to: ' + this.displayName);
+		}
+		
+	}
+
+	async getNotes() : Promise<any> 
+	{
+
+			const result = await this.isy.callISY(`nodes/${this.address}/notes`);
+			if(result !== null && result !== undefined)
+				return result.NodeProperties;
+			else
+				return null;
 	}
 
 	public async updateProperty(propertyName: string, value: string): Promise<any> {
