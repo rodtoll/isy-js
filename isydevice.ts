@@ -125,12 +125,19 @@ export class ISYDevice extends ISYNode {
 	async getNotes() : Promise<any> 
 	{
 
-			return this.isy.callISY(`nodes/${this.address}/notes`).then(result => {
+		try
+		{
+		return this.isy.callISY(`nodes/${this.address}/notes`).then(result => {
 			if(result !== null && result !== undefined )
 				return result.NodeProperties;
 			else
 				return null;
 			},reason => null);
+		}
+		catch
+		{
+			return Promise.reject();
+		}
 	}
 
 	public async updateProperty(propertyName: string, value: string): Promise<any> {

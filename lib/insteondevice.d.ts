@@ -18,8 +18,12 @@ export declare const InsteonLampDevice: (InsteonBaseDevice: any) => {
 export declare const InsteonSwitchDevice: (InsteonBaseDevice: any) => {
     new (isy: any, node: any, productInfo: any): {
         [x: string]: any;
-        readonly brightnessLevel: number;
-        updateBrightnessLevel(level: any, resultHandler: any): void;
+    };
+    [x: string]: any;
+};
+export declare const KeypadDevice: (InsteonBaseDevice: any) => {
+    new (isy: any, node: any, productInfo: any): {
+        [x: string]: any;
     };
     [x: string]: any;
 };
@@ -35,16 +39,20 @@ declare const InsteonRelayDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -87,16 +95,20 @@ declare const InsteonDimmableDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -129,8 +141,6 @@ export declare class InsteonDimmableDevice extends InsteonDimmableDevice_base {
 declare const InsteonRelaySwitchDevice_base: {
     new (isy: any, node: any, productInfo: any): {
         [x: string]: any;
-        readonly brightnessLevel: number;
-        updateBrightnessLevel(level: any, resultHandler: any): void;
     };
     [x: string]: any;
 };
@@ -143,7 +153,13 @@ export declare class InsteonOnOffOutletDevice extends InsteonRelayDevice {
 export declare class InsteonDimmerOutletDevice extends InsteonDimmableDevice {
     constructor(isy: any, deviceNode: any, productInfo: any);
 }
-export declare class InsteonDimmerSwitchDevice extends InsteonDimmableDevice {
+declare const InsteonDimmerSwitchDevice_base: {
+    new (isy: any, node: any, productInfo: any): {
+        [x: string]: any;
+    };
+    [x: string]: any;
+};
+export declare class InsteonDimmerSwitchDevice extends InsteonDimmerSwitchDevice_base {
     constructor(isy: any, deviceNode: any, productInfo: any);
 }
 export declare class InsteonKeypadDevice extends InsteonRelayDevice {
@@ -164,16 +180,20 @@ declare const InsteonLockDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -222,16 +242,20 @@ declare const InsteonDoorWindowSensorDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -273,16 +297,20 @@ declare const InsteonLeakSensorDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -324,16 +352,20 @@ declare const InsteonCOSensorDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -396,16 +428,20 @@ declare const InsteonFanDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -442,16 +478,20 @@ declare const InsteonFanDevice_base: {
         readonly subCategory: number;
         readonly type: any;
         _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
         readonly scenes: import("./isyscene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("./isyscene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
-        refreshProperty(propertyName: any): Promise<void>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
         updateProperty(propertyName: string, value: string): Promise<any>;
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
@@ -479,9 +519,11 @@ declare const InsteonFanDevice_base: {
 } & typeof InsteonBaseDevice;
 export declare class InsteonFanDevice extends InsteonFanDevice_base {
     constructor(isy: any, deviceNode: any, productInfo: any);
+    Light: InsteonDimmableDevice;
     get isOn(): boolean;
     get fanSpeed(): number;
-    updateFanSpeed(level: any): Promise<any>;
-    updateIsOn(isOn: any): Promise<void>;
+    addChild(childDevice: any): void;
+    updateFanSpeed(level: number): Promise<any>;
+    updateIsOn(isOn: boolean): Promise<void>;
 }
 export {};
