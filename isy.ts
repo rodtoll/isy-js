@@ -214,7 +214,7 @@ export class ISY {
 
 			if (this.checkForFailure(response)) {
 				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
-				return Promise.reject(response);
+				return Promise.reject(response ?? '');
 			}
 			return response;
 		},Promise.reject);
