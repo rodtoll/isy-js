@@ -69,7 +69,14 @@ export class ISYDevice extends ISYNode {
 				})`
 			);
 		}
-		this.refreshNotes();
+		try
+		{
+			this.refreshNotes();
+		}
+		catch
+		{
+
+		}
 	}
 
 	public convertTo(value: any, uom: number): any {
@@ -112,6 +119,8 @@ export class ISYDevice extends ISYNode {
 	}
 
 	public async refreshNotes() {
+		try
+		{
 		const result = await this.getNotes();
 		if(result !== null && result !== undefined)
 		{
@@ -119,7 +128,8 @@ export class ISYDevice extends ISYNode {
 			this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
 			this.logger('The friendly name updated to: ' + this.displayName);
 		}
-		
+	}
+		finally {}
 	}
 
 	async getNotes() : Promise<any> 
