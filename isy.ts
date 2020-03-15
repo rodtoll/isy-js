@@ -214,7 +214,7 @@ export class ISY {
 
 			if (this.checkForFailure(response)) {
 				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
-				return Promise.reject(response ?? '');
+				return Promise.reject(response);
 			}
 			return response;
 		},Promise.reject);
@@ -803,8 +803,8 @@ export class ISY {
 
 		this.loadConfig()
 			.then(this.loadNodes.bind(this))
-			.then(() =>
-				this.refreshStatuses().then(() => {
+			.finally(() =>
+				this.refreshStatuses().finally(() => {
 					this.loadVariables(VariableTypes.Integer, () => {
 						this.loadVariables(VariableTypes.State, () => {
 							if (this.elkEnabled) {
@@ -842,7 +842,7 @@ export class ISY {
 					});
 				})
 			)
-			.catch((reason) => this.logger('Error calling ISY: ' + JSON.stringify(reason)));
+			.catch((reason) => this.logger('Error initializing ISY: ' + JSON.stringify(reason)));
 	}
 
 	public handleWebSocketMessage(event: { data: any; }) {

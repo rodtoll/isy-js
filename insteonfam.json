@@ -1,0 +1,783 @@
+{
+	"NodeFamily": {
+		"id": 1,
+		"name": "INSTEON",
+		"description": ["\r\n\t\tFamily of INSTEON Devices\r\n\t"],
+		"nodeCategory": [
+			{
+				"id": 0,
+				"name": "Controllers",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "CONTROLinc 2430"
+					},
+					{
+						"id": 5,
+						"name": "ICON REMOTELinc 2843"
+					},
+					{
+						"id": 6,
+						"name": "ICON TABLETOP 2830"
+					},
+					{
+						"id": 9,
+						"name": "SIGNALinc 2442"
+					},
+					{
+						"id": 10,
+						"name": "POOLUX LCD Controller"
+					},
+					{
+						"id": 11,
+						"name": "ACCESSPOINT"
+					},
+					{
+						"id": 12,
+						"name": "IES COLOR TOUCHSCREEN"
+					},
+					{
+						"id": 16,
+						"name": "REMOTELinc 2 Keypad 4"
+					},
+					{
+						"id": 17,
+						"name": "REMOTELinc 2 Switch"
+					},
+					{
+						"id": 18,
+						"name": "REMOTELinc 2 Keypad 8"
+					}
+				]
+			},
+			{
+				"id": 1,
+				"name": "Dimmable Devices",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "LampLinc V2 2456D3"
+					},
+					{
+						"id": 1,
+						"name": "SwitchLinc V2 Dimmer 2476D"
+					},
+					{
+						"id": 2,
+						"name": "Inline Dimmable"
+					},
+					{
+						"id": 3,
+						"name": "ICON Switch Dimmer 2876D3"
+					},
+					{
+						"id": 4,
+						"name": "SwitchLINK V2 Dimmer 2476DH"
+					},
+					{
+						"id": 5,
+						"name": "KeypadLinc TIMER 2484DWH8"
+					},
+					{
+						"id": 6,
+						"name": "LampLinc 2-Pin"
+					},
+					{
+						"id": 7,
+						"name": "ICON LampLinc V2 2-Pin 2456D2"
+					},
+					{
+						"id": 9,
+						"name": "KeypadLinc Dimmer 2486D"
+					},
+					{
+						"id": 10,
+						"name": "ICON INWALL Controller 2886D"
+					},
+					{
+						"id": 11,
+						"name": "LampLinc BI PHY"
+					},
+					{
+						"id": 12,
+						"name": "KeypadLinc Dimmer 2486DWH8"
+					},
+					{
+						"id": 13,
+						"name": "SocketLinc 2454D"
+					},
+					{
+						"id": 14,
+						"name": "DEV CAT BIPHY LampLinc B2457D2"
+					},
+					{
+						"id": 19,
+						"name": "ICON SwitchLinc Dimmer BELL CANADA"
+					},
+					{
+						"id": 23,
+						"name": "ToggleLinc Dimmer 2466D"
+					},
+					{
+						"id": 24,
+						"name": "COMPANION Switch 2474D"
+					},
+					{
+						"id": 25,
+						"name": "SwitchLinc Dimmer W SENSE 2476D"
+					},
+					{
+						"id": 26,
+						"name": "InlineLinc Dimmer 2475D"
+					},
+					{
+						"id": 27,
+						"name": "KeypadLinc Dimmer 2486D 6"
+					},
+					{
+						"id": 28,
+						"name": "KeypadLinc Dimmer 2486D 8"
+					},
+					{
+						"id": 29,
+						"name": "SwitchLinc Dimmer 2476DH"
+					},
+					{
+						"id": 30,
+						"name": "ICON Switch Dimmer 2876DB"
+					},
+					{
+						"id": 31,
+						"name": "ToggleLinc Dimmer 2466D 2"
+					},
+					{
+						"id": 32,
+						"name": "SwitchLinc Dimmer 2477D"
+					},
+					{
+						"id": 33,
+						"name": "OutletLinc Dimmer 2472D Dual Band"
+					},
+					{
+						"id": 34,
+						"name": "LampLinc 2-Pin Dimmer 2457D2X"
+					},
+					{
+						"id": 36,
+						"name": "SwitchLinc Dimmer 2-Wire 2474DWH"
+					},
+					{
+						"id": 37,
+						"name": "Ballast Dimmer 2475DA2"
+					},
+					{
+						"id": 39,
+						"name": "SwitchLinc Dimmer 2477D SP"
+					},
+					{
+						"id": 41,
+						"name": "KeypadLinc Dimmer 2486D 8 SP"
+					},
+					{
+						"id": 42,
+						"name": "LampLinc 2-Pin Dimmer 2457D2X SP"
+					},
+					{
+						"id": 43,
+						"name": "SwitchLinc Dimmer 2477DH SP"
+					},
+					{
+						"id": 44,
+						"name": "InlineLinc Dimmer 2475D SP"
+					},
+					{
+						"id": 45,
+						"name": "SwitchLinc Dimmer 2477DH"
+					},
+					{
+						"id": 46,
+						"name": "FANLinc 2475F"
+					},
+					{
+						"id": 48,
+						"name": "SwitchLinc Dimmer 2476D"
+					},
+					{
+						"id": 49,
+						"name": "SwitchLinc Dimmer 2478D"
+					},
+					{
+						"id": 50,
+						"name": "InlineLinc Dimmer 2475DA1"
+					},
+					{
+						"id": 58,
+						"name": "LED Bulb 8 Watt 2672 222"
+					},
+					{
+						"id": 73,
+						"name": "LED Bulb 12 Watt PAR38 2674 222"
+					},
+					{
+						"id": 52,
+						"name": "DIN Rail Dimmer 2452 222"
+					},
+					{
+						"id": 54,
+						"name": "DIN Rail Dimmer 2452 422"
+					},
+					{
+						"id": 55,
+						"name": "DIN Rail Dimmer 2452 522"
+					},
+					{
+						"id": 53,
+						"name": "MICRO Module Dimmer 2442 222"
+					},
+					{
+						"id": 56,
+						"name": "MICRO Module Dimmer 2442 422"
+					},
+					{
+						"id": 57,
+						"name": "MICRO Module Dimmer 2442 522"
+					},
+					{
+						"id": 11,
+						"name": "Plugin Dimmer 2632 422"
+					},
+					{
+						"id": 15,
+						"name": "Plugin Dimmer 2632 432"
+					},
+					{
+						"id": 17,
+						"name": "Plugin Dimmer 2632 442"
+					},
+					{
+						"id": 18,
+						"name": "Plugin Dimmer 2632 522"
+					},
+					{
+						"id": 65,
+						"name": "KeypadLinc Dimmer 2334 2 8-Button"
+					},
+					{
+						"id": 66,
+						"name": "KeypadLinc Dimmer 2334 2 5-Button"
+					}
+				]
+			},
+			{
+				"id": 2,
+				"name": "Switched/Relay Devices",
+				"nodeSubCategory": [
+					{
+						"id": 5,
+						"name": "KeypadLinc Relay 2486SWH8"
+					},
+					{
+						"id": 6,
+						"name": "ApplianceLinc Outdoor 2456S3E"
+					},
+					{
+						"id": 7,
+						"name": "TIMERLinc 2456S3T"
+					},
+					{
+						"id": 8,
+						"name": "OutletLinc 2473"
+					},
+					{
+						"id": 9,
+						"name": "ApplianceLinc 2456S3"
+					},
+					{
+						"id": 10,
+						"name": "SwitchLinc Relay 2476S"
+					},
+					{
+						"id": 11,
+						"name": "ICON On/Off Switch 2876S"
+					},
+					{
+						"id": 12,
+						"name": "ICON Appliance Adapter 2856S3"
+					},
+					{
+						"id": 13,
+						"name": "ToggleLinc Relay 2466S"
+					},
+					{
+						"id": 14,
+						"name": "SwitchLinc Relay 2476S 2"
+					},
+					{
+						"id": 15,
+						"name": "KeypadLinc Relay 2486S"
+					},
+					{
+						"id": 16,
+						"name": "Inline Relay"
+					},
+					{
+						"id": 17,
+						"name": "EZ Switch 30"
+					},
+					{
+						"id": 18,
+						"name": "COMPANION Switch 2474S"
+					},
+					{
+						"id": 19,
+						"name": "ICON SwitchLinc Relay BELL CANADA"
+					},
+					{
+						"id": 20,
+						"name": "Inline Relay WITH SENSE"
+					},
+					{
+						"id": 21,
+						"name": "SwitchLinc Relay W SENSE 2476S"
+					},
+					{
+						"id": 22,
+						"name": "ICON Relay 2876SB"
+					},
+					{
+						"id": 23,
+						"name": "ICON ApplianceLinc 2856S3B"
+					},
+					{
+						"id": 24,
+						"name": "SwitchLinc Relay 2494S220"
+					},
+					{
+						"id": 25,
+						"name": "SwitchLinc Relay 2494S220 B"
+					},
+					{
+						"id": 26,
+						"name": "ToggleLinc Relay 2466S 2"
+					},
+					{
+						"id": 28,
+						"name": "SwitchLinc Relay REMOTE CONTROL 2476S"
+					},
+					{
+						"id": 30,
+						"name": "KeypadLinc Relay 2487S"
+					},
+					{
+						"id": 31,
+						"name": "InlineLinc Relay DualBand 2475SDB"
+					},
+					{
+						"id": 37,
+						"name": "KeypadLinc TIMER Relay 2484SWH8"
+					},
+					{
+						"id": 41,
+						"name": "SwitchLinc Relay COUNTDOWN TIMER 2476ST"
+					},
+					{
+						"id": 42,
+						"name": "SwitchLinc Relay Dual Band 2477S"
+					},
+					{
+						"id": 44,
+						"name": "KeypadLinc Dual Band Relay 2487S"
+					},
+					{
+						"id": 55,
+						"name": "On/Off Module 2635 222"
+					},
+					{
+						"id": 57,
+						"name": "On/Off 2663 222"
+					},
+					{
+						"id": 59,
+						"name": "On/Off Outdoor Module 2634 222"
+					},
+					{
+						"id": 32,
+						"name": "KeypadLinc Relay 2486S SP"
+					},
+					{
+						"id": 33,
+						"name": "OutletLinc 2473 SP"
+					},
+					{
+						"id": 34,
+						"name": "Inline Relay SP"
+					},
+					{
+						"id": 35,
+						"name": "SwitchLinc Relay 2476S SP"
+					},
+					{
+						"id": 46,
+						"name": "DIN Rail Relay 2453 222"
+					},
+					{
+						"id": 51,
+						"name": "DIN Rail Relay 2453 422"
+					},
+					{
+						"id": 52,
+						"name": "DIN Rail Relay 2453 522"
+					},
+					{
+						"id": 47,
+						"name": "MICRO Module Relay 2443 222"
+					},
+					{
+						"id": 49,
+						"name": "MICRO Module Relay 2443 422"
+					},
+					{
+						"id": 50,
+						"name": "MICRO Module Relay 2443 522"
+					},
+					{
+						"id": 45,
+						"name": "Plugin Relay 2633 422"
+					},
+					{
+						"id": 48,
+						"name": "Plugin Relay 2633 432"
+					},
+					{
+						"id": 53,
+						"name": "Plugin Relay 2633 442"
+					},
+					{
+						"id": 54,
+						"name": "Plugin Relay 2633 522"
+					},
+					{
+						"id": 56,
+						"name": "On/Off Outdoor Module 2634 222"
+					}
+				]
+			},
+			{
+				"id": 3,
+				"name": "Network Bridge",
+				"nodeSubCategory": [
+					{
+						"id": 1,
+						"name": "PowerLinc Serial 2414S"
+					},
+					{
+						"id": 2,
+						"name": "PowerLinc USB 2414U"
+					},
+					{
+						"id": 3,
+						"name": "ICON PowerLinc SERIAL 2814S"
+					},
+					{
+						"id": 4,
+						"name": "ICON PowerLinc USB 2814U"
+					},
+					{
+						"id": 5,
+						"name": "Powerline Modem"
+					},
+					{
+						"id": 6,
+						"name": "IRLinc"
+					},
+					{
+						"id": 7,
+						"name": "IRLinc TX"
+					},
+					{
+						"id": 11,
+						"name": "PowerLinc MODEM USB"
+					},
+					{
+						"id": 13,
+						"name": "EZX10RF"
+					},
+					{
+						"id": 15,
+						"name": "EZX10IR"
+					}
+				]
+			},
+			{
+				"id": 4,
+				"name": "Irrigation",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "COMPACTA EZFLORA SPRINKLER Controller"
+					}
+				]
+			},
+			{
+				"id": 5,
+				"name": "Climate",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "BROAN SMSC080 EXHAUST FAN"
+					},
+					{
+						"id": 1,
+						"name": "COMPACTA EZTHERM"
+					},
+					{
+						"id": 2,
+						"name": "BROAN SMSC110 EXHAUST FAN"
+					},
+					{
+						"id": 3,
+						"name": "INSTEON Thermostat Adapter"
+					},
+					{
+						"id": 4,
+						"name": "COMPACTA EZTHERMX"
+					},
+					{
+						"id": 5,
+						"name": "BROAN VENMAR BEST"
+					},
+					{
+						"id": 9,
+						"name": "INSTEON Thermostat Adapter SP"
+					},
+					{
+						"id": 10,
+						"name": "INSTEON Thermostat Wireless 2441ZTH"
+					},
+					{
+						"id": 11,
+						"name": "INSTEON Thermostat TempLinc 2441TH"
+					},
+					{
+						"id": 14,
+						"name": "INSTEON Thermostat Adapter 2491T"
+					},
+					{
+						"id": 19,
+						"name": "INSTEON Thermostat TempLinc 2732 242"
+					},
+					{
+						"id": 20,
+						"name": "INSTEON Thermostat TempLinc 2732 442"
+					},
+					{
+						"id": 21,
+						"name": "INSTEON Thermostat TempLinc 2732 542"
+					},
+					{
+						"id": 22,
+						"name": "INSTEON Thermostat TempLinc 2732 222 2"
+					},
+					{
+						"id": 23,
+						"name": "INSTEON Thermostat TempLinc 2732 422 2"
+					},
+					{
+						"id": 24,
+						"name": "INSTEON Thermostat TempLinc 2732 522 2"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"name": "Pool Control",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "COMPACTA EZPOOL"
+					}
+				]
+			},
+			{
+				"id": 7,
+				"name": "Sensors and Actuators",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "IOLinc 2450"
+					},
+					{
+						"id": 1,
+						"name": "COMPACTA EZSENSE"
+					},
+					{
+						"id": 2,
+						"name": "COMPACTA EZIO 8T"
+					},
+					{
+						"id": 3,
+						"name": "COMPACTA EZIO"
+					},
+					{
+						"id": 4,
+						"name": "COMPACTA EZIO 8"
+					},
+					{
+						"id": 5,
+						"name": "COMPACTA EZSNS RF"
+					},
+					{
+						"id": 6,
+						"name": "COMPACTA EZISNS RF"
+					},
+					{
+						"id": 7,
+						"name": "COMPACTA EZIO 6I"
+					},
+					{
+						"id": 8,
+						"name": "COMPACTA EZIO 4O"
+					},
+					{
+						"id": 9,
+						"name": "SynchroLinc"
+					},
+					{
+						"id": 13,
+						"name": "REF IOLinc 2450"
+					}
+				]
+			},
+			{
+				"id": 9,
+				"name": "Energy Management",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "EMETER ZBPCM"
+					},
+					{
+						"id": 1,
+						"name": "ONSITE PRO Leak DETECTOR"
+					},
+					{
+						"id": 2,
+						"name": "ONSITE PRO CONTROL VALVE"
+					},
+					{
+						"id": 7,
+						"name": "IMETER SOLO"
+					},
+					{
+						"id": 10,
+						"name": "Dual Band NO Relay 240V 2477SA1"
+					},
+					{
+						"id": 11,
+						"name": "Dual Band NC Relay 240V 2477SA2"
+					},
+					{
+						"id": 13,
+						"name": "ENERGY DISPLAY 2448A2"
+					}
+				]
+			},
+			{
+				"id": 14,
+				"name": "Windows/Shades",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "SOMFY DRAPE Controller RF"
+					},
+					{
+						"id": 1,
+						"name": "MICRO Module Open Close 2444 222"
+					},
+					{
+						"id": 2,
+						"name": "MICRO Module Open Close 2444 422"
+					},
+					{
+						"id": 3,
+						"name": "MICRO Module Open Close 2444 522"
+					}
+				]
+			},
+			{
+				"id": 15,
+				"name": "Access Control/Doors/Locks",
+				"nodeSubCategory": [
+					{
+						"id": 0,
+						"name": "WEILAND CENTRAL DRIVE Controller"
+					},
+					{
+						"id": 1,
+						"name": "WEILAND SECONDARY CENTRAL DRIVE"
+					},
+					{
+						"id": 2,
+						"name": "WEILAND ASSIST DRIVE"
+					},
+					{
+						"id": 3,
+						"name": "WEILAND ELEVATION DRIVE"
+					},
+					{
+						"id": 6,
+						"name": "MORNING Linc"
+					}
+				]
+			},
+			{
+				"id": 16,
+				"name": "Security/Health/Safety",
+				"nodeSubCategory": [
+					{
+						"id": 1,
+						"name": "Motion Sensor 2420M"
+					},
+					{
+						"id": 2,
+						"name": "TriggerLinc 2421"
+					},
+					{
+						"id": 3,
+						"name": "Motion Sensor 2420M SP"
+					},
+					{
+						"id": 8,
+						"name": "Leak Sensor 2852 222"
+					},
+					{
+						"id": 9,
+						"name": "Open Close Sensor 2843 222"
+					},
+					{
+						"id": 10,
+						"name": "Smoke Sensor"
+					},
+					{
+						"id": 17,
+						"name": "Door Sensor 2845 222"
+					}
+				]
+			},
+			{
+				"id": 113,
+				"name": "A10/X10 Nodes",
+				"nodeSubCategory": [
+					{
+						"id": 1,
+						"name": "X10"
+					},
+					{
+						"id": 2,
+						"name": "A10"
+					}
+				]
+			}
+		]
+	}
+}
