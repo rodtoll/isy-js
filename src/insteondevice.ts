@@ -2,12 +2,19 @@ import { ISY } from './isy';
 import { Commands, DeviceTypes, Families, Props, States } from './isyconstants';
 import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from './isydevice';
 import { byteToDegree, byteToPct, pctToByte } from './utils';
+import { InsteonNLS } from './insteonfam'
 
 export class InsteonBaseDevice extends ISYDevice {
 	constructor(isy: ISY, node, productInfo) {
 		super(isy, node);
 		this.family = Families.Insteon;
-		this.productName = productInfo.name;
+		let typeArray = node.type.split('.');
+		let category = Number(typeArray[0]);
+		let device = Number(typeArray[1]);
+		let version = Number(typeArray[2]);
+		
+
+		this.productName = InsteonNLS.getDeviceDescription(String.fromCharCode(category,device,version));
 		this.deviceType = productInfo.deviceType;
 		this.batteryOperated = this.deviceType === DeviceTypes.motionSensor;
 		this.connectionType = productInfo.connectionType;
@@ -91,6 +98,7 @@ export class InsteonRelayDevice extends ISYBinaryStateDevice(
 ) {
 	constructor(isy: ISY, node, productInfo) {
 		super(isy, node, productInfo);
+		
 	}
 
 	get isOn() {

@@ -17,12 +17,14 @@
         "insteon",
         "poylglot"
     ],
+
     "main": "./lib/isy.js",
     "devDependencies": {
         "@types/node": "^10.17.15",
         "babel-preset-env": "^1.7.0",
         "fake-isy-994i": "",
-        "mocha": ""
+        "mocha": "",
+        "@types/xml2js": "^0.4.5"
     },
     "dependencies": {
         "faye-websocket": "",

@@ -1,4 +1,4 @@
-import { ISYDevice } from './isydevice.js';
+import { ISYDevice } from './ISYDevice';
 
 
 /////////////////////////////
