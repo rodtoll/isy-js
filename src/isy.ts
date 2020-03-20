@@ -470,8 +470,8 @@ export class ISY {
 			// this.logger(JSON.stringify(deviceTypeInfo));
 
 			const enabled = Boolean(device.enabled);
-			let d = DeviceFactory.getDeviceDetails(device.family, device.isyType);
-			console.log(JSON.stringify(d));
+			let d = DeviceFactory.getDeviceDetails(device.family, device.type);
+		
 			if (d.class) {
 				newDevice = new d.class(this,device);
 				newDevice.productName = '(' + d.modelNumber + ') ' + d.name + ' v.' + d.version;
