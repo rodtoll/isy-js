@@ -2,23 +2,14 @@ import { ISY } from './isy';
 import { Commands, DeviceTypes, Families, Props, States } from './isyconstants';
 import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from './isydevice';
 import { byteToDegree, byteToPct, pctToByte } from './utils';
-import { InsteonNLS } from './insteonfam'
+//import { InsteonNLS } from './insteonfam'
 
 export class InsteonBaseDevice extends ISYDevice {
-	constructor(isy: ISY, node, productInfo) {
+	constructor(isy: ISY, node: { type: string }) {
 		super(isy, node);
-		this.family = Families.Insteon;
-		let typeArray = node.type.split('.');
-		let category = Number(typeArray[0]);
-		let device = Number(typeArray[1]);
-		let version = Number(typeArray[2]);
-		
-
-		this.productName = InsteonNLS.getDeviceDescription(String.fromCharCode(category,device,version));
-		this.deviceType = productInfo.deviceType;
-		this.batteryOperated = this.deviceType === DeviceTypes.motionSensor;
-		this.connectionType = productInfo.connectionType;
-		this.deviceFriendlyName = this.deviceType;
+		this.family = Families.Insteon;		
+		//this.productName = InsteonNLS.getDeviceDescription(String.fromCharCode(category,device,version));
+	
 		this.childDevices = {};
 	}
 
@@ -50,10 +41,10 @@ export class InsteonBaseDevice extends ISYDevice {
 	}
 }
 
-export const InsteonLampDevice = (InsteonBaseDevice) =>
+export const InsteonLampDevice = (InsteonBaseDevice: any) =>
 	class extends InsteonBaseDevice{
-		constructor(isy, node, productInfo) {
-			super(isy, node, productInfo);
+		constructor(isy: any, node: any) {
+			super(isy, node);
 			this.isDimmable = true;
 		}
 
@@ -61,7 +52,7 @@ export const InsteonLampDevice = (InsteonBaseDevice) =>
 			return byteToPct(this.status);
 		}
 
-		public updateBrightnessLevel(level, resultHandler) {
+		public updateBrightnessLevel(level: number, resultHandler: any) {
 			if (level !== this.brightnessLevel) {
 				this.isy.sendRestCommand(
 					this.address,
@@ -72,32 +63,31 @@ export const InsteonLampDevice = (InsteonBaseDevice) =>
 			}
 		}
 	};
-export const InsteonSwitchDevice = (InsteonBaseDevice) =>
+export const InsteonSwitchDevice = (InsteonBaseDevice: typeof InsteonRelayDevice) =>
 	class extends InsteonBaseDevice {
-		constructor(isy, node, productInfo) {
-			super(isy, node, productInfo);
+		constructor(isy: any, node: any) {
+			super(isy, node);
 			
 		}
 
 		
 	};
 
-export const KeypadDevice = (InsteonBaseDevice) =>
-	class extends InsteonBaseDevice {
-		constructor (isy, node, productInfo) {
-			super(isy, node, productInfo)
-			
+export const KeypadDevice = (InsteonBaseDevice: any) =>
+	{
+		return class extends InsteonBaseDevice {
+			constructor (isy: any, node: any) {
+				super(isy, node);
+			}
 		}
-
-		
 	};	
 
 
 export class InsteonRelayDevice extends ISYBinaryStateDevice(
 	InsteonBaseDevice
 ) {
-	constructor(isy: ISY, node, productInfo) {
-		super(isy, node, productInfo);
+	constructor(isy: ISY, node: { type: string }) {
+		super(isy, node);
 		
 	}
 
@@ -111,13 +101,17 @@ export class InsteonRelayDevice extends ISYBinaryStateDevice(
 }
 
 export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {
-	constructor(isy, node, productInfo) {
-		super(isy, node, productInfo);
+	constructor(isy: ISY, node: any) {
+		super(isy, node);
 		this.isDimmable = true;
 	}
 
+	get brightnessLevel()
+	{
+		return this.level;
+	}
 
-	public async updateBrightnessLevel(level): Promise<{}> {
+	public async updateBrightnessLevel(level: number): Promise<{}> {
 		return super.updateLevel(level);
 	}
 }
@@ -125,48 +119,48 @@ export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {
 export class InsteonRelaySwitchDevice extends InsteonSwitchDevice(
 	InsteonRelayDevice
 ) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: any, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 export class InsteonOnOffOutletDevice extends InsteonRelayDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 export class InsteonDimmerOutletDevice extends InsteonDimmableDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: any, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 export class InsteonDimmerSwitchDevice extends InsteonSwitchDevice(InsteonDimmableDevice) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: any, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 export class InsteonKeypadDevice extends InsteonRelayDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 export class InsteonDimmerKeypadDevice extends InsteonDimmableDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: any, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 
 
 export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
-	public sendLockCommand(lockState, resultHandler) {
+	public sendLockCommand(lockState: any, resultHandler: any) {
 		if (this.deviceType === DeviceTypes.lock) {
 			this.sendNonSecureLockCommand(lockState);
 		} else if (this.deviceType === DeviceTypes.secureLock) {
@@ -203,14 +197,14 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 		return this.ST > 0;
 	}
 
-	public async sendNonSecureLockCommand(lockState) {
+	public async sendNonSecureLockCommand(lockState: any) {
 		if (lockState) {
 			return this.isy.sendNodeCommand(this, Commands.Lock.Lock);
 		} else {
 			return this.isy.sendNodeCommand(this, Commands.Lock.Unlock);
 		}
 	}
-	public async sendSecureLockCommand(lockState) {
+	public async sendSecureLockCommand(lockState: any) {
 		if (lockState) {
 			return this.isy.sendNodeCommand(
 				this,
@@ -230,8 +224,8 @@ export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {
 export class InsteonDoorWindowSensorDevice extends ISYBinaryStateDevice(
 	InsteonBaseDevice
 ) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
 	get isOpen() {
@@ -242,8 +236,8 @@ export class InsteonDoorWindowSensorDevice extends ISYBinaryStateDevice(
 export class InsteonLeakSensorDevice extends ISYBinaryStateDevice(
 	InsteonBaseDevice
 ) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
 	get leakDetected() {
@@ -254,8 +248,8 @@ export class InsteonLeakSensorDevice extends ISYBinaryStateDevice(
 export class InsteonCOSensorDevice extends ISYBinaryStateDevice(
 	InsteonBaseDevice
 ) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
 	get monoxideDetected() {
@@ -264,12 +258,12 @@ export class InsteonCOSensorDevice extends ISYBinaryStateDevice(
 }
 
 export class InsteonMotionSensorDevice extends InsteonBaseDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 		this._isMotionDetected = false;
 	}
 
-	public handleEvent(event) {
+	public handleEvent(event: { control: string }) {
 		if (!super.handleEvent(event)) {
 			if (event.control === Commands.On) {
 				this.logger('Motion detected.');
@@ -297,8 +291,8 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
 }
 
 export class InsteonThermostatDevice extends InsteonBaseDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
 	get currentTemperature() {
@@ -324,30 +318,30 @@ export class InsteonThermostatDevice extends InsteonBaseDevice {
 		return this[Props.Climate.Humidity];
 	}
 
-	public async updateCoolSetPoint(value) {
+	public async updateCoolSetPoint(value: string) {
 		return this.updateProperty(Props.Climate.CoolSetPoint, value);
 	}
 
-	public async updateHeatSetPoint(value) {
+	public async updateHeatSetPoint(value: string) {
 		return this.updateProperty(Props.Climate.HeatSetPoint, value);
 	}
 
-	public async updateMode(value) {
+	public async updateMode(value: string) {
 		return this.updateProperty(Props.Climate.Mode, value);
 	}
 }
 
 export class InsteonOutletDevice extends InsteonRelayDevice {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: any) {
+		super(isy, deviceNode);
 	}
 }
 
 export class InsteonFanDevice extends ISYLevelDevice(
 	ISYBinaryStateDevice(InsteonBaseDevice)
 ) {
-	constructor(isy, deviceNode, productInfo) {
-		super(isy, deviceNode, productInfo);
+	constructor(isy: ISY, deviceNode: { type: string }) {
+		super(isy, deviceNode);
 	}
 
 	public Light : InsteonDimmableDevice;
@@ -360,7 +354,7 @@ export class InsteonFanDevice extends ISYLevelDevice(
 		return this.level;
 	}
 
-	public addChild(childDevice)
+	public addChild(childDevice: ISYDevice)
 	{
 		super.addChild(childDevice);
 		if(childDevice instanceof InsteonDimmableDevice)

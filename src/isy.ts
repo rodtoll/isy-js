@@ -27,7 +27,7 @@ import * as ProductInfoData from './isyproductinfo.json';
 import { ISYScene } from './isyscene';
 import { ISYVariable } from './isyvariable';
 import { getAsync } from './utils';
-import { InsteonNLS } from './insteonfam'
+import { DeviceFactory } from './insteonfam';
 
 export {
 	ISYScene,
@@ -465,70 +465,78 @@ export class ISY {
 			
 			
 			let newDevice: ISYDevice = null;
-			let deviceTypeInfo = this.isyTypeToTypeName(device.type, device.address);
+			
+			//let deviceTypeInfo = this.isyTypeToTypeName(device.type, device.address);
 			// this.logger(JSON.stringify(deviceTypeInfo));
 
 			const enabled = Boolean(device.enabled);
+			let d = DeviceFactory.getDeviceDetails(device.family, device.isyType);
+			if (d.class) {
+				 newDevice = new d.class(this,device);
+				newDevice.productName = '(' + d.modelNumber + ') ' + d.name + ' v.' + d.version;
+				newDevice.modelNumber = d.modelNumber;
+				newDevice.version = d.version;
+			}
 			if (enabled) {
 				// Try fallback to new generic device identification when not specifically identified.
-				if (deviceTypeInfo === null || deviceTypeInfo === undefined) {
-					deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(device);
-				}
-				if (deviceTypeInfo !== null && deviceTypeInfo !== undefined) {
-					if (deviceTypeInfo.deviceType === DeviceTypes.light) {
-						newDevice = new InsteonRelayDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.dimmableLight) {
-						newDevice = new InsteonDimmableDevice(this, device, deviceTypeInfo);
-					} else if (
-						deviceTypeInfo.deviceType === DeviceTypes.doorWindowSensor
-					) {
-						newDevice = new InsteonDoorWindowSensorDevice(
-							this,
-							device,
-							deviceTypeInfo
-						);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.motionSensor) {
-						newDevice = new InsteonMotionSensorDevice(
-							this,
-							device,
-							deviceTypeInfo
-						);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.leakSensor) {
-						newDevice = new InsteonLeakSensorDevice(
-							this,
-							device,
-							deviceTypeInfo
-						);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
-						newDevice = new InsteonFanDevice(this, device, deviceTypeInfo);
-					} else if (
-						deviceTypeInfo.deviceType === DeviceTypes.lock ||
-						deviceTypeInfo.deviceType === DeviceTypes.secureLock
-					) {
-						newDevice = new InsteonLockDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.outlet) {
-						newDevice = new InsteonOutletDevice(this, device, deviceTypeInfo);
-					} else if (deviceTypeInfo.deviceType === DeviceTypes.thermostat) {
-						newDevice = new InsteonThermostatDevice(
-							this,
-							device,
-							deviceTypeInfo
-						);
-					}
+				// if (deviceTypeInfo === null || deviceTypeInfo === undefined) {
+				// 	deviceTypeInfo = this.getDeviceTypeBasedOnISYTable(device);
+				// }
+				// if (deviceTypeInfo !== null && deviceTypeInfo !== undefined) {
+				// 	if (deviceTypeInfo.deviceType === DeviceTypes.light) {
+				// 		newDevice = new InsteonRelayDevice(this, device, deviceTypeInfo);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.dimmableLight) {
+				// 		newDevice = new InsteonDimmableDevice(this, device, deviceTypeInfo);
+				// 	} else if (
+				// 		deviceTypeInfo.deviceType === DeviceTypes.doorWindowSensor
+				// 	) {
+				// 		newDevice = new InsteonDoorWindowSensorDevice(
+				// 			this,
+				// 			device,
+				// 			deviceTypeInfo
+				// 		);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.motionSensor) {
+				// 		newDevice = new InsteonMotionSensorDevice(
+				// 			this,
+				// 			device,
+				// 			deviceTypeInfo
+				// 		);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.leakSensor) {
+				// 		newDevice = new InsteonLeakSensorDevice(
+				// 			this,
+				// 			device,
+				// 			deviceTypeInfo
+				// 		);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.fan) {
+				// 		newDevice = new InsteonFanDevice(this, device, deviceTypeInfo);
+				// 	} else if (
+				// 		deviceTypeInfo.deviceType === DeviceTypes.lock ||
+				// 		deviceTypeInfo.deviceType === DeviceTypes.secureLock
+				// 	) {
+				// 		newDevice = new InsteonLockDevice(this, device, deviceTypeInfo);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.outlet) {
+				// 		newDevice = new InsteonOutletDevice(this, device, deviceTypeInfo);
+				// 	} else if (deviceTypeInfo.deviceType === DeviceTypes.thermostat) {
+				// 		newDevice = new InsteonThermostatDevice(
+				// 			this,
+				// 			device,
+				// 			deviceTypeInfo
+				// 		);
+				// 	}
 
-					this.logger(
-						`Device ${newDevice.productName} named ${newDevice.name} added as ${newDevice.constructor.name}.`
-					);
+				// 	this.logger(
+				// 		`Device ${newDevice.productName} named ${newDevice.name} added as ${newDevice.constructor.name}.`
+				// 	);
 
-					// Support the device with a base device object
-				} else {
-					this.logger(
-						`Device ${device.name} with type: ${device.type} and nodedef: ${
-						device.nodeDefId
-						} is not specifically supported, returning generic device object. `
-					);
-					newDevice = new ISYDevice(this, device);
-				}
+				// 	// Support the device with a base device object
+				// } else {
+				// 	this.logger(
+				// 		`Device ${device.name} with type: ${device.type} and nodedef: ${
+				// 		device.nodeDefId
+				// 		} is not specifically supported, returning generic device object. `
+				// 	);
+				// 	newDevice = new ISYDevice(this, device);
+				// }
 				if (newDevice !== null) {
 					this.deviceList.set(newDevice.address, newDevice);
 

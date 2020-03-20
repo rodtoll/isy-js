@@ -1,8 +1,11 @@
 import { parseStringPromise } from 'xml2js';
 import { format } from 'util';
+import { ISYDevice } from './isy'
+import ISYConstants from './isyconstants'
+import { InsteonSwitchDevice, InsteonRelayDevice, InsteonOnOffOutletDevice, InsteonRelaySwitchDevice, InsteonKeypadDevice, InsteonDimmerKeypadDevice, InsteonDimmableDevice, InsteonDimmerSwitchDevice, InsteonFanDevice, InsteonDimmerOutletDevice, InsteonMotionSensorDevice, InsteonDoorWindowSensorDevice } from './insteondevice'
 
 
-export class InsteonNLS {
+export class DeviceFactory {
 		public static LINK_MANAGEMENT_NAME: string = 'Link Management';
 
 		public static LIGHT_NAME: string = 'Name';
@@ -159,36 +162,6 @@ export class InsteonNLS {
 
 		public static LINK_EZX10RF_LABEL: string = 'Add X10 Device to EZX10RF';
 
-		public static DOOR_SENSOR_PROGRAMMING_MODE_ENTRY: string = '<b>Door Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on the side of the Door Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br>';
-
-		public static OPEN_CLOSE_SENSOR_PROGRAMMING_MODE_ENTRY: string = '<b>Open/Close Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button inside the Open/Close Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br>';
-
-		public static LEAK_SENSOR_PROGRAMMING_MODE_ENTRY: string = '<b>Leak Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on top of the Leak Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br>';
-
-		public static REMOTELINC2_PROGRAMMING_MODE_ENTRY: string = '<b>RemoteLinc 2<br>&nbsp; &nbsp; Ensure the on/off switch is in the On position.<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button at the base of the RemoteLinc2<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br>';
-
-		public static REMOTELINC_PROGRAMMING_MODE_ENTRY: string = '<b>RemoteLinc<br>&nbsp; &nbsp; Simultaneously press and hold the <font color="red">Dim & Bright</font> buttons on the RemoteLinc<br>&nbsp; &nbsp; until the LED starts flashing (takes about 10 seconds)</b><br>';
-
-		public static MOTION_SENSOR_PROGRAMMING_MODE_ENTRY: string = '<b>Motion Sensor or Open/Close Sensor<br>&nbsp; &nbsp; Click and hold the <font color="red">Set</font> button until the light starts flashing (takes about 5 seconds)</b><br>';
-
-		public static DOOR_SENSOR_PROGRAMMING_MODE: string = '<html><b>Your Door Sensor needs to be put into communications mode<br>to complete this operation.</b><br><br><b>Door Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on the side of the Door Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static OPEN_CLOSE_SENSOR_PROGRAMMING_MODE: string = '<html><b>Your Open/Close Sensor needs to be put into communications mode<br>to complete this operation.</b><br><br><b>Open/Close Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button inside the Open/Close Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static LEAK_SENSOR_PROGRAMMING_MODE: string = '<html><b>Your Leak Sensor needs to be put into communications mode<br>to complete this operation.</b><br><br><b>Leak Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on top of the Leak Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static REMOTELINC2_PROGRAMMING_MODE: string = '<html><b>Your RemoteLinc2 needs to be put into communications mode<br>to complete this operation.</b><br><br><b>RemoteLinc 2<br>&nbsp; &nbsp; Ensure the on/off switch is in the On position.<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button at the base of the RemoteLinc2<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static REMOTELINC_PROGRAMMING_MODE: string = '<html><b>Your RemoteLinc needs to be put into communications mode<br>to complete this operation.</b><br><br><b>RemoteLinc<br>&nbsp; &nbsp; Simultaneously press and hold the <font color="red">Dim & Bright</font> buttons on the RemoteLinc<br>&nbsp; &nbsp; until the LED starts flashing (takes about 10 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static MOTIONSENSOR_PROGRAMMING_MODE: string = '<html><b>Your Motion Sensor or Open/Close Sensor needs to be put into communications mode<br>to complete this operation.</b><br><br><b>Motion Sensor or Open/Close Sensor<br>&nbsp; &nbsp; Click and hold the <font color="red">Set</font> button until the light starts flashing (takes about 5 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static BATTERY_POWERED_PROGRAMMING_INSTRUCTIONS: string = '<b>Door Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on the side of the Door Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Open/Close Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button inside the Open/Close Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Leak Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on top of the Leak Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>RemoteLinc 2<br>&nbsp; &nbsp; Ensure the on/off switch is in the On position.<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button at the base of the RemoteLinc2<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>RemoteLinc<br>&nbsp; &nbsp; Simultaneously press and hold the <font color="red">Dim & Bright</font> buttons on the RemoteLinc<br>&nbsp; &nbsp; until the LED starts flashing (takes about 10 seconds)</b><br><br><b>Motion Sensor or Open/Close Sensor<br>&nbsp; &nbsp; Click and hold the <font color="red">Set</font> button until the light starts flashing (takes about 5 seconds)</b><br><br>';
-
-		public static BATTERY_POWERED_PROGRAMMING_MODE: string = '<html><b>One or more of your battery powered devices need to be put in communications mode<br>to complete this operation.</b><br><br><b>Door Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on the side of the Door Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Open/Close Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button inside the Open/Close Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>Leak Sensor<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button on top of the Leak Sensor<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>RemoteLinc 2<br>&nbsp; &nbsp; Ensure the on/off switch is in the On position.<br>&nbsp; &nbsp; Press and hold the <font color="red">Set</font> Button at the base of the RemoteLinc2<br>&nbsp; &nbsp; until the LED starts flashing green (takes about 3 seconds)</b><br><br><b>RemoteLinc<br>&nbsp; &nbsp; Simultaneously press and hold the <font color="red">Dim & Bright</font> buttons on the RemoteLinc<br>&nbsp; &nbsp; until the LED starts flashing (takes about 10 seconds)</b><br><br><b>Motion Sensor or Open/Close Sensor<br>&nbsp; &nbsp; Click and hold the <font color="red">Set</font> button until the light starts flashing (takes about 5 seconds)</b><br><br><b>Click <font color="red">Ok</font> when complete</html>';
-
-		public static A10_DEVICE_ADD_MESSAGE: string = '<html><b>On some A10 devices, you can programmatically assign an address. <br>If you so desire, please put your device into programming mode before clicking the <font color="red">Ok</font> button';
-
 		public static KEYPADLINC: string = 'KeypadLinc';
 
 		public static BUTTONS_GROUPING: string = 'Buttons Grouping';
@@ -303,14 +276,6 @@ export class InsteonNLS {
 
 		public static DEFAULT_TIMEOUT_VALUE: string = 'Default Timeout (min)';
 
-		public static BUTTON_GROUPING_WARNING: string = '<html><b><font color="red">WARNING:</font><br>It is highly recommended that button groupings are migrated/accomplished through <font color="red">Scenes</font> by adjusting respective <font color="red">On Levels</font>.<br>By doing so correct status of the buttons are also reflected in ISY regardless of their groupings.<br><font color="red">Note:</font> any changes made on this screen, and especially <font color="red">Reset</font> may irrecoverably corrupt any associated scenes!</b></html>';
-
-		public static ARE_YOU_SURE: string = '<br><br>Are you sure you would like to proceed with this operation?</b></html>';
-
-		public static SCENE_TEST_WARNING = '<html><b>Programs may impact the outcome of this test!<br/>Please ensure all programs are disabled before running this test.<br/><br/><font color="red">Note:</font> This test will turn the scene on and then off.<br/><br/>Would you like to proceed?</b></html>';
-
-		public static SAFE_MODE_MESSAGE = '<html><font color="red"><b>Your system is in Safe Mode!</b></font><br/><br/>This is normally caused when the system cannot communicate with the PLM.<br/>Please check the connections/wiring to the PLM and then reboot your system.<br/>If the problem persists, in all likelihood, the PLM is defective.</html>';
-
 		public static TRIGGER_THRESHOLD_WATTS: string = 'Trigger Threshold (Watts)';
 
 		public static HOLD_OFF_SECS: string = 'Holdoff (Secs)';
@@ -322,527 +287,553 @@ export class InsteonNLS {
 
 
 
-		public static getDeviceDescription(paramString: string) {
-
-				let c = paramString.charAt(0);
-				let str = null;
-				if (c == '\000') {
-						str = InsteonNLS.getNLSControllerInfo(paramString);
-				} else if (c == '\001') {
-						str = InsteonNLS.getNLSDimLightInfo(paramString);
-				} else if (c == '\002') {
-						str = InsteonNLS.getNLSSwitchLightInfo(paramString);
-				} else if (c == '\003') {
-						str = InsteonNLS.getNLSNetworkBridgeInfo(paramString);
-				} else if (c == '\005') {
-						str = InsteonNLS.getNLSClimateControlInfo(paramString);
-				} else if (c == '\004') {
-						str = InsteonNLS.getNLSIrrigationControlInfo(paramString);
-				} else if (c == '\007') {
-						str = InsteonNLS.getNLSIOControlInfo(paramString);
-				} else if (c == '\017') {
-						str = InsteonNLS.getNLSAccessControlInfo(paramString);
-				} else if (c == '\020') {
-						str = InsteonNLS.getNLSSHS(paramString);
-				} else if (c == '\t') {
-						str = InsteonNLS.getNLSEnergyManagement(paramString);
-				} else if (c == '\016') {
-						str = InsteonNLS.getNLSWindowsCovering(paramString);
-				}
-
-				if (paramString.length > 2) {
-						str.append(' v.');
-						str.append(format('%02X',
-								Number.parseInt(paramString.charAt(2))
-						));
-				}
-				return str;
-		}
-
-
-
-		static getNLSNetworkBridgeInfo(paramString: string) {
-				const c = paramString.charAt(1);
-				switch (c) {
-						case '\001':
-								return '(2414S) PowerLinc Serial'
-						case '\002':
-								return '(2414U) PowerLinc USB'
-						case '\003':
-								return '(2814S) Icon PowerLinc Serial'
-						case '\004':
-								return '(2814U) Icon PowerLinc USB'
-						case '\005':
-								return '(2412S) PowerLine Modem'
-						case '\006':
-								return '(2411R) IRLinc Receiver'
-						case '\007':
-								return '(2411T) IRLinc Transmitter'
-						case '\013':
-								return '(2412U) PowerLine Modem USB'
-						case '\r':
-								return 'EZX10-RF'
-						case '\017':
-								return 'EZX10-IR'
-						case 'O':
-								return '(12237DB) PowerLine Modem'
-				}
+		public static getDeviceDetails(family: number, typeCode: string) : {name: string, modelNumber: string, version: string, class: typeof ISYDevice} 
+		{
+			if(family ?? ISYConstants.Families.Insteon === ISYConstants.Families.Insteon)
+			{
+				return this.getInsteonDeviceDetails(typeCode);
+			}
+			else
 				return null;
 		}
 
-		static getNLSIrrigationControlInfo(paramString: string) {
-				const c = paramString.charAt(1);
-				return (c == '\000') ? 'EZRain/EZFlora Irrigation Controller' : null;
+		public static getInsteonDeviceDetails(typeCode: string): { name: string, modelNumber: string, version: string, class: typeof ISYDevice } 
+		{
+				const typeArray = typeCode.split('.');
+				const category = Number(typeArray[0]);
+				const device = Number(typeArray[1]);
+				const version = Number(typeArray[2]);
+				let str = null;
+				if (category === 0o000) {
+						str = DeviceFactory.getNLSControllerInfo(device);
+				} else if (category === 0o001) {
+						str = DeviceFactory.getNLSDimLightInfo(device);
+				} else if (category === 0o002) {
+						str = DeviceFactory.getNLSSwitchLightInfo(device);
+				} else if (category === 0o003) {
+						str = DeviceFactory.getNLSNetworkBridgeInfo(device);
+				} else if (category === 0o005) {
+						str = DeviceFactory.getNLSClimateControlInfo(device);
+				} else if (category === 0o004) {
+						str = DeviceFactory.getNLSIrrigationControlInfo(device);
+				} else if (category === 0o007) {
+						str = DeviceFactory.getNLSIOControlInfo(device);
+				} else if (category === 0o017) {
+						str = DeviceFactory.getNLSAccessControlInfo(device);
+				} else if (category === 0o020) {
+						str = DeviceFactory.getNLSSHS(device);
+				} else if (category === 0o011) {
+						str = DeviceFactory.getNLSEnergyManagement(device);
+				} else if (category === 0o016) {
+						str = DeviceFactory.getNLSWindowsCovering(device);
+				}
+
+			str.version = version.toString(16);
+
+			//str = str + version.toString(16);
+			console.log(str);
+			return str;
+			
 		}
 
-		static getNLSSwitchLightInfo(paramString: string) {
-				const c = paramString.charAt(1);
+
+
+		static getNLSNetworkBridgeInfo(device: number) {
+				const c = String.fromCharCode(device);
+				let retVal = null;
 				switch (c) {
-						case '\006':
-								return '(2456S3E) ApplianceLinc - Outdoor Plugin Module'
-						case '\007':
-								return '(2456S3T) TimerLinc'
-						case '\t':
-								return '(2456S3) ApplianceLinc'
-						case '\n':
-								return '(2476ST) SwitchLinc Relay'
-						case '\013':
-								return '(2876S) Icon On/Off Switch'
-						case '\f':
-								return '(2856S3) Icon Appliance Adapter'
+						case String.fromCharCode(0o001):
+								retVal = { name: 'PowerLinc Serial', modelNumber: '2414S' };
+						case String.fromCharCode(0o002):
+								retVal = { name: 'PowerLinc USB', modelNumber: '2414U' };
+						case String.fromCharCode(0o003):
+								retVal = { name: 'Icon PowerLinc Serial', modelNumber: '2814S' };
+						case String.fromCharCode(0o004):
+								retVal = { name: 'Icon PowerLinc USB', modelNumber: '2814U' };
+						case String.fromCharCode(0o005):
+								retVal = { name: 'PowerLine Modem', modelNumber: '2412S' };
+						case String.fromCharCode(0o006):
+								retVal = { name: 'IRLinc Receiver', modelNumber: '2411R' };
+						case String.fromCharCode(0o007):
+								retVal = { name: 'IRLinc Transmitter', modelNumber: '2411T' };
+						case String.fromCharCode(0o013):
+								retVal = { name: 'PowerLine Modem USB', modelNumber: '2412U' };
 						case '\r':
-						case '\032':
-								return '(2466S) ToggleLinc Relay'
-						case '\016':
+								return 'EZX10-RF';
+						case String.fromCharCode(0o017):
+								return 'EZX10-IR';
+						case 'O':
+								retVal = { name: 'PowerLine Modem', modelNumber: '12237DB' };
+				}
+				return retVal;
+		}
+
+		static getNLSIrrigationControlInfo(device: number) {
+				const c = String.fromCharCode(device);
+				return (c === String.fromCharCode(0o000)) ? 'EZRain/EZFlora Irrigation Controller' : null;
+		}
+
+	static getNLSSwitchLightInfo(device: number): { name: string, modelNumber: string, version: string, class: typeof ISYDevice } {
+				const c = String.fromCharCode(device);
+			let retVal = null;
+				switch (c) {
+						case String.fromCharCode(0o006):
+								retVal = { name: 'ApplianceLinc - Outdoor Plugin Module', modelNumber: '2456S3E' };
+						case String.fromCharCode(0o007):
+								retVal = { name: 'TimerLinc', modelNumber: '2456S3T' };
+						case '\t':
+								retVal = { name: 'ApplianceLinc', modelNumber: '2456S3' };
+						case '\n':
+								retVal = { name: 'SwitchLinc Relay', modelNumber: '2476ST' };
+						case String.fromCharCode(0o013):
+								retVal = { name: 'Icon On/Off Switch', modelNumber: '2876S' };
+						case '\f':
+								retVal = { name: 'Icon Appliance Adapter', modelNumber: '2856S3' };
+						case '\r':
+						case String.fromCharCode(0o032):
+								retVal = { name: 'ToggleLinc Relay', modelNumber: '2466S' };
+						case String.fromCharCode(0o016):
 						case ')':
-								return '(2476ST) SwitchLinc Relay Timer'
-						case '\021':
-								return 'EZSwitch30'
-						case '\017':
-								return '(2486S/WH6) KeypadLinc Relay'
-						case '\005':
-								return '(2486S/WH8) KeypadLinc Relay (8 buttons)'
-						case '\020':
-								return '(2475S) In-LineLinc Relay'
-						case '\024':
-								return '(B2475S) In-LineLinc Relay W/ Sense'
-						case '\023':
-								return 'Icon SwitchLinc Relay for Bell Canada'
+								retVal = { name: 'SwitchLinc Relay Timer', modelNumber: '2476ST' };
+						case String.fromCharCode(0o021):
+								//return 'EZSwitch30';
+						case String.fromCharCode(0o017):
+								retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6' };
+						case String.fromCharCode(0o005):
+								retVal = { name: 'KeypadLinc Relay (8 buttons)', modelNumber: '2486S/WH8' };
+						case String.fromCharCode(0o020):
+								retVal = { name: 'In-LineLinc Relay', modelNumber: '2475S' };
+						case String.fromCharCode(0o024):
+								retVal = { name: 'In-LineLinc Relay W/ Sense', modelNumber: 'B2475S' };
+						case String.fromCharCode(0o023):
+								//return 'Icon SwitchLinc Relay for Bell Canada';
 						case '\b':
-								return '(2473) OutletLinc'
-						case '\022':
-								return '(2474S) Companion Switch'
-						case '\025':
-								return '(2476S) SwitchLinc Relay W/ Sense'
-						case '\027':
-								return '(2856S3B) Icon Relay 3-Pin'
-						case '\026':
-								return '(2876SB)  Icon Relay Switch'
-						case '\030':
-								return '(2494S220) SwitchLinc Relay 220 V.'
-						case '\031':
-								return '(2494S220) SwitchLinc Relay 220 V. w/Beeper'
-						case '\034':
-								return '(2476S) SwitchLinc Relay - Remote Control On/Off Switch'
+								retVal = { name: 'OutletLinc', modelNumber: '2473', class: InsteonOnOffOutletDevice };
+						case String.fromCharCode(0o022):
+								retVal = { name: 'Companion Switch', modelNumber: '2474S' };
+						case String.fromCharCode(0o025):
+								retVal = { name: 'SwitchLinc Relay W/ Sense', modelNumber: '2476S' };
+						case String.fromCharCode(0o027):
+								retVal = { name: 'Icon Relay 3-Pin', modelNumber: '2856S3B' };
+						case String.fromCharCode(0o026):
+								retVal = { name: ' Icon Relay Switch', modelNumber: '2876SB' };
+						case String.fromCharCode(0o030):
+								retVal = { name: 'SwitchLinc Relay 220 V.', modelNumber: '2494S220' };
+						case String.fromCharCode(0o031):
+								retVal = { name: 'SwitchLinc Relay 220 V. w/Beeper', modelNumber: '2494S220' };
+						case String.fromCharCode(0o034):
+								retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S' };
 						case '%':
-								return '(2484S/WH8) KeypadLinc Timer Relay (8 buttons)'
+								retVal = { name: 'KeypadLinc Timer Relay (8 buttons)', modelNumber: '2484S/WH8' };
 						case ' ':
-								return '(2486S/WH6-SP) KeypadLinc Relay'
+						retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6-SP', class: InsteonDimmerKeypadDevice };
 						case '!':
-								return '(2473-SP) OutletLinc'
+								retVal = { name: 'OutletLinc', modelNumber: '2473-SP', class: InsteonOnOffOutletDevice};
 						case '#':
-								return '(2476S-SP) SwitchLinc Relay - Remote Control On/Off Switch'
+						retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S-SP', class: InsteonRelaySwitchDevice };
 						case '"':
-								return '(2475S-SP) In-LineLinc Relay'
-						case '\036':
+						retVal = { name: 'In-LineLinc Relay', modelNumber: '2475S-SP', class: InsteonRelaySwitchDevice };
+						case String.fromCharCode(0o036):
 						case ',':
-								return '(2487S) Dual Band KeypadLinc Relay'
-						case '\037':
-								return '(2475SDB) Dual Band InlineLinc On/Off Switch'
+								retVal = { name: 'Dual Band KeypadLinc Relay', modelNumber: '2487S', class: InsteonKeypadDevice};
+						case String.fromCharCode(0o037):
+						retVal = { name: 'Dual Band InlineLinc On/Off Switch', modelNumber: '2475SDB', class: InsteonRelaySwitchDevice};
 						case '*':
-								return '(2477S) Dual Band SwitchLinc On/Off Switch'
+								retVal = { name: 'Dual Band SwitchLinc On/Off Switch', modelNumber: '2477S', class: InsteonRelaySwitchDevice };
 						case '/':
-								return '(2443-222) Micro Module On/Off'
+						retVal = { name: 'Micro Module On/Off', modelNumber: '2443-222'};
 						case '1':
-								return '(2443-422) Micro Module On/Off'
+						retVal = { name: 'Micro Module On/Off', modelNumber: '2443-422'};
 						case '2':
 						case '<':
-								return '(2443-522) Micro Module On/Off'
+						retVal = { name: 'Micro Module On/Off', modelNumber: '2443-522' };
 						case '.':
-								return '(2453-222) Din Rail Relay'
+						retVal = { name: 'Din Rail Relay', modelNumber: '2453-222' };
 						case '3':
-								return '(2453-422) Din Rail Relay'
+						retVal = { name: 'Din Rail Relay', modelNumber: '2453-422'};
 						case '4':
 						case '=':
-								return '(2453-522) Din Rail Relay'
+						retVal = { name: 'Din Rail Relay', modelNumber: '2453-522' };
 						case '7':
-								return '(2635-222) On/Off Module'
+						retVal = { name: 'On/Off Module', modelNumber: '2635-222' };
 						case '8':
-								return '(2634-222) On/Off Outdoor Module'
+						retVal = { name: 'On/Off Outdoor Module', modelNumber: '2634-222'};
 						case '9':
-								return '(2663-222) On/Off Outlet'
+						retVal = { name: 'On/Off Outlet', modelNumber: '2663-222' };
 						case '-':
-								return '(2633-422) Plugin Relay'
+						retVal = { name: 'Plugin Relay', modelNumber: '2633-422'};
 						case '0':
-								return '(2633-432) Plugin Relay'
+						retVal = { name: 'Plugin Relay', modelNumber: '2633-432' };
 						case '5':
-								return '(2633-442) Plugin Relay'
+						retVal = { name: 'Plugin Relay', modelNumber: '2633-442'};
 						case '6':
-								return '(2633-522) Plugin Relay'
+								retVal = { name: 'Plugin Relay', modelNumber: '2633-522'};
 				}
-				return null;
+				if(retVal.class === undefined)
+					retVal.class = InsteonRelayDevice;
+				return retVal;
 		}
 
-		private static getNLSDimLightInfo(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSDimLightInfo(device: number) {
+				const c = String.fromCharCode(device);
+				let retVal = null;
 				switch (c) {
-						case '\000':
-								return '(2456D3) LampLinc'
-						case '\001':
-								return '(2476D) SwitchLinc Dimmer'
-						case '\002':
-								return '(2475D) In-LineLinc Dimmable'
-						case '\003':
-								return '(2876D3) Icon Switch Dimmer'
-						case '\004':
-								return '(2476DH) SwitchLinc Dimmer'
-						case '\006':
-								return '(2456D2) LampLinc 2 Pin'
+						case String.fromCharCode(0o000):
+								retVal = { name: 'LampLinc', modelNumber: '2456D3' };
+						case String.fromCharCode(0o001):
+								retVal = { name: 'SwitchLinc Dimmer', modelNumber: '2476D', class: InsteonDimmerSwitchDevice };
+						case String.fromCharCode(0o002):
+								retVal = { name: 'In-LineLinc Dimmable', modelNumber: '2475D' };
+						case String.fromCharCode(0o003):
+								retVal = { name: 'Icon Switch Dimmer', modelNumber: '2876D3' };
+						case String.fromCharCode(0o004):
+						retVal = { name: 'SwitchLinc Dimmer', modelNumber: '2476DH', class: InsteonDimmerSwitchDevice };
+						case String.fromCharCode(0o006):
+								retVal = { name: 'LampLinc 2 Pin', modelNumber: '2456D2' };
 						case '\t':
-								return '(2486D) KeypadLinc Dimmer'
-						case '\007':
-								return '(2856D2) Icon LampLinc 2 Pin'
+								retVal = { name: 'KeypadLinc Dimmer', modelNumber: '2486D' };
+						case String.fromCharCode(0o007):
+								retVal = { name: 'Icon LampLinc 2 Pin', modelNumber: '2856D2' };
 						case '\n':
-								return '(2886D) Icon In-Wall Controller'
+								retVal = { name: 'Icon In-Wall Controller', modelNumber: '2886D' };
 						case '\r':
-								return '(2454D) SocketLinc'
+								retVal = { name: 'SocketLinc', modelNumber: '2454D' };
 						case '\f':
-								return '(2486DWH8) KeypadLinc Dimmer 8 Button'
-						case '\023':
-								return 'Icon SwitchLinc Dimmer for Bell Canada'
-						case '\027':
-						case '\037':
-								return '(2466D) ToggleLinc Dimmer'
-						case '\030':
-								return '(2474D) Companion Dimmer'
-						case '\032':
-								return '(2475D) InlineLinc Dimmer'
-						case '\005':
-								return '(2484DWH8) KeypadLinc Countdown Timer'
-						case '\033':
-								return '(2486D) KeypadLinc Dimmer 6 Buttons'
-						case '\034':
-								return '(2486D) KeypadLinc Dimmer 8 Buttons'
-						case '\031':
-								return '(2476D) SwitchLinc Dimmer W/Beeper'
-						case '\016':
-								return '(B2457D2) LampLinc BiPhy'
-						case '\036':
-								return '(2876DB) Icon Dimmer'
-						case '\035':
-								return '(2476DH) SwitchLinc Dimmer 1000W'
+								retVal = { name: 'KeypadLinc Dimmer 8 Button', modelNumber: '2486DWH8' };
+						case String.fromCharCode(0o023):
+								retVal = { name: 'Icon SwitchLinc Dimmer for Bell Canada' };
+						case String.fromCharCode(0o027):
+						case String.fromCharCode(0o037):
+						retVal = { name: 'ToggleLinc Dimmer', modelNumber: '2466D', class: InsteonDimmerSwitchDevice };
+						case String.fromCharCode(0o030):
+								retVal = { name: 'Companion Dimmer', modelNumber: '2474D' };
+						case String.fromCharCode(0o032):
+						retVal = { name: 'InlineLinc Dimmer', modelNumber: '2475D', class: InsteonDimmerSwitchDevice };
+						case String.fromCharCode(0o005):
+								retVal = { name: 'KeypadLinc Countdown Timer', modelNumber: '2484DWH8' };
+						case String.fromCharCode(0o033):
+								retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2486D' };
+						case String.fromCharCode(0o034):
+								retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D' };
+						case String.fromCharCode(0o031):
+								retVal = { name: 'SwitchLinc Dimmer W/Beeper', modelNumber: '2476D' };
+						case String.fromCharCode(0o016):
+								retVal = { name: 'LampLinc BiPhy', modelNumber: 'B2457D2' };
+						case String.fromCharCode(0o036):
+								retVal = { name: 'Icon Dimmer', modelNumber: '2876DB' };
+						case String.fromCharCode(0o035):
+						retVal = { name: 'SwitchLinc Dimmer 1000W', modelNumber: '2476DH', class: InsteonDimmerSwitchDevice};
 						case '"':
-								return '(2457D2X) LampLinc 2-Pin Dimmer'
+								retVal = { name: 'LampLinc 2-Pin Dimmer', modelNumber: '2457D2X' };
 						case 'U':
-								return '(2432-622) Dual Band Switchlinc Dimmer'
+						retVal = { name: 'Dual Band Switchlinc Dimmer', modelNumber: '2432-622', class: InsteonDimmerSwitchDevice};
 						case ' ':
-								return '(2477D) Dual Band SwitchLinc Dimmer'
+						retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477D', class: InsteonDimmerSwitchDevice };
 						case '1':
-								return '(2478D) Dual Band SwitchLinc Dimmer (240V)'
+						retVal = { name: 'Dual Band SwitchLinc Dimmer (240V)', modelNumber: '2478D', class: InsteonDimmerSwitchDevice};
 						case '-':
-								return '(2477DH) Dual Band SwitchLinc Dimmer'
+						retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477DH', class: InsteonDimmerSwitchDevice };
 						case '\'':
-								return '(2477D-SP) Dual Band SwitchLinc Dimmer'
+						retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477D-SP', class: InsteonDimmerSwitchDevice };
 						case '+':
-								return '(2477DH-SP) Dual Band SwitchLinc Dimmer'
+						retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477DH-SP', class: InsteonDimmerSwitchDevice};
 						case ')':
-								return '(2486D-SP) KeypadLinc Dimmer 8 Buttons'
+						retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D-SP', class: InsteonDimmerSwitchDevice };
 						case '*':
-								return '(2457D2X-SP) LampLinc 2-Pin Dimmer'
+								retVal = { name: 'LampLinc 2-Pin Dimmer', modelNumber: '2457D2X-SP' };
 						case ',':
-								return '(2475D-SP) InlineLinc Dimmer'
+								retVal = { name: 'InlineLinc Dimmer', modelNumber: '2475D-SP' };
 						case '%':
-								return '(2475DA2) Ballast Dimmer'
+								retVal = { name: 'Ballast Dimmer', modelNumber: '2475DA2' };
 						case '=':
-								return '(2446-422) Ballast Dimmer'
+								retVal = { name: 'Ballast Dimmer', modelNumber: '2446-422' };
 						case '>':
-								return '(2446-522) Ballast Dimmer'
+								retVal = { name: 'Ballast Dimmer', modelNumber: '2446-522' };
 						case '.':
-								return '(2475F) FanLinc'
+								retVal = { name: 'FanLinc', modelNumber: '2475F', class: InsteonFanDevice };
 						case '!':
-								return '(2472D) Dual Band OutletLinc Dimmer'
+								retVal = { name: 'Dual Band OutletLinc Dimmer', modelNumber: '2472D', class: InsteonDimmerOutletDevice };
 						case '0':
-								return '(2476D) SwitchLinc Dimmer'
+								retVal = { name: 'SwitchLinc Dimmer', modelNumber: '2476D', class: InsteonDimmerSwitchDevice};
 						case '$':
-								return '(2474DWH) SwitchLinc Dimmer 2-Wire'
+								retVal = { name: 'SwitchLinc Dimmer 2-Wire', modelNumber: '2474DWH', class: InsteonDimmerSwitchDevice };
 						case '2':
-								return '(2475DA1) InLineLinc Dimmer'
+								retVal = { name: 'InLineLinc Dimmer', modelNumber: '2475DA1' };
 						case ':':
-								return '(2672-222) Insteon LED Bulb 8 Watt (60W)'
+								retVal = { name: 'Insteon LED Bulb 8 Watt (60W)', modelNumber: '2672-222' };
 						case 'I':
-								return '(2674-222) Insteon LED Bulb PAR38 12 Watt'
+								retVal = { name: 'Insteon LED Bulb PAR38 12 Watt', modelNumber: '2674-222' };
 						case '5':
-								return '(2442-222) Micro Module Dimmer'
+								retVal = { name: 'Micro Module Dimmer', modelNumber: '2442-222' };
 						case '8':
-								return '(2442-422) Micro Module Dimmer'
+								retVal = { name: 'Micro Module Dimmer', modelNumber: '2442-422' };
 						case '9':
 						case 'S':
-								return '(2442-522) Micro Module Dimmer'
+								retVal = { name: 'Micro Module Dimmer', modelNumber: '2442-522' };
 						case '4':
-								return '(2452-222) Din Rail Dimmer'
+								retVal = { name: 'Din Rail Dimmer', modelNumber: '2452-222' };
 						case '6':
-								return '(2452-422) Din Rail Dimmer'
+								retVal = { name: 'Din Rail Dimmer', modelNumber: '2452-422' };
 						case '7':
 						case 'T':
-								return '(2452-522) Din Rail Dimmer'
+								retVal = { name: 'Din Rail Dimmer', modelNumber: '2452-522' };
 						case 'B':
-								return '(2334-2) KeypadLinc Dimmer 5 Buttons'
+								retVal = { name: 'KeypadLinc Dimmer 5 Buttons', modelNumber: '2334-2' };
 						case 'A':
-								return '(2334-2) KeypadLinc Dimmer 8 Buttons'
+								retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2334-2' };
 						case 'V':
-								return '(2334-632) KeypadLinc Dimmer 6 Buttons'
-						case '\013':
-								return '(2632-422) Plugin Dimmer'
-						case '\017':
-								return '(2632-432) Plugin Dimmer'
-						case '\021':
-								return '(2632-442) Plugin Dimmer'
+								retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2334-632' };
+						case String.fromCharCode(0o013):
+								retVal = { name: 'Plugin Dimmer', modelNumber: '2632-422' };
+						case String.fromCharCode(0o017):
+								retVal = { name: 'Plugin Dimmer', modelNumber: '2632-432' };
+						case String.fromCharCode(0o021):
+								retVal = { name: 'Plugin Dimmer', modelNumber: '2632-442' };
 						case 'P':
-								return '(2632-452) Plugin Dimmer'
-						case '\022':
-								return '(2632-522) Plugin Dimmer'
+								retVal = { name: 'Plugin Dimmer', modelNumber: '2632-452' };
+						case String.fromCharCode(0o022):
+								retVal = { name: 'Plugin Dimmer', modelNumber: '2632-522' };
 				}
-				return null;
+				if(retVal.class === undefined)
+					retVal.class = InsteonDimmableDevice;
+				return retVal;
 		}
 
-		private static getNLSControllerInfo(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSControllerInfo(device: number) {
+				const c = String.fromCharCode(device);
+				let retVal = null;
 				switch (c) {
-						case '\000':
-								return '(2430) ControLinc'
-						case '\005':
-								return '(2440) RemoteLinc'
-						case '\016':
-								return '(2440EZ) RemoteLinc EZ'
-						case '\006':
-								return '(2830) Icon Tabletop'
+						case String.fromCharCode(0o000):
+								retVal = { name: 'ControLinc', modelNumber: '2430' };
+						case String.fromCharCode(0o005):
+								retVal = { name: 'RemoteLinc', modelNumber: '2440' };
+						case String.fromCharCode(0o016):
+								retVal = { name: 'RemoteLinc EZ', modelNumber: '2440EZ' };
+						case String.fromCharCode(0o006):
+								retVal = { name: 'Icon Tabletop', modelNumber: '2830' };
 						case '\t':
-								return '(2442) SignaLinc'
-						case '\021':
-								return '(2342-242) RemoteLinc 2 Switch'
-						case '\020':
-								return '(2342-232) RemoteLinc 2 Keypad, 4 Scene'
-						case '\022':
-								return '(2342-222) RemoteLinc 2 Keypad, 8 Scene'
-						case '\024':
-								return '(2342-432) Mini Remote Keypad, 4 Scene'
-						case '\025':
-								return '(2342-442) Mini Remote Switch'
-						case '\026':
-								return '(2342-422) Mini Remote Keypad, 8 Scene'
-						case '\027':
-								return '(2342-532) Mini Remote Keypad, 4 Scene'
-						case '\030':
-								return '(2342-522) Mini Remote Keypad, 8 Scene'
-						case '\031':
-								return '(2342-542) Mini Remote Switch'
-						case '\032':
-								return '(2342-222) Mini Remote Keypad, 8 Scene'
-						case '\033':
-								return '(2342-232) Mini Remote Keypad, 4 Scene'
-						case '\034':
-								return '(2342-242) Mini Remote Switch'
+								retVal = { name: 'SignaLinc', modelNumber: '2442' };
+						case String.fromCharCode(0o021):
+								retVal = { name: 'RemoteLinc 2 Switch', modelNumber: '2342-242' };
+						case String.fromCharCode(0o020):
+								retVal = { name: 'RemoteLinc 2 Keypad, 4 Scene', modelNumber: '2342-232' };
+						case String.fromCharCode(0o022):
+								retVal = { name: 'RemoteLinc 2 Keypad, 8 Scene', modelNumber: '2342-222' };
+						case String.fromCharCode(0o024):
+								retVal = { name: 'Mini Remote Keypad, 4 Scene', modelNumber: '2342-432' };
+						case String.fromCharCode(0o025):
+								retVal = { name: 'Mini Remote Switch', modelNumber: '2342-442' };
+						case String.fromCharCode(0o026):
+								retVal = { name: 'Mini Remote Keypad, 8 Scene', modelNumber: '2342-422' };
+						case String.fromCharCode(0o027):
+								retVal = { name: 'Mini Remote Keypad, 4 Scene', modelNumber: '2342-532' };
+						case String.fromCharCode(0o030):
+								retVal = { name: 'Mini Remote Keypad, 8 Scene', modelNumber: '2342-522' };
+						case String.fromCharCode(0o031):
+								retVal = { name: 'Mini Remote Switch', modelNumber: '2342-542' };
+						case String.fromCharCode(0o032):
+								retVal = { name: 'Mini Remote Keypad, 8 Scene', modelNumber: '2342-222' };
+						case String.fromCharCode(0o033):
+								retVal = { name: 'Mini Remote Keypad, 4 Scene', modelNumber: '2342-232' };
+						case String.fromCharCode(0o034):
+								retVal = { name: 'Mini Remote Switch', modelNumber: '2342-242' };
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSIOControlInfo(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSIOControlInfo(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\000':
-								return '(2450) IOLinc'
-						case '\003':
-								return 'Compacta EZIO 2x4: INSTEON I/O Controller'
-						case '\004':
-								return 'Compacta EZIO8SA: INSTEON I/O Controller'
-						case '\002':
-								return 'Compacta EZIO8T: INSTEON I/O Controller'
-						case '\005':
-								return 'Compacta EZSnSRF'
-						case '\006':
-								return 'Compacta EZSnSRF Interface'
-						case '\007':
-								return 'Compacta EZIO6I'
+						case String.fromCharCode(0o000):
+								retVal = { name: 'IOLinc', modelNumber: '2450' };
+						case String.fromCharCode(0o003):
+								return 'Compacta EZIO 2x4: INSTEON I/O Controller';
+						case String.fromCharCode(0o004):
+								return 'Compacta EZIO8SA: INSTEON I/O Controller';
+						case String.fromCharCode(0o002):
+								return 'Compacta EZIO8T: INSTEON I/O Controller';
+						case String.fromCharCode(0o005):
+								return 'Compacta EZSnSRF';
+						case String.fromCharCode(0o006):
+								return 'Compacta EZSnSRF Interface';
+						case String.fromCharCode(0o007):
+								return 'Compacta EZIO6I';
 						case '\b':
-								return 'Compacta EZIO4O'
+								return 'Compacta EZIO4O';
 						case '\t':
-								return '(2423A5) SynchroLinc'
+								retVal = { name: 'SynchroLinc', modelNumber: '2423A5' };
 						case '\r':
-								return '(2450) IOLinc (Refurbished)'
-						case '\016':
-								return '(2248-222) I/O Module'
-						case '\017':
-								return '(2248-422) I/O Module'
-						case '\020':
-								return '(2248-442) I/O Module'
-						case '\021':
-								return '(2248-522) I/O Module'
-						case '\022':
-								return '(2822-222) IOLinc'
-						case '\023':
-								return '(2822-422) IOLinc'
-						case '\024':
-								return '(2822-442) IOLinc'
-						case '\025':
-								return '(2822-522) IOLinc'
-						case '\026':
-								return '(2822-222) Contact Closure'
-						case '\027':
-								return '(2822-422) Contact Closure'
-						case '\030':
-								return '(2822-442) Contact Closure'
-						case '\031':
-								return '(2822-522) Contact Closure'
-						case '\032':
-								return '(2867-222) Alert Module'
-						case '\036':
-								return '(2868-222) Siren'
+								retVal = { name: 'IOLinc (Refurbished)', modelNumber: '2450' };
+						case String.fromCharCode(0o016):
+								retVal = { name: 'I/O Module', modelNumber: '2248-222' };
+						case String.fromCharCode(0o017):
+								retVal = { name: 'I/O Module', modelNumber: '2248-422' };
+						case String.fromCharCode(0o020):
+								retVal = { name: 'I/O Module', modelNumber: '2248-442' };
+						case String.fromCharCode(0o021):
+								retVal = { name: 'I/O Module', modelNumber: '2248-522' };
+						case String.fromCharCode(0o022):
+								retVal = { name: 'IOLinc', modelNumber: '2822-222' };
+						case String.fromCharCode(0o023):
+								retVal = { name: 'IOLinc', modelNumber: '2822-422' };
+						case String.fromCharCode(0o024):
+								retVal = { name: 'IOLinc', modelNumber: '2822-442' };
+						case String.fromCharCode(0o025):
+								retVal = { name: 'IOLinc', modelNumber: '2822-522' };
+						case String.fromCharCode(0o026):
+								retVal = { name: 'Contact Closure', modelNumber: '2822-222' };
+						case String.fromCharCode(0o027):
+								retVal = { name: 'Contact Closure', modelNumber: '2822-422' };
+						case String.fromCharCode(0o030):
+								retVal = { name: 'Contact Closure', modelNumber: '2822-442' };
+						case String.fromCharCode(0o031):
+								retVal = { name: 'Contact Closure', modelNumber: '2822-522' };
+						case String.fromCharCode(0o032):
+								retVal = { name: 'Alert Module', modelNumber: '2867-222' };
+						case String.fromCharCode(0o036):
+								retVal = { name: 'Siren', modelNumber: '2868-222' };
 						case ' ':
-								return '(2868-622) Siren'
+								retVal = { name: 'Siren', modelNumber: '2868-622' };
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSSHS(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSSHS(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\001':
-								return '(2842-222) INSTEON Motion Sensor'
-						case '\004':
-								return '(2842-422) INSTEON Motion Sensor'
-						case '\005':
-								return '(2842-522) INSTEON Motion Sensor'
-						case '\003':
-								return '(2420M-SP) INSTEON Motion Sensor'
-						case '\002':
-								return '(2421) TriggerLinc'
+						case String.fromCharCode(0o001):
+								retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-222', class: InsteonMotionSensorDevice };
+						case String.fromCharCode(0o004):
+								retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-422' };
+						case String.fromCharCode(0o005):
+								retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-522' };
+						case String.fromCharCode(0o003):
+								retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2420M-SP' };
+						case String.fromCharCode(0o002):
+								retVal = { name: 'TriggerLinc', modelNumber: '2421' };
 						case '\t':
-								return '(2843-222) Open/Close Sensor'
-						case '\006':
-								return '(2843-422) Open/Close Sensor'
-						case '\007':
-						case '\031':
-								return '(2843-522) Open/Close Sensor'
+								retVal = { name: 'Open/Close Sensor', modelNumber: '2843-222', class: InsteonDoorWindowSensorDevice };
+						case String.fromCharCode(0o006):
+						retVal = { name: 'Open/Close Sensor', modelNumber: '2843-422', class: InsteonDoorWindowSensorDevice };
+						case String.fromCharCode(0o007):
+						case String.fromCharCode(0o031):
+						retVal = { name: 'Open/Close Sensor', modelNumber: '2843-522', class: InsteonDoorWindowSensorDevice };
 						case '\b':
-								return '(2852-222) Leak Sensor'
+								retVal = { name: 'Leak Sensor', modelNumber: '2852-222' };
 						case '\r':
-								return '(2852-422) Leak Sensor'
-						case '\016':
-						case '\032':
-								return '(2852-522) Leak Sensor'
+								retVal = { name: 'Leak Sensor', modelNumber: '2852-422' };
+						case String.fromCharCode(0o016):
+						case String.fromCharCode(0o032):
+								retVal = { name: 'Leak Sensor', modelNumber: '2852-522' };
 						case '\n':
-								return 'INSTEON Smoke Sensor'
-						case '\021':
-								return '(2845-222) INSTEON Hidden Door Sensor'
-						case '\024':
-								return '(2845-422) INSTEON Hidden Door Sensor'
-						case '\025':
-						case '\033':
-								return '(2845-522) INSTEON Hidden Door Sensor'
-						case '\026':
-								return '(2844-222) Insteon Motion Sensor II'
-						case '\030':
-								return '(2844-522) Insteon Motion Sensor II'
+								return 'INSTEON Smoke Sensor';
+						case String.fromCharCode(0o021):
+						retVal = { name: 'INSTEON Hidden Door Sensor', modelNumber: '2845-222', class: InsteonDoorWindowSensorDevice };
+						case String.fromCharCode(0o024):
+						retVal = { name: 'INSTEON Hidden Door Sensor', modelNumber: '2845-422', class: InsteonDoorWindowSensorDevice };
+						case String.fromCharCode(0o025):
+						case String.fromCharCode(0o033):
+						retVal = { name: 'INSTEON Hidden Door Sensor', modelNumber: '2845-522', class: InsteonDoorWindowSensorDevice };
+						case String.fromCharCode(0o026):
+								retVal = { name: 'Insteon Motion Sensor II', modelNumber: '2844-222', class: InsteonMotionSensorDevice };
+						case String.fromCharCode(0o030):
+						retVal = { name: 'Insteon Motion Sensor II', modelNumber: '2844-522', class: InsteonDoorWindowSensorDevice };
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSClimateControlInfo(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSClimateControlInfo(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\000':
-								return 'BROAN SMSC080 Exhaust Fan'
-						case '\002':
-								return 'BROAN SMSC110 Exhaust Fan'
-						case '\005':
-								return 'BROAN, Venmar, Best Rangehoods'
-						case '\001':
-						case '\004':
-								return 'Compacta EZTherm'
-						case '\003':
-								return '(2441V) INSTEON Thermostat Adapter'
+						case String.fromCharCode(0o000):
+								return 'BROAN SMSC080 Exhaust Fan';
+						case String.fromCharCode(0o002):
+								return 'BROAN SMSC110 Exhaust Fan';
+						case String.fromCharCode(0o005):
+								return 'BROAN, Venmar, Best Rangehoods';
+						case String.fromCharCode(0o001):
+						case String.fromCharCode(0o004):
+								return 'Compacta EZTherm';
+						case String.fromCharCode(0o003):
+								retVal = { name: 'INSTEON Thermostat Adapter', modelNumber: '2441V' };
 						case '\t':
-								return '(2441V-SP) INSTEON Thermostat Adapter'
-						case '\013':
-								return '(2441TH) INSTEON Thermostat'
-						case '\017':
-								return '(2732-422) INSTEON Thermostat'
-						case '\020':
-								return '(2732-522) INSTEON Thermostat'
-						case '\021':
-								return '(2732-432) INSTEON Thermostat'
-						case '\022':
-								return '(2732-532) INSTEON Thermostat'
-						case '\023':
-								return '(2732-242) INSTEON Thermostat Heat Pump'
-						case '\024':
-								return '(2732-442) INSTEON Thermostat Heat Pump for Europe'
-						case '\025':
-								return '(2732-542) INSTEON Thermostat Heat Pump for Aus/NZ'
-						case '\026':
-								return '(2732-222) INSTEON Thermostat 2.0 (HVAC/HP)'
-						case '\027':
-								return '(2732-422) INSTEON Thermostat 2.0 (HVAC/HP) for Europe'
-						case '\030':
-								return '(2732-522) INSTEON Thermostat 2.0 (HVAC/HP) for Aus/NZ'
+								retVal = { name: 'INSTEON Thermostat Adapter', modelNumber: '2441V-SP' };
+						case String.fromCharCode(0o013):
+								retVal = { name: 'INSTEON Thermostat', modelNumber: '2441TH' };
+						case String.fromCharCode(0o017):
+								retVal = { name: 'INSTEON Thermostat', modelNumber: '2732-422' };
+						case String.fromCharCode(0o020):
+								retVal = { name: 'INSTEON Thermostat', modelNumber: '2732-522' };
+						case String.fromCharCode(0o021):
+								retVal = { name: 'INSTEON Thermostat', modelNumber: '2732-432' };
+						case String.fromCharCode(0o022):
+								retVal = { name: 'INSTEON Thermostat', modelNumber: '2732-532' };
+						case String.fromCharCode(0o023):
+								retVal = { name: 'INSTEON Thermostat Heat Pump', modelNumber: '2732-242' };
+						case String.fromCharCode(0o024):
+								retVal = { name: 'INSTEON Thermostat Heat Pump for Europe', modelNumber: '2732-442' };
+						case String.fromCharCode(0o025):
+								retVal = { name: 'INSTEON Thermostat Heat Pump for Aus/NZ', modelNumber: '2732-542' };
+						case String.fromCharCode(0o026):
+								retVal = { name: 'INSTEON Thermostat 2.0 (HVAC/HP)', modelNumber: '2732-222' };
+						case String.fromCharCode(0o027):
+								retVal = { name: 'for Europe', modelNumber: '2732-422) INSTEON Thermostat 2.0 (HVAC/HP' };
+						case String.fromCharCode(0o030):
+								retVal = { name: 'for Aus/NZ', modelNumber: '2732-522) INSTEON Thermostat 2.0 (HVAC/HP' };
 						case '\n':
-								return '(2441ZTH) INSTEON Wireless Thermostat'
-						case '\016':
-								return '(2491T) All-In-One INSTEON Thermostat Adapter'
+								retVal = { name: 'INSTEON Wireless Thermostat', modelNumber: '2441ZTH' };
+						case String.fromCharCode(0o016):
+								retVal = { name: 'All-In-One INSTEON Thermostat Adapter', modelNumber: '2491T' };
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSAccessControlInfo(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSAccessControlInfo(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\006':
-								return 'MorningLinc'
+						case String.fromCharCode(0o006):
+								return 'MorningLinc';
 						case '\n':
-								return 'Lock Controller'
+								return 'Lock Controller';
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSEnergyManagement(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSEnergyManagement(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\000':
-								return 'ZBPCM (iMeter Solo compat.)'
-						case '\007':
-								return '(2423A1) iMeter Solo'
-						case '\013':
-								return 'Dual Band Normally Closed 240V Load Controller (2477SA2)'
+						case String.fromCharCode(0o000):
+								return 'ZBPCM (iMeter Solo compat.)';
+						case String.fromCharCode(0o007):
+								retVal = { name: 'iMeter Solo', modelNumber: '2423A1' };
+						case String.fromCharCode(0o013):
+								return 'Dual Band Normally Closed 240V Load Controller (2477SA2)';
 						case '\n':
-								return 'Dual Band Normally Open 240V Load Controller (2477SA1)'
+								return 'Dual Band Normally Open 240V Load Controller (2477SA1)';
 						case '\r':
-								return 'Energy Display (2448A2)'
+								return 'Energy Display (2448A2)';
 				}
-				return null;
+				return retVal;
 		}
 
-		private static getNLSWindowsCovering(paramString: string) {
-				const c = paramString.charAt(1);
+		private static getNLSWindowsCovering(device: number) {
+				const c = String.fromCharCode(device);
+			let retVal = null;
 				switch (c) {
-						case '\001':
-								return '(2444-222) Micro Module Open/Close'
-						case '\002':
-								return '(2444-422) Micro Module Open/Close'
-						case '\003':
-						case '\007':
-								return '(2444-522) Micro Module Open/Close'
+						case String.fromCharCode(0o001):
+								retVal = { name: 'Micro Module Open/Close', modelNumber: '2444-222' };
+						case String.fromCharCode(0o002):
+								retVal = { name: 'Micro Module Open/Close', modelNumber: '2444-422' };
+						case String.fromCharCode(0o003):
+						case String.fromCharCode(0o007):
+								retVal = { name: 'Micro Module Open/Close', modelNumber: '2444-522' };
 				}
-				return null;
+				return retVal;
 		}
 
 }

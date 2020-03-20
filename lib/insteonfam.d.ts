@@ -1,4 +1,5 @@
-export declare class InsteonNLS {
+import { ISYDevice } from './isy';
+export declare class DeviceFactory {
     static LINK_MANAGEMENT_NAME: string;
     static LIGHT_NAME: string;
     static LIGHT_ADDRESS: string;
@@ -77,21 +78,6 @@ export declare class InsteonNLS {
     static LINK_IRLINC_TX_LABEL: string;
     static LINK_EZSNSRF_LABEL: string;
     static LINK_EZX10RF_LABEL: string;
-    static DOOR_SENSOR_PROGRAMMING_MODE_ENTRY: string;
-    static OPEN_CLOSE_SENSOR_PROGRAMMING_MODE_ENTRY: string;
-    static LEAK_SENSOR_PROGRAMMING_MODE_ENTRY: string;
-    static REMOTELINC2_PROGRAMMING_MODE_ENTRY: string;
-    static REMOTELINC_PROGRAMMING_MODE_ENTRY: string;
-    static MOTION_SENSOR_PROGRAMMING_MODE_ENTRY: string;
-    static DOOR_SENSOR_PROGRAMMING_MODE: string;
-    static OPEN_CLOSE_SENSOR_PROGRAMMING_MODE: string;
-    static LEAK_SENSOR_PROGRAMMING_MODE: string;
-    static REMOTELINC2_PROGRAMMING_MODE: string;
-    static REMOTELINC_PROGRAMMING_MODE: string;
-    static MOTIONSENSOR_PROGRAMMING_MODE: string;
-    static BATTERY_POWERED_PROGRAMMING_INSTRUCTIONS: string;
-    static BATTERY_POWERED_PROGRAMMING_MODE: string;
-    static A10_DEVICE_ADD_MESSAGE: string;
     static KEYPADLINC: string;
     static BUTTONS_GROUPING: string;
     static MUTUALLY_EXCLUSIVE_BUTTONS: string;
@@ -149,18 +135,30 @@ export declare class InsteonNLS {
     static LED_ON: string;
     static ONE_MIN_LOCAL_WARNING: string;
     static DEFAULT_TIMEOUT_VALUE: string;
-    static BUTTON_GROUPING_WARNING: string;
-    static ARE_YOU_SURE: string;
-    static SCENE_TEST_WARNING: string;
-    static SAFE_MODE_MESSAGE: string;
     static TRIGGER_THRESHOLD_WATTS: string;
     static HOLD_OFF_SECS: string;
     static HYSTERESIS_WATTS: string;
     static MICRO_OPEN_CLOSE_MOMENTARY_TIMEOUT: string;
-    static getDeviceDescription(paramString: string): any;
-    static getNLSNetworkBridgeInfo(paramString: string): "(2414S) PowerLinc Serial" | "(2414U) PowerLinc USB" | "(2814S) Icon PowerLinc Serial" | "(2814U) Icon PowerLinc USB" | "(2412S) PowerLine Modem" | "(2411R) IRLinc Receiver" | "(2411T) IRLinc Transmitter" | "(2412U) PowerLine Modem USB" | "EZX10-RF" | "EZX10-IR" | "(12237DB) PowerLine Modem";
-    static getNLSIrrigationControlInfo(paramString: string): string;
-    static getNLSSwitchLightInfo(paramString: string): "(2456S3E) ApplianceLinc - Outdoor Plugin Module" | "(2456S3T) TimerLinc" | "(2456S3) ApplianceLinc" | "(2476ST) SwitchLinc Relay" | "(2876S) Icon On/Off Switch" | "(2856S3) Icon Appliance Adapter" | "(2466S) ToggleLinc Relay" | "(2476ST) SwitchLinc Relay Timer" | "EZSwitch30" | "(2486S/WH6) KeypadLinc Relay" | "(2486S/WH8) KeypadLinc Relay (8 buttons)" | "(2475S) In-LineLinc Relay" | "(B2475S) In-LineLinc Relay W/ Sense" | "Icon SwitchLinc Relay for Bell Canada" | "(2473) OutletLinc" | "(2474S) Companion Switch" | "(2476S) SwitchLinc Relay W/ Sense" | "(2856S3B) Icon Relay 3-Pin" | "(2876SB)  Icon Relay Switch" | "(2494S220) SwitchLinc Relay 220 V." | "(2494S220) SwitchLinc Relay 220 V. w/Beeper" | "(2476S) SwitchLinc Relay - Remote Control On/Off Switch" | "(2484S/WH8) KeypadLinc Timer Relay (8 buttons)" | "(2486S/WH6-SP) KeypadLinc Relay" | "(2473-SP) OutletLinc" | "(2476S-SP) SwitchLinc Relay - Remote Control On/Off Switch" | "(2475S-SP) In-LineLinc Relay" | "(2487S) Dual Band KeypadLinc Relay" | "(2475SDB) Dual Band InlineLinc On/Off Switch" | "(2477S) Dual Band SwitchLinc On/Off Switch" | "(2443-222) Micro Module On/Off" | "(2443-422) Micro Module On/Off" | "(2443-522) Micro Module On/Off" | "(2453-222) Din Rail Relay" | "(2453-422) Din Rail Relay" | "(2453-522) Din Rail Relay" | "(2635-222) On/Off Module" | "(2634-222) On/Off Outdoor Module" | "(2663-222) On/Off Outlet" | "(2633-422) Plugin Relay" | "(2633-432) Plugin Relay" | "(2633-442) Plugin Relay" | "(2633-522) Plugin Relay";
+    static getDeviceDetails(family: number, typeCode: string): {
+        name: string;
+        modelNumber: string;
+        version: string;
+        class: typeof ISYDevice;
+    };
+    static getInsteonDeviceDetails(typeCode: string): {
+        name: string;
+        modelNumber: string;
+        version: string;
+        class: typeof ISYDevice;
+    };
+    static getNLSNetworkBridgeInfo(device: number): any;
+    static getNLSIrrigationControlInfo(device: number): string;
+    static getNLSSwitchLightInfo(device: number): {
+        name: string;
+        modelNumber: string;
+        version: string;
+        class: typeof ISYDevice;
+    };
     private static getNLSDimLightInfo;
     private static getNLSControllerInfo;
     private static getNLSIOControlInfo;
