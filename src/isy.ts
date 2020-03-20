@@ -27,7 +27,7 @@ import * as ProductInfoData from './isyproductinfo.json';
 import { ISYScene } from './isyscene';
 import { ISYVariable } from './isyvariable';
 import { getAsync } from './utils';
-import { DeviceFactory } from './insteonfam';
+import { DeviceFactory } from './devicefactory';
 
 export {
 	ISYScene,
@@ -471,8 +471,9 @@ export class ISY {
 
 			const enabled = Boolean(device.enabled);
 			let d = DeviceFactory.getDeviceDetails(device.family, device.isyType);
+			console.log(JSON.stringify(d));
 			if (d.class) {
-				 newDevice = new d.class(this,device);
+				newDevice = new d.class(this,device);
 				newDevice.productName = '(' + d.modelNumber + ') ' + d.name + ' v.' + d.version;
 				newDevice.modelNumber = d.modelNumber;
 				newDevice.version = d.version;
@@ -541,6 +542,15 @@ export class ISY {
 					this.deviceList.set(newDevice.address, newDevice);
 
 					// this.deviceList.push(newDevice);
+				}
+				else
+				{
+					this.logger(
+						`Device ${device.name} with type: ${device.type} and nodedef: ${
+						device.nodeDefId
+						} is not specifically supported, returning generic device object. `
+					);
+					newDevice = new ISYDevice(this, device);
 				}
 			} else {
 				this.logger(`Ignoring disabled device: ${device.name}`);

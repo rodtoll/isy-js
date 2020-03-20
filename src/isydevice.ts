@@ -30,7 +30,7 @@ export class ISYDevice extends ISYNode {
 		const s = this.type.split('.');
 		this.category = Number(s[0]);
 		this.subCategory = Number(s[1]);
-		
+
 		// console.log(nodeDetail);
 		if (
 			this.parentAddress !== this.address &&
@@ -72,6 +72,7 @@ export class ISYDevice extends ISYNode {
 		try
 		{
 			this.refreshNotes();
+		
 		}
 		catch
 		{
