@@ -8,8 +8,7 @@
         "email": "rod_toll@hotmail.com"
     },
     "scripts": {
-        "test": "mocha",
-        "prepare": "tsc"
+        "test": "mocha"
     },
     "keywords": [
         "isy",
