@@ -217,8 +217,8 @@ export class ISY {
 			this.loadDevices(result);
 			this.loadScenes(result);
 		}
-		catch (e) {
-			throw e;
+		catch ( e) {
+			throw new Error('Error loading nodes: ' + e);
 		}
 	}
 
@@ -381,7 +381,7 @@ export class ISY {
 			this.variableCallback(this, variable);
 		}
 	}
-	public checkForFailure(response: any) {
+	public checkForFailure(response: any) : boolean {
 
 
 		return (
@@ -536,16 +536,17 @@ export class ISY {
 		}
 	}
 
-	public initialize(initializeCompleted: any) {
+	public async initialize(initializeCompleted: any) : Promise<any>{
 		const that = this;
 		const options = {
 			username: this.userName,
 			password: this.password
 		};
-
-		this.loadConfig().then(
-			that.loadNodes, (reason) => that.handleInitializeError('Loading Config', reason)).then(
-				that.refreshStatuses, (reason) => that.handleInitializeError('Loading Nodes', reason)).then(() => {
+		try
+		{
+					await this.loadConfig();
+					await this.loadNodes();
+					await this.refreshStatuses().then(() => {
 					this.loadVariables(VariableTypes.Integer, () => {
 						this.loadVariables(VariableTypes.State, () => {
 							if (this.elkEnabled) {
@@ -581,7 +582,18 @@ export class ISY {
 							}
 						});
 					});
-				}, (reason) => that.handleInitializeError('Refreshing Statuses', reason)).finally(() => that.finishInitialize(true,initializeCompleted));
+				});
+			}
+			catch (e)
+			{
+				this.logger(`Error initializing ISY: ${JSON.stringify(e)}`);
+
+			}
+			finally
+			{
+				this.finishInitialize(true, initializeCompleted);
+				return Promise.resolve(true);
+			}
 	}
 
 	public async handleInitializeError(step: string, reason: any): Promise<any> {

@@ -92,7 +92,7 @@ export declare class ISY {
     createVariables(type: any, result: any): void;
     setVariableValues(result: any): void;
     refreshStatuses(): Promise<void>;
-    initialize(initializeCompleted: any): void;
+    initialize(initializeCompleted: any): Promise<any>;
     handleInitializeError(step: string, reason: any): Promise<any>;
     handleWebSocketMessage(event: {
         data: any;
