@@ -120,11 +120,11 @@ export class ISYDevice extends ISYNode {
 			}
 
 		}
-		catch {
+		catch (e){
 
-
+			this.logger(e);
 		}
-		return Promise.resolve();
+		
 	}
 
 	async getNotes(): Promise<any> {
@@ -135,9 +135,9 @@ export class ISYDevice extends ISYNode {
 					return result.NodeProperties;
 			else
 					return null;
-			
+
 		}
-		catch
+		catch (e)
 		{
 			return null;
 		}

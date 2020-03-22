@@ -192,8 +192,8 @@ export class ISY {
 		}
 		catch(e)
 		{
-			return Promise.reject(e);
-		};
+			throw new Error(JSON.stringify(e));
+		}
 
 	}
 
