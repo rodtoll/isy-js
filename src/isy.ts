@@ -185,10 +185,11 @@ export class ISY {
 			const response = await getAsync(url, this.restlerOptions);
 
 			if (this.checkForFailure(response)) {
-				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
-				return Promise.reject(response);
+				//this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
+				throw new Error(`Error calling ISY: ${JSON.stringify(response)}`);
 			}
-			return response;
+			else
+				return response;
 		}
 		catch(e)
 		{
