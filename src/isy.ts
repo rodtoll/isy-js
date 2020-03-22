@@ -180,15 +180,21 @@ export class ISY {
 	public async callISY(url: string): Promise<any> {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
 		this.logger(`Sending request: ${url}`);
-		const p = await getAsync(url, this.restlerOptions).then((response) => {
+		try
+		{
+			const response = await getAsync(url, this.restlerOptions)
 
 			if (this.checkForFailure(response)) {
 				this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
 				return Promise.reject(response);
 			}
-			return response;
-		}, (reason) => Promise.reject(reason));
-		return p;
+			return Promise.resolve(response);
+		}
+		catch(e)
+		{
+			return Promise.reject(e);
+		};
+
 	}
 
 
