@@ -1,8 +1,8 @@
 
 const ISYConstants = {
 	States: {
-	Off: 0,
-	On: 100,
+		Off: 0,
+		On: 100,
 		Lock: {
 			Locked: 100,
 			Unlocked: 0
@@ -14,17 +14,16 @@ const ISYConstants = {
 		DoorWindow: {
 			Closed: 0,
 			Open: 100// 255
-	},
-	Siren:
+		},
+		Siren:
 		{
 
-	},
-
-    Sensor:
-    {
-      Triggered: 100,
-      NotTriggered: 0
-    },
+		},
+		Sensor:
+		{
+			Triggered: 100,
+			NotTriggered: 0
+		},
 		Level: {
 			Min: 0,
 			Max: 100
@@ -41,7 +40,7 @@ const ISYConstants = {
 		},
 		Climate: {
 			FanMode: {
-			  On: 7,
+				On: 7,
 				Auto: 8
 			},
 			Mode: {
@@ -125,8 +124,8 @@ const ISYConstants = {
 			ScheduleMode: 'CLISMD',
 			EnergyMode: 'CLIEMD',
 
-    },
-    Error: 'ERR',
+		},
+		Error: 'ERR',
 		UnitOfMeasure: 'UOM'
 	},
 	deviceTypes: {
@@ -162,8 +161,8 @@ const ISYConstants = {
 		Insteon: 1,
 		UPB: 2,
 		ZigBee: 3,
-    ZWave: 4,
-    UDI: 7,
+		ZWave: 4,
+		UDI: 7,
 		Poly: 10
 	},
 	UpdateTypes: {

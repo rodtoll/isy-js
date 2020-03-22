@@ -1,8 +1,7 @@
-import { ISYNode } from './isynode';
-
-import { InsteonDimmableDevice } from './insteondevice';
+import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonRelayDevice, ISYDevice } from './isy';
 import { Commands, DeviceTypes } from './isyconstants';
+import { ISYNode } from './isynode';
 
 export class ISYScene extends ISYNode {
 	public type: string;

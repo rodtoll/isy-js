@@ -1,6 +1,9 @@
+import { RequestOptions } from 'https';
 import { get } from 'restler';
 
-import { Categories } from './isyconstants';
+import { Categories } from './Categories';
+
+//import { get } from 'http';
 
 export function byteToPct(value) {
 	return Math.round((value * 100) / 255);
@@ -16,20 +19,20 @@ export function byteToDegree(value) {
 
 let lastrequest = Promise.resolve();
 
-export async function getAsync(url: string, options): Promise<any> {
+export async function getAsync(url: string, options: RequestOptions): Promise<any> {
 	const p = new Promise<any>((resolve, reject) => {
 		// console.log('Calling: ' + url);
 		get(url, options)
-			.on('complete', (result) => {
-
+			.on('complete', (result: any) => {
+				console.log(JSON.stringify(result));
 				resolve(result);
 			})
 			.on('error', (err, response) => {
-			
+
 				reject(err);
 			})
 			.on('fail', (data, response) => {
-			
+
 				reject(data);
 			})
 			.on('abort', () => {

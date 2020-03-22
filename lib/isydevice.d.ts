@@ -15,6 +15,7 @@ export declare class ISYDevice extends ISYNode {
     readonly formatted: any[string];
     readonly uom: any[string];
     readonly pending: any[string];
+    hidden: boolean;
     location: string;
     constructor(isy: ISY, node: any);
     convertTo(value: any, uom: number): any;
@@ -48,6 +49,7 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        hidden: boolean;
         location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
@@ -99,6 +101,7 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
+        hidden: boolean;
         location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;

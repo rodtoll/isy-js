@@ -1,9 +1,10 @@
+import { timingSafeEqual } from 'crypto';
+import { isNullOrUndefined } from 'util';
+
 import { Controls, ISY } from './isy';
 import { Commands, States } from './isyconstants';
 import { ISYNode } from './isynode';
 import { ISYScene } from './isyscene';
-import { isNullOrUndefined } from 'util'
-import { timingSafeEqual } from 'crypto'
 
 export class ISYDevice extends ISYNode {
 	public readonly typeCode: string;
@@ -18,6 +19,7 @@ export class ISYDevice extends ISYNode {
 	public readonly formatted: any[string] = {};
 	public readonly uom: any[string] = {};
 	public readonly pending: any[string] = {};
+	public hidden : boolean = false;
 	public location: string;
 
 	constructor (isy: ISY, node: any) {
@@ -72,7 +74,7 @@ export class ISYDevice extends ISYNode {
 		try
 		{
 			this.refreshNotes();
-		
+
 		}
 		catch
 		{
@@ -133,7 +135,7 @@ export class ISYDevice extends ISYNode {
 		finally {}
 	}
 
-	async getNotes() : Promise<any> 
+	async getNotes() : Promise<any>
 	{
 
 		try
@@ -229,7 +231,7 @@ export class ISYDevice extends ISYNode {
 					formattedValue
 				);
 				this.propertyChanged.emit('', propertyName, val, formattedValue);
-				
+
 				this.scenes.forEach((element) => {
 					this.logger('Recalulating ' + element.name);
 					element.recalculateState();
@@ -272,7 +274,7 @@ export const ISYLevelDevice = <T extends Constructor<ISYDevice>>(base: T) =>
 
 		public async updateLevel(level: number): Promise<any> {
 			if (level !== this.ST || level !== this.pending.ST) {
-			
+
 				this.pending.ST = level;
 				if (level > 0) {
 					return this.sendCommand(

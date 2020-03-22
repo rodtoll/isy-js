@@ -1,304 +1,69 @@
-import { parseStringPromise } from 'xml2js';
 import { format } from 'util';
-import { ISYDevice } from './isy';
-import ISYConstants from './isyconstants';
-import {
-	InsteonSwitchDevice,
-	InsteonRelayDevice,
-	InsteonOnOffOutletDevice,
-	InsteonRelaySwitchDevice,
-	InsteonKeypadDevice,
-	InsteonDimmerKeypadDevice,
-	InsteonDimmableDevice,
-	InsteonDimmerSwitchDevice,
-	InsteonFanDevice,
-	InsteonDimmerOutletDevice,
-	InsteonMotionSensorDevice,
-	InsteonDoorWindowSensorDevice,
-	InsteonLeakSensorDevice
-} from './insteondevice';
+import { parseStringPromise } from 'xml2js';
+
+import { InsteonSwitchDevice, KeypadDevice } from './Devices/Insteon/insteondevice';
+import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
+import { InsteonDimmerKeypadDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
+import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
+import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
+import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
+import { InsteonFanDevice, InsteonFanMotorDevice } from './Devices/Insteon/InsteonFanDevice';
+import { InsteonKeypadDevice } from './Devices/Insteon/InsteonKeypadDevice';
+import { InsteonLeakSensorDevice } from './Devices/Insteon/InsteonLeakSensorDevice';
+import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
+import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
+import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
+import { InsteonRelaySwitchDevice } from './Devices/Insteon/InsteonRelaySwitchDevice';
+import { Families, ISYDevice } from './isy';
+import ISYConstants, { Categories } from './isyconstants';
 
 export class DeviceFactory {
-	public static LINK_MANAGEMENT_NAME: string = 'Link Management';
 
-	public static LIGHT_NAME: string = 'Name';
-
-	public static LIGHT_ADDRESS: string = 'Address';
-
-	public static DEVICE_TYPE: string = 'Type';
-
-	public static ON_LEVEL: string = 'On Level';
-
-	public static OFF_LEVEL: string = 'Off Level';
-
-	public static RAMP_RATE: string = 'Ramp Rate';
-
-	public static STATUS: string = 'Current State';
-
-	public static LIGHT_ON: string = 'On';
-
-	public static LIGHT_OFF: string = 'Off';
-
-	public static LIGHT_FAST_ON: string = 'Fast On';
-
-	public static LIGHT_FAST_OFF: string = 'Fast Off';
-
-	public static LIGHT_DIM: string = 'Dim';
-
-	public static LIGHT_BRIGHTEN: string = 'Brighten';
-
-	public static LIGHT_MOVE_UP: string = 'Move Up';
-
-	public static LIGHT_MOVE_DOWN: string = 'Move Down';
-
-	public static SETPOINT: string = 'Setpoint';
-
-	public static HUMIDITY: string = 'Humidity';
-
-	public static TEMPERATURE: string = 'Temperature';
-
-	public static LOCK_DOOR: string = 'Lock';
-
-	public static UNLOCK_DOOR: string = 'Unlock';
-
-	public static LOCKED_DOOR: string = 'Locked';
-
-	public static UNLOCKED_DOOR: string = 'Unlocked';
-
-	public static ACCUMULATED_POWER: string = 'Accumulated Power';
-
-	public static RESET: string = 'Reset';
-
-	public static ADVANCED: string = 'Advanced';
-
-	public static LED_BRIGHTNESS: string = 'LED Brightness';
-
-	public static LOCKED_DOOR_ST: string = '<html><font color="RED">Locked</font></html>';
-
-	public static UNLOCKED_DOOR_ST: string = '<html><font color="GREEN">Unlocked</font></html>';
-
-	public static SCENE_UNSUPPORTED_VALUE: string = '(Unsupported Value)';
-
-	public static SCENE_NO_RETRIES: string = 'No Retries';
-
-	public static SCENE_ONE_RETRY: string = '  1 Retry';
-
-	public static SCENE_N_RETRIES_SUFFIX: string = 'Retries';
-
-	public static SCENE_ADVANCED_PROPERTIES: string = 'Show Advanced Properties';
-
-	public static SCENE_DEVICE_COMMUNICATION_PROP: string = 'Device Communication';
-
-	public static PLM_COMMUNICATIONS_MENU: string = 'PLM Communication';
-
-	public static PLM_COMMUNICATIONS_TITLE: string = 'PLM Communication';
-
-	public static PLM_COMMUNICATIONS_DESC: string = 'Communication to the PLM';
-
-	public static FANLINC_OFF: string = 'Off';
-
-	public static FANLINC_LOW: string = 'Low';
-
-	public static FANLINC_MED: string = 'Med';
-
-	public static FANLINC_HIGH: string = 'High';
-
-	public static EZFLORA_ZONE_8_PUMP: string = 'Zone 8: Pump';
-
-	public static EZFLORA_ZONE_8_NORMAL: string = 'Zone 8: Normal';
-
-	public static RL2_LED_LABEL: string = 'LED';
-
-	public static RL2_BEEP_LABEL: string = 'Beep';
-
-	public static RL2_4_BUTTON_LABEL: string = '4-Scene';
-
-	public static RL2_8_BUTTON_NON_TOG_LABEL: string = '8-Scene non-Toggle';
-
-	public static RL2_8_BUTTON_TOG_LABEL: string = '8-Scene Toggle';
-
-	public static RL2_1_BUTTON_LABEL: string = '1-Scene';
-
-	public static RL2_2_BUTTON_NON_TOG_LABEL: string = '2-Scene non-Toggle';
-
-	public static RL2_2_BUTTON_TOG_LABEL: string = '2-Scene Toggle';
-
-	public static RL2_CHANGE_BUTTON_CONFIG_TITLE: string = 'Change Button Configuration';
-
-	public static CLIMATE_INCREMENT_SETPOINT: string = 'Setpoint Up 1';
-
-	public static CLIMATE_DECREMENT_SETPOINT: string = 'Setpoint Down 1';
-
-	public static MASTER_CONTROLLER_LABEL: string = 'Controller';
-
-	public static SLAVE_LABEL: string = 'Responder';
-
-	public static SCENE_ATTRIBUTES: string = 'Scene Attributes';
-
-	public static COPYING_SCENE_ATTRIBUTES: string = 'Copying Scene Attributes';
-
-	public static GLOBALLY_CHANGE_SCENE_ATTRIBUTES: string = 'Apply Changes To All Devices';
-
-	public static NODE_LABEL: string = 'INSTEON Device';
-
-	public static A10_NODE_LABEL: string = 'INSTEON/A10/X10 Device';
-
-	public static LINK_SENSOR_LABEL: string = 'Link a Sensor';
-
-	public static LINK_HIDDEN_DOOR_SENSOR_LABEL: string = 'Hidden Door Sensor';
-
-	public static LINK_OPEN_CLOSE_SENSOR_LABEL: string = 'Open/Close Sensor';
-
-	public static LINK_LEAK_SENSOR_LABEL: string = 'Leak Sensor';
-
-	public static LINK_MOTION_SENSOR_LABEL: string = 'Motion Sensor';
-
-	public static LINK_MOTION_SENSOR_II_LABEL: string = 'Motion Sensor II';
-
-	public static LINK_REMOTELINC2_LABEL: string = 'Link a RemoteLinc 2';
-
-	public static LINK_REMOTELINC2_SWITCH_SUBLABEL: string = 'Switch';
-
-	public static LINK_REMOTELINC2_4SCENE_SUBLABEL: string = '4-Scene Keypad';
-
-	public static LINK_REMOTELINC2_8SCENE_SUBLABEL: string = '8-Scene Keypad';
-
-	public static LINK_CONTROLINC_LABEL: string = 'Link a ControLinc';
-
-	public static LINK_REMOTELINC_LABEL: string = 'Link a RemoteLinc';
-
-	public static LINK_IRLINC_RX_LABEL: string = 'Add Button to IRLinc Receiver';
-
-	public static LINK_IRLINC_TX_LABEL: string = 'Add Button to IRLinc Transmitter';
-
-	public static LINK_EZSNSRF_LABEL: string = 'Add Sensor to EZSnSRF';
-
-	public static LINK_EZX10RF_LABEL: string = 'Add X10 Device to EZX10RF';
-
-	public static KEYPADLINC: string = 'KeypadLinc';
-
-	public static BUTTONS_GROUPING: string = 'Buttons Grouping';
-
-	public static MUTUALLY_EXCLUSIVE_BUTTONS: string = 'Mutually Exclusive Buttons';
-
-	public static BUTTON_TOGGLE: string = 'Buttons Toggle Mode';
-
-	public static BUTTON_BACKLIGHT: string = 'LED Brightness';
-
-	public static THERMOSTAT_HUMIDTY: string = 'Report Humidty';
-
-	public static PLM: string = 'Modem (PLM)';
-
-	public static TOGGLE_CONTROLLER_RESPONDER: string = 'Controller/Responder';
-
-	public static TOGGLE_BUTTON_TOGGLE: string = 'Toggle On/Off';
-
-	public static SET_TOGGLE_MODE: string = 'Set Button Toggle Mode';
-
-	public static TOGGLE_MODES: string = 'Button Toggle Modes';
-
-	public static ALL_TOGGLE_LABEL: string = 'All Toggle';
-
-	public static ALL_NON_TOGGLE_LABEL: string = 'All Non-Toggle';
-
-	public static SET_SCHEDULE: string = 'Schedule';
-
-	public static SET_OPTIONS: string = 'Options';
-
-	public static LOCAL_ONLY_LABEL: string = ' [Applied Locally]';
-
-	public static AUTO_DISCOVER_LABEL: string = 'Auto Discover';
-
-	public static CHOOSE_BRIDGE_TYPE: string = 'Choose INSTEON Bridge';
-
-	public static GET_PLM_STATUS: string = 'PLM Info/Status';
-
-	public static SHOW_PLM_LINKS: string = 'Show PLM Links Table';
-
-	public static SHOW_DEVICE_LINKS: string = 'Show Device Links Table';
-
-	public static SHOW_ISY_LINKS: string = 'Show ISY Links Table';
-
-	public static PLM_LINKS_TABLE: string = 'PLM Links Table';
-
-	public static DEVICE_LINKS_TABLE: string = 'Device Links Table';
-
-	public static ADVANCED_OPTIONS: string = 'Advanced Options';
-
-	public static SCENE_TEST: string = 'Scene Test';
-
-	public static ADVANCED_OPTIONS_ENGINE: string = 'Configure INSTEON Messaging:';
-
-	public static USE_I1_ONLY: string = '<html><b>i1 Only</b>: ISY uses i1 messaging option</html>';
-
-	public static CALBIRATE_ENGINE_VERSIONS: string = '<html><b>Automatic</b>: ISY tries to find the most suitable messaging option</html>';
-
-	public static DEVICE_REPORTED_VERSION: string = '<html><b>Device Reported</b>: ISY uses the device reported messaging option</html>';
-
-	public static ISY_LINK_TABLE: string = 'ISY Links Table';
-
-	public static DL_FROM_LINK: string = 'From Link';
-
-	public static DL_READ: string = 'Read ';
-
-	public static DL_LINKS: string = 'Links';
-
-	public static START_LINK_ADDRESS: string = 'Start Address';
-
-	public static END_LINK_ADDRESS: string = 'End Address';
-
-	public static SENSITIVITY_LEVEL: string = 'Darkness Sensitivity';
-
-	public static SENSING_MODE: string = '<html>Sensing mode:<br>As motion is sensed (checked)<br>Only after timeout (unchecked)</html>';
-
-	public static NIGHT_ONLY_MODE: string = '<html>Night mode:<br>Always (checked)<br>At night only (unchecked)</html>';
-
-	public static ON_ONLY_MODE: string = '<html>On only mode:<br>On/off commands (checked)<br>On commands only (unchecked)</html>';
-
-	public static NIGHT_ONLY_MODE_CHECKED: string = 'Night only mode';
-
-	public static ON_ONLY_MODE_CHECKED: string = 'On commands only';
-
-	public static PROGRAM_LOCK: string = 'Local programming lockout';
-
-	public static LED_ON_TX: string = 'LED on TX';
-
-	public static RELAY_FOLLOWS_INPUT: string = 'Relay Follows Input';
-
-	public static MOMENTARY_A: string = '<html>Momentary A: <font color="red">Triggered by either On or Off</font></html>';
-
-	public static LATCH: string = '<html>Latching: <font color="red">Continuous</font></html>';
-
-	public static MOMENTARY_BOTH: string = '<html>Momentary B: <font color="red">Triggered by both On and Off</font></html>';
-
-	public static MOMENTARY_LOOK_AT_SENSOR: string = '<html>Momentary C: <font color="red">Trigger based on sensor input</font></html>';
-
-	public static SEND_X10: string = 'Send X10 Send On (or Off)';
-
-	public static TRIGGER_OFF: string = 'Trigger Reverse';
-
-	public static BEEP: string = 'Beep';
-
-	public static TIMER_ENABLED: string = 'Countdown Timer Enabled';
-
-	public static TRIGGER_GROUP_ON: string = 'Trigger Group';
-
-	public static LED_ON: string = 'LED On';
-
-	public static ONE_MIN_LOCAL_WARNING: string = '1 Minute Warning';
-
-	public static DEFAULT_TIMEOUT_VALUE: string = 'Default Timeout (min)';
-
-	public static TRIGGER_THRESHOLD_WATTS: string = 'Trigger Threshold (Watts)';
-
-	public static HOLD_OFF_SECS: string = 'Holdoff (Secs)';
-
-	public static HYSTERESIS_WATTS: string = 'Hysteresis (Watts)';
-
-	public static MICRO_OPEN_CLOSE_MOMENTARY_TIMEOUT: string = 'Momentary Mode Timeout';
+	public static createDevice(nodeDef: any): {name: string; modelNumber: string; version: string; class: typeof ISYDevice;
+}
+	{
+		const family = Number(nodeDef.family);
+		const typeArray = nodeDef.type.split('.');
+		const category = Number(typeArray[0]);
+		const device = Number(typeArray[1]);
+		const version = Number(typeArray[2]);
+		const nodeDefId = nodeDef.nodeDefId;
+		let str = null;
+		if (category === Categories.Controller) {
+			str = DeviceFactory.getNLSControllerInfo(device);
+		} else if (category === 0o001) {
+			str = DeviceFactory.getNLSDimLightInfo(device);
+		} else if (category === 0o002) {
+			str = DeviceFactory.getNLSSwitchLightInfo(device);
+		} else if (category === 0o003) {
+			str = DeviceFactory.getNLSNetworkBridgeInfo(device);
+		} else if (category === 0o005) {
+			str = DeviceFactory.getNLSClimateControlInfo(device);
+		} else if (category === 0o004) {
+			str = DeviceFactory.getNLSIrrigationControlInfo(device);
+		} else if (category === 0o007) {
+			str = DeviceFactory.getNLSIOControlInfo(device);
+		} else if (category === 0o017) {
+			str = DeviceFactory.getNLSAccessControlInfo(device);
+		} else if (category === 0o020) {
+			str = DeviceFactory.getNLSSHS(device);
+		} else if (category === 0o011) {
+			str = DeviceFactory.getNLSEnergyManagement(device);
+		} else if (category === 0o016) {
+			str = DeviceFactory.getNLSWindowsCovering(device);
+		}
+
+		str.version = version.toString(16);
+		if(nodeDefId === 'FanLincMotor')
+		{
+			str.class = typeof InsteonFanMotorDevice;
+		}
+
+		return str;
+	}
 
 	public static getDeviceDetails(family: number, typeCode: string): { name: string; modelNumber: string; version: string; class: typeof ISYDevice } {
-		if (family ?? ISYConstants.Families.Insteon === ISYConstants.Families.Insteon) {
+		if (family ?? Families.Insteon === ISYConstants.Families.Insteon) {
 			return this.getInsteonDeviceDetails(typeCode);
 		} else return null;
 	}
@@ -309,7 +74,7 @@ export class DeviceFactory {
 		const device = Number(typeArray[1]);
 		const version = Number(typeArray[2]);
 		let str = null;
-		if (category === 0o000) {
+		if (category === Categories.Controller) {
 			str = DeviceFactory.getNLSControllerInfo(device);
 		} else if (category === 0o001) {
 			str = DeviceFactory.getNLSDimLightInfo(device);
@@ -457,13 +222,13 @@ export class DeviceFactory {
 				retVal = { name: 'SwitchLinc Relay 220 V. w/Beeper', modelNumber: '2494S220' };
 				break;
 			case String.fromCharCode(0o034):
-				retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S' };
+				retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S', class: InsteonKeypadDevice };
 				break;
 			case '%':
 				retVal = { name: 'KeypadLinc Timer Relay (8 buttons)', modelNumber: '2484S/WH8' };
 				break;
 			case ' ':
-				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6-SP', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6-SP', class: InsteonKeypadDevice };
 				break;
 			case '!':
 				retVal = { name: 'OutletLinc', modelNumber: '2473-SP', class: InsteonOnOffOutletDevice };
@@ -567,7 +332,7 @@ export class DeviceFactory {
 				retVal = { name: 'SocketLinc', modelNumber: '2454D' };
 				break;
 			case '\f':
-				retVal = { name: 'KeypadLinc Dimmer 8 Button', modelNumber: '2486DWH8' };
+				retVal = { name: 'KeypadLinc Dimmer 8 Button', modelNumber: '2486DWH8', class: InsteonDimmerKeypadDevice };
 				break;
 			case String.fromCharCode(0o023):
 				retVal = { name: 'Icon SwitchLinc Dimmer for Bell Canada' };
@@ -587,10 +352,10 @@ export class DeviceFactory {
 				retVal = { name: 'KeypadLinc Countdown Timer', modelNumber: '2484DWH8' };
 				break;
 			case String.fromCharCode(0o033):
-				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2486D' };
+				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2486D', class: InsteonDimmerKeypadDevice };
 				break;
 			case String.fromCharCode(0o034):
-				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D' };
+				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D', class: InsteonDimmerKeypadDevice };
 				break;
 			case String.fromCharCode(0o031):
 				retVal = { name: 'SwitchLinc Dimmer W/Beeper', modelNumber: '2476D' };
@@ -619,7 +384,7 @@ export class DeviceFactory {
 			case '-':
 				retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477DH', class: InsteonDimmerSwitchDevice };
 				break;
-			case "'":
+			case '\'':
 				retVal = { name: 'Dual Band SwitchLinc Dimmer', modelNumber: '2477D-SP', class: InsteonDimmerSwitchDevice };
 				break;
 			case '+':
@@ -687,13 +452,13 @@ export class DeviceFactory {
 				retVal = { name: 'Din Rail Dimmer', modelNumber: '2452-522' };
 				break;
 			case 'B':
-				retVal = { name: 'KeypadLinc Dimmer 5 Buttons', modelNumber: '2334-2' };
+				retVal = { name: 'KeypadLinc Dimmer 5 Buttons', modelNumber: '2334-2', class: InsteonDimmerKeypadDevice};
 				break;
 			case 'A':
-				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2334-2' };
+				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2334-2', class: InsteonDimmerKeypadDevice };
 				break;
 			case 'V':
-				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2334-632' };
+				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2334-632', class: InsteonDimmerKeypadDevice };
 				break;
 			case String.fromCharCode(0o013):
 				retVal = { name: 'Plugin Dimmer', modelNumber: '2632-422' };
@@ -862,16 +627,16 @@ export class DeviceFactory {
 				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-222', class: InsteonMotionSensorDevice };
 				break;
 			case String.fromCharCode(0o004):
-				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-422' };
+				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-422', class: InsteonMotionSensorDevice };
 				break;
 			case String.fromCharCode(0o005):
-				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-522' };
+				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2842-522', class: InsteonMotionSensorDevice };
 				break;
 			case String.fromCharCode(0o003):
-				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2420M-SP' };
+				retVal = { name: 'INSTEON Motion Sensor', modelNumber: '2420M-SP', class: InsteonMotionSensorDevice };
 				break;
 			case String.fromCharCode(0o002):
-				retVal = { name: 'TriggerLinc', modelNumber: '2421' };
+				retVal = { name: 'TriggerLinc', modelNumber: '2421'    };
 				break;
 			case '\t':
 				retVal = { name: 'Open/Close Sensor', modelNumber: '2843-222', class: InsteonDoorWindowSensorDevice };

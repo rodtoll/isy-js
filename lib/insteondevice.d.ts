@@ -311,10 +311,22 @@ declare const InsteonDimmerSwitchDevice_base: {
 export declare class InsteonDimmerSwitchDevice extends InsteonDimmerSwitchDevice_base {
     constructor(isy: any, deviceNode: any);
 }
-export declare class InsteonKeypadDevice extends InsteonRelayDevice {
+declare const InsteonKeypadDevice_base: {
+    new (isy: any, node: any): {
+        [x: string]: any;
+    };
+    [x: string]: any;
+};
+export declare class InsteonKeypadDevice extends InsteonKeypadDevice_base {
     constructor(isy: ISY, deviceNode: any);
 }
-export declare class InsteonDimmerKeypadDevice extends InsteonDimmableDevice {
+declare const InsteonDimmerKeypadDevice_base: {
+    new (isy: any, node: any): {
+        [x: string]: any;
+    };
+    [x: string]: any;
+};
+export declare class InsteonDimmerKeypadDevice extends InsteonDimmerKeypadDevice_base {
     constructor(isy: any, deviceNode: any);
 }
 declare const InsteonLockDevice_base: {
@@ -547,6 +559,63 @@ declare const InsteonCOSensorDevice_base: {
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonCOSensorDevice extends InsteonCOSensorDevice_base {
+    constructor(isy: ISY, deviceNode: {
+        type: string;
+    });
+    get monoxideDetected(): boolean;
+}
+declare const InsteonSmokeSensorDevice_base: {
+    new (...args: any[]): {
+        [x: string]: any;
+        readonly state: boolean;
+        updateState(state: boolean): Promise<any>;
+        readonly typeCode: string;
+        readonly deviceClass: any;
+        readonly parentAddress: any;
+        readonly category: number;
+        readonly subCategory: number;
+        readonly type: any;
+        _parentDevice: ISYDevice;
+        readonly children: ISYDevice[];
+        readonly scenes: import("./isyscene").ISYScene[];
+        readonly formatted: any;
+        readonly uom: any;
+        readonly pending: any;
+        location: string;
+        convertTo(value: any, uom: number): any;
+        convertFrom(value: any, uom: number): any;
+        addLink(isyScene: import("./isyscene").ISYScene): void;
+        addChild(childDevice: ISYDevice): void;
+        readonly parentDevice: ISYDevice;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
+        sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
+        readonly isy: ISY;
+        readonly flag: any;
+        readonly nodeDefId: string;
+        readonly address: string;
+        name: string;
+        displayName: string;
+        family: any;
+        folder: string;
+        parent: any;
+        parentType: number;
+        readonly elkId: string;
+        nodeType: number;
+        propertyChanged: import("events").EventEmitter;
+        propsInitialized: boolean;
+        logger: (msg: any) => void;
+        lastChanged: Date;
+        enabled: boolean;
+        handleEvent(event: any): boolean;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
+    };
+} & typeof InsteonBaseDevice;
+export declare class InsteonSmokeSensorDevice extends InsteonSmokeSensorDevice_base {
     constructor(isy: ISY, deviceNode: {
         type: string;
     });
