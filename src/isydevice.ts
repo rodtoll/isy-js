@@ -118,25 +118,28 @@ export class ISYDevice extends ISYNode {
 				this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
 				this.logger('The friendly name updated to: ' + this.displayName);
 			}
+
 		}
-		finally {
-			return Promise.resolve();
+		catch {
+
+
 		}
+		return Promise.resolve();
 	}
 
 	async getNotes(): Promise<any> {
 
 		try {
-			return this.isy.callISY(`nodes/${this.address}/notes`).then(result => {
-				if (result !== null && result !== undefined)
+			let result = await this.isy.callISY(`nodes/${this.address}/notes`);
+			if (result !== null && result !== undefined)
 					return result.NodeProperties;
-				else
+			else
 					return null;
-			}, reason => null);
+			
 		}
 		catch
 		{
-			return Promise.reject();
+			return null;
 		}
 	}
 
