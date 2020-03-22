@@ -35,7 +35,7 @@ export class InsteonFanMotorDevice extends ISYLevelDevice(ISYBinaryStateDevice(I
 
 }
 
-export class InsteonFanDevice extends ISYDevice {
+export class InsteonFanDevice extends InsteonBaseDevice {
 	constructor (isy: ISY, deviceNode: {
 		type: string;
 	}) {
@@ -50,7 +50,7 @@ export class InsteonFanDevice extends ISYDevice {
     public handleEvent(event) : boolean
     {
         const child = this.children.find(p => p.address === event.node)
-        if(child != null)
+        if(child !== undefined)
         {
             return child.handleEvent(event);
         }
@@ -65,11 +65,11 @@ export class InsteonFanDevice extends ISYDevice {
     }
 
 	public async updateFanSpeed(level: number) {
-		return this.updateLevel(level);
+		return this.Motor.updateLevel(level);
 	}
 	public async updateIsOn(isOn: boolean) {
 		if (!isOn) {
-			this.updateLevel(States.Level.Min);
+			this.Motor.updateLevel(States.Level.Min);
 		}
 		else {
 			this.updateLevel(States.Level.Max);

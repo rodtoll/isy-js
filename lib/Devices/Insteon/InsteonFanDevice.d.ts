@@ -115,7 +115,7 @@ export declare class InsteonFanMotorDevice extends InsteonFanMotorDevice_base {
     updateFanSpeed(level: number): Promise<any>;
     updateIsOn(isOn: boolean): Promise<void>;
 }
-export declare class InsteonFanDevice extends ISYDevice {
+export declare class InsteonFanDevice extends InsteonBaseDevice {
     constructor(isy: ISY, deviceNode: {
         type: string;
     });
