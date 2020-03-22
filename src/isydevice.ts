@@ -19,7 +19,7 @@ export class ISYDevice extends ISYNode {
 	public readonly formatted: any[string] = {};
 	public readonly uom: any[string] = {};
 	public readonly pending: any[string] = {};
-	public hidden : boolean = false;
+	public hidden: boolean = false;
 	public location: string;
 
 	constructor (isy: ISY, node: any) {
@@ -39,8 +39,7 @@ export class ISYDevice extends ISYNode {
 			this.parentAddress !== undefined
 		) {
 			this._parentDevice = isy.getDevice(this.parentAddress);
-			if(!isNullOrUndefined(this._parentDevice))
-			{
+			if (!isNullOrUndefined(this._parentDevice)) {
 				this._parentDevice.addChild(this);
 			}
 
@@ -52,7 +51,7 @@ export class ISYDevice extends ISYNode {
 				this.uom[prop.id] = prop.uom;
 				this.logger(
 					`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${
-						this[prop.id]
+					this[prop.id]
 					} (${this.formatted[prop.id]})`
 				);
 			}
@@ -65,21 +64,13 @@ export class ISYDevice extends ISYNode {
 			this.uom[node.property.id] = node.property.uom;
 			this.logger(
 				`Property ${Controls[node.property.id].label} (${
-					node.property.id
+				node.property.id
 				}) initialized to: ${this[node.property.id]} (${
-					this.formatted[node.property.id]
+				this.formatted[node.property.id]
 				})`
 			);
 		}
-		try
-		{
-			this.refreshNotes();
 
-		}
-		catch
-		{
-
-		}
 	}
 
 	public convertTo(value: any, uom: number): any {
@@ -94,8 +85,7 @@ export class ISYDevice extends ISYNode {
 		this.scenes.push(isyScene);
 	}
 
-	public addChild(childDevice: ISYDevice)
-	{
+	public addChild(childDevice: ISYDevice) {
 		this.children.push(childDevice);
 	}
 
@@ -107,8 +97,7 @@ export class ISYDevice extends ISYNode {
 				this.parentAddress !== undefined
 			) {
 				this._parentDevice = this.isy.getDevice(this.parentAddress);
-				if(this._parentDevice !== null)
-				{
+				if (this._parentDevice !== null) {
 					this._parentDevice.addChild(this);
 				}
 			}
@@ -117,35 +106,33 @@ export class ISYDevice extends ISYNode {
 		return this._parentDevice;
 	}
 
-	public async refreshProperty(propertyName : string) : Promise<any> {
+	public async refreshProperty(propertyName: string): Promise<any> {
 		return this.isy.callISY(`nodes/${this.address}/status/${propertyName}`);
 	}
 
 	public async refreshNotes() {
-		try
-		{
-		const result = await this.getNotes();
-		if(result !== null && result !== undefined)
-		{
-			this.location = result.location;
-			this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
-			this.logger('The friendly name updated to: ' + this.displayName);
+		try {
+			const result = await this.getNotes();
+			if (result !== null && result !== undefined) {
+				this.location = result.location;
+				this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
+				this.logger('The friendly name updated to: ' + this.displayName);
+			}
+		}
+		finally {
+			return Promise.resolve();
 		}
 	}
-		finally {}
-	}
 
-	async getNotes() : Promise<any>
-	{
+	async getNotes(): Promise<any> {
 
-		try
-		{
-		return this.isy.callISY(`nodes/${this.address}/notes`).then(result => {
-			if(result !== null && result !== undefined )
-				return result.NodeProperties;
-			else
-				return null;
-			},reason => null);
+		try {
+			return this.isy.callISY(`nodes/${this.address}/notes`).then(result => {
+				if (result !== null && result !== undefined)
+					return result.NodeProperties;
+				else
+					return null;
+			}, reason => null);
 		}
 		catch
 		{
@@ -184,7 +171,7 @@ export class ISYDevice extends ISYNode {
 				device.uom[prop.id] = prop.uom;
 				device.logger(
 					`Property ${Controls[prop.id].label} (${prop.id}) refreshed to: ${
-						device[prop.id]
+					device[prop.id]
 					} (${device.formatted[prop.id]})`
 				);
 			}
@@ -209,7 +196,7 @@ export class ISYDevice extends ISYNode {
 			if (this[propertyName] !== val) {
 				this.logger(
 					`Property ${
-						Controls[propertyName].label
+					Controls[propertyName].label
 					} (${propertyName}) updated to: ${val} (${formattedValue})`
 				);
 				this[propertyName] = val;
@@ -219,7 +206,7 @@ export class ISYDevice extends ISYNode {
 			} else {
 				this.logger(
 					`Update event triggered, property ${
-						Controls[propertyName].label
+					Controls[propertyName].label
 					} (${propertyName}) is unchanged.`
 				);
 			}

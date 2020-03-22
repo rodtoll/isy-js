@@ -68,7 +68,7 @@ export declare class ISY {
         nodes: {
             node: any;
         };
-    }): void;
+    }): Promise<void>;
     loadElkNodes(result: any): void;
     loadElkInitialStatus(result: any): void;
     finishInitialize(success: boolean, initializeCompleted: () => void): void;

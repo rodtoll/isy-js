@@ -214,7 +214,7 @@ export class ISY {
 				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
 			}
 			this.loadFolders(result);
-			this.loadDevices(result);
+			await this.loadDevices(result);
 			this.loadScenes(result);
 		}
 		catch ( e) {
@@ -244,7 +244,7 @@ export class ISY {
 		}
 	}
 
-	public loadDevices(obj: { nodes: { node: any; }; }) {
+	public async loadDevices(obj: { nodes: { node: any; }; }) {
 		this.logger('Loading Devices');
 		for (const device of obj.nodes.node) {
 			if (!this.deviceMap.has(device.pnode)) {
@@ -261,18 +261,19 @@ export class ISY {
 			// this.logger(JSON.stringify(deviceTypeInfo));
 
 			const enabled = Boolean(device.enabled);
-			const d = DeviceFactory.getDeviceDetails(device.family, device.type);
+			const d = DeviceFactory.createDevice(device);
 
 			if (d.class) {
 				newDevice = new d.class(this, device);
 				newDevice.productName = d.name;
-				newDevice.name = `(${d.modelNumber}) ${d.name} v.${d.version}`;
+				newDevice.model = `(${d.modelNumber}) ${d.name} v.${d.version}`;
 				newDevice.modelNumber = d.modelNumber;
 				newDevice.version = d.version;
 			}
 			if (enabled) {
 
 				if (newDevice !== null) {
+					await newDevice.refresh();
 					if(!newDevice.hidden)
 					{
 						this.deviceList.set(newDevice.address,newDevice);
@@ -442,7 +443,7 @@ export class ISY {
 				}
 			}
 		} catch (e) {
-			throw Error(e);
+			throw Error(`Error Loading Config: ${e}`);
 		}
 
 	}
@@ -505,10 +506,12 @@ export class ISY {
 
 	public async refreshStatuses() {
 		const that = this;
-		const result = await this.callISY('status');
-		// this.logger(JSON.stringify(result.nodes.node));
+		const result = await that.callISY('status');
+		if (this.debugLogEnabled) {
+			writeFile('ISYStatusDump.json', JSON.stringify(result), this.logger);
+		}
 		for (const node of result.nodes.node) {
-			// this.logger(node);
+			 this.logger(node);
 			const device = that.getDevice(node.id);
 			if (Array.isArray(node.property)) {
 				for (const prop of node.property) {
