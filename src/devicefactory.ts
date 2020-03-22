@@ -56,6 +56,7 @@ export class DeviceFactory {
 		str.version = version.toString(16);
 		if(nodeDefId === 'FanLincMotor')
 		{
+		
 			str.class = typeof InsteonFanMotorDevice;
 		}
 

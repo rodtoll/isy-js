@@ -60,6 +60,7 @@ export class InsteonFanDevice extends InsteonBaseDevice {
 	public addChild(childDevice: ISYDevice) {
 		super.addChild(childDevice);
 		if (childDevice instanceof InsteonFanMotorDevice) {
+            this.logger('Fan Motor Found');
             this.Motor = childDevice as InsteonFanMotorDevice;
         }
     }
