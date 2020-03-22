@@ -287,9 +287,9 @@ export class ISY {
 					catch (e) {
 						this.logger('No notes found.');
 					}
-					if (!newDevice.hidden) {
+					//if (!newDevice.hidden) {
 						this.deviceList.set(newDevice.address, newDevice);
-					}
+					//}
 
 
 					// this.deviceList.push(newDevice);
@@ -741,7 +741,7 @@ export class ISY {
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {
-				return this.deviceList[`${address.substr(0, address.length - 1)}1`];
+				return this.deviceList[`${address.substr(0, address.length - 1)} 1`];
 			}
 		} else {
 			while (
