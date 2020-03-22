@@ -187,7 +187,7 @@ export class ISY {
 				return Promise.reject(response);
 			}
 			return response;
-		}, Promise.reject);
+		}, (reason) => Promise.reject(reason));
 		return p;
 	}
 
@@ -218,8 +218,10 @@ export class ISY {
 			this.loadScenes(result);
 		}
 		catch ( e) {
-			throw new Error('Error loading nodes: ' + e);
+
+			throw new Error(`Error loading nodes: ${e}`);
 		}
+		return Promise.resolve();
 	}
 
 	public loadFolders(result: { nodes: { folder: any; }; }) {
@@ -603,7 +605,7 @@ export class ISY {
 				this.finishInitialize(true, initializeCompleted);
 			}
 		return Promise.resolve(true);
-	
+
 	}
 
 	public async handleInitializeError(step: string, reason: any): Promise<any> {
