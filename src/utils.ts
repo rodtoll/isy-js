@@ -42,9 +42,9 @@ export async function getAsync(url: string, options: any): Promise<any> {
 				reject(ms);
 			});
 	});
-	await lastrequest;
+	//await lastrequest;
 
-	lastrequest = p;
+	//lastrequest = p;
 
 	return p;
 }
