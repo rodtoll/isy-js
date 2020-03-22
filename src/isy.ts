@@ -180,8 +180,7 @@ export class ISY {
 	public async callISY(url: string): Promise<any> {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
 		this.logger(`Sending request: ${url}`);
-		try
-		{
+		try {
 			const response = await getAsync(url, this.restlerOptions);
 
 			if (this.checkForFailure(response)) {
@@ -191,8 +190,7 @@ export class ISY {
 			else
 				return response;
 		}
-		catch(e)
-		{
+		catch (e) {
 			throw new Error(JSON.stringify(e));
 		}
 
@@ -224,7 +222,7 @@ export class ISY {
 			await this.loadDevices(result);
 			this.loadScenes(result);
 		}
-		catch ( e) {
+		catch (e) {
 
 			throw new Error(`Error loading nodes: ${e}`);
 		}
@@ -282,13 +280,11 @@ export class ISY {
 			if (enabled) {
 
 				if (newDevice !== null) {
-					try
-					{
+					try {
 						await newDevice.refreshNotes();
 
 					}
-					catch (e)
-					{
+					catch (e) {
 						this.logger('No notes found.');
 					}
 					if (!newDevice.hidden) {
@@ -398,7 +394,7 @@ export class ISY {
 			this.variableCallback(this, variable);
 		}
 	}
-	public checkForFailure(response: any) : boolean {
+	public checkForFailure(response: any): boolean {
 
 
 		return (
@@ -521,97 +517,99 @@ export class ISY {
 
 
 	public async refreshStatuses() {
-		const that = this;
-		const result = await that.callISY('status');
-		if (that.debugLogEnabled) {
-			writeFile('ISYStatusDump.json', JSON.stringify(result), this.logger);
-		}
-		for (const node of result.nodes.node) {
-			 this.logger(node);
-			const device = that.getDevice(node.id);
-			if (Array.isArray(node.property)) {
-				for (const prop of node.property) {
-					device[prop.id] = Number(prop.value);
-					device.formatted[prop.id] = prop.formatted;
-					device.uom[prop.id] = prop.uom;
+		try {
+			const that = this;
+			const result = await that.callISY('status');
+			if (that.debugLogEnabled) {
+				writeFile('ISYStatusDump.json', JSON.stringify(result), this.logger);
+			}
+			for (const node of result.nodes.node) {
+				this.logger(node);
+				const device = that.getDevice(node.id);
+				if (Array.isArray(node.property)) {
+					for (const prop of node.property) {
+						device[prop.id] = Number(prop.value);
+						device.formatted[prop.id] = prop.formatted;
+						device.uom[prop.id] = prop.uom;
+						device.logger(
+							`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${
+							device[prop.id]
+							} (${device.formatted[prop.id]})`
+						);
+					}
+				} else {
+					device[node.property.id] = Number(node.property.value);
+					device.formatted[node.property.id] = node.property.formatted;
+					device.uom[node.property.id] = node.property.uom;
 					device.logger(
-						`Property ${Controls[prop.id].label} (${prop.id}) initialized to: ${
-						device[prop.id]
-						} (${device.formatted[prop.id]})`
+						`Property ${Controls[node.property.id].label} (${
+						node.property.id
+						}) initialized to: ${device[node.property.id]} (${
+						device.formatted[node.property.id]
+						})`
 					);
 				}
-			} else {
-				device[node.property.id] = Number(node.property.value);
-				device.formatted[node.property.id] = node.property.formatted;
-				device.uom[node.property.id] = node.property.uom;
-				device.logger(
-					`Property ${Controls[node.property.id].label} (${
-					node.property.id
-					}) initialized to: ${device[node.property.id]} (${
-					device.formatted[node.property.id]
-					})`
-				);
 			}
+		}
+		catch (e) {
+			throw new Error('Error refreshing statuses: ' + JSON.stringify(e));
 		}
 	}
 
-	public async initialize(initializeCompleted: any) : Promise<any>{
+	public async initialize(initializeCompleted: any): Promise<any> {
 		const that = this;
 		const options = {
 			username: this.userName,
 			password: this.password
 		};
-		try
-		{
-					await this.loadConfig();
-					await this.loadNodes();
-					await this.refreshStatuses().then(() => {
-					this.loadVariables(VariableTypes.Integer, () => {
-						this.loadVariables(VariableTypes.State, () => {
-							if (this.elkEnabled) {
-								get(
-									`${this.protocol}://${that.address}/rest/elk/get/topology`,
-									options
-								).on('complete', (result: { message: string; }, response: any) => {
-									if (that.checkForFailure(response)) {
-										that.logger('Error loading from elk: ' + result.message);
-										throw new Error(
-											'Unable to contact the ELK to get the topology'
-										);
-									} else {
-										that.loadElkNodes(result);
-										get(
-											`${that.protocol}://${that.address}/rest/elk/get/status`,
-											options
-										).on('complete', (result: { message: string; }, response: any) => {
-											if (that.checkForFailure(response)) {
-												that.logger(`Error:${result.message}`);
-												throw new Error(
-													'Unable to get the status from the elk'
-												);
-											} else {
-												that.loadElkInitialStatus(result);
-												that.finishInitialize(true, initializeCompleted);
-											}
-										});
-									}
-								});
-							} else {
-								that.finishInitialize(true, initializeCompleted);
-							}
-						});
+		try {
+			await this.loadConfig();
+			await this.loadNodes();
+			await this.refreshStatuses().then(() => {
+				this.loadVariables(VariableTypes.Integer, () => {
+					this.loadVariables(VariableTypes.State, () => {
+						if (this.elkEnabled) {
+							get(
+								`${this.protocol}://${that.address}/rest/elk/get/topology`,
+								options
+							).on('complete', (result: { message: string; }, response: any) => {
+								if (that.checkForFailure(response)) {
+									that.logger('Error loading from elk: ' + result.message);
+									throw new Error(
+										'Unable to contact the ELK to get the topology'
+									);
+								} else {
+									that.loadElkNodes(result);
+									get(
+										`${that.protocol}://${that.address}/rest/elk/get/status`,
+										options
+									).on('complete', (result: { message: string; }, response: any) => {
+										if (that.checkForFailure(response)) {
+											that.logger(`Error:${result.message}`);
+											throw new Error(
+												'Unable to get the status from the elk'
+											);
+										} else {
+											that.loadElkInitialStatus(result);
+											that.finishInitialize(true, initializeCompleted);
+										}
+									});
+								}
+							});
+						} else {
+							that.finishInitialize(true, initializeCompleted);
+						}
 					});
 				});
-			}
-			catch (e)
-			{
-				this.logger(`Error initializing ISY: ${JSON.stringify(e)}`);
+			});
+		}
+		catch (e) {
+			this.logger(`Error initializing ISY: ${JSON.stringify(e)}`);
 
-			}
-			finally
-			{
-				this.finishInitialize(true, initializeCompleted);
-			}
+		}
+		finally {
+			this.finishInitialize(true, initializeCompleted);
+		}
 		return Promise.resolve(true);
 
 	}
