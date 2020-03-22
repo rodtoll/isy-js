@@ -286,11 +286,12 @@ export class ISY {
 						await newDevice.refreshNotes();
 
 					}
-					finally
+					catch (e)
 					{
-						if (!newDevice.hidden) {
-							this.deviceList.set(newDevice.address, newDevice);
-						}
+						this.logger('No notes found.');
+					}
+					if (!newDevice.hidden) {
+						this.deviceList.set(newDevice.address, newDevice);
 					}
 
 
