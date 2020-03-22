@@ -273,10 +273,16 @@ export class ISY {
 			if (enabled) {
 
 				if (newDevice !== null) {
-					await newDevice.refresh();
-					if(!newDevice.hidden)
+					try
 					{
-						this.deviceList.set(newDevice.address,newDevice);
+						await newDevice.refreshNotes();
+
+					}
+					finally
+					{
+						if (!newDevice.hidden) {
+							this.deviceList.set(newDevice.address, newDevice);
+						}
 					}
 
 
@@ -507,7 +513,7 @@ export class ISY {
 	public async refreshStatuses() {
 		const that = this;
 		const result = await that.callISY('status');
-		if (this.debugLogEnabled) {
+		if (that.debugLogEnabled) {
 			writeFile('ISYStatusDump.json', JSON.stringify(result), this.logger);
 		}
 		for (const node of result.nodes.node) {
@@ -595,8 +601,9 @@ export class ISY {
 			finally
 			{
 				this.finishInitialize(true, initializeCompleted);
-				return Promise.resolve(true);
 			}
+		return Promise.resolve(true);
+	
 	}
 
 	public async handleInitializeError(step: string, reason: any): Promise<any> {
