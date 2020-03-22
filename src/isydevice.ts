@@ -112,19 +112,19 @@ export class ISYDevice extends ISYNode {
 
 	public async refreshNotes() {
 		try {
+			const that = this;
 			const result = await this.getNotes();
 			if (result !== null && result !== undefined) {
-				this.location = result.location;
-				this.displayName = (this.folder ?? result.location) + ' ' + result.spoken;
-				this.logger('The friendly name updated to: ' + this.displayName);
+				that.location = result.location;
+				that.displayName = (that.location ?? that.folder) + ' ' + result.spoken;
+				that.logger('The friendly name updated to: ' + that.displayName);
 			}
-
 		}
 		catch (e){
 
 			this.logger(e);
 		}
-		
+
 	}
 
 	async getNotes(): Promise<any> {

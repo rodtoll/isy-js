@@ -1,7 +1,7 @@
-import { RequestOptions } from 'https';
 import { get } from 'restler';
 
 import { Categories } from './Categories';
+
 
 //import { get } from 'http';
 
@@ -19,12 +19,12 @@ export function byteToDegree(value) {
 
 let lastrequest = Promise.resolve();
 
-export async function getAsync(url: string, options: RequestOptions): Promise<any> {
+export async function getAsync(url: string, options: any): Promise<any> {
 	const p = new Promise<any>((resolve, reject) => {
 		// console.log('Calling: ' + url);
 		get(url, options)
 			.on('complete', (result: any) => {
-				console.log(JSON.stringify(result));
+				//console.log(JSON.stringify(result));
 				resolve(result);
 			})
 			.on('error', (err, response) => {
