@@ -1,5 +1,9 @@
 
 const ISYConstants = {
+	Events:
+	{
+
+	},
 	States: {
 		Off: 0,
 		On: 100,

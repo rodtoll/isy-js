@@ -608,7 +608,8 @@ export class ISY {
 
 		}
 		finally {
-			this.finishInitialize(true, initializeCompleted);
+			if(this.nodesLoaded !== true)
+				this.finishInitialize(true, initializeCompleted);
 		}
 		return Promise.resolve(true);
 

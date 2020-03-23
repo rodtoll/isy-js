@@ -1,4 +1,5 @@
 declare const ISYConstants: {
+    Events: {};
     States: {
         Off: number;
         On: number;

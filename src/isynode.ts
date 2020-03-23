@@ -1,7 +1,8 @@
 import { EventEmitter } from 'events';
 import { isNullOrUndefined } from 'util';
 
-import { Controls, ISY, NodeTypes } from './isy';
+import { Categories, Controls, ISY, NodeTypes } from './isy';
+import { Families } from './isyconstants';
 
 export class ISYNode {
 	public readonly isy: ISY;
@@ -23,7 +24,7 @@ export class ISYNode {
 	public lastChanged: Date;
 	public enabled: boolean;
 	constructor (isy: ISY, node: any) {
-	
+
 		this.isy = isy;
 		this.nodeType = 0;
 		this.flag = node.flag;
@@ -59,7 +60,7 @@ export class ISYNode {
 				return isy.logger(`${this.name} (${this.address}): ${msg}`);
 			};
 		}
-
+		
 
 		this.logger(this.nodeDefId);
 		this.lastChanged = new Date();
@@ -95,7 +96,7 @@ export class ISYNode {
 		}
 	}
 
-	
+
 
 	public onPropertyChanged(propertyName = null, callback: (...args) => void) {
 		if (propertyName === null) {

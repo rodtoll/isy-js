@@ -65,7 +65,7 @@ export class DeviceFactory {
 	}
 
 	public static getDeviceDetails(family: number, typeCode: string): { name: string; modelNumber: string; version: string; class: typeof ISYDevice } {
-		if (family ?? Families.Insteon === ISYConstants.Families.Insteon) {
+		if (family ?? Families.Insteon === Families.Insteon) {
 			return this.getInsteonDeviceDetails(typeCode);
 		} else return null;
 	}
