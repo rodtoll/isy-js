@@ -288,7 +288,7 @@ export class ISY {
 						this.logger('No notes found.');
 					}
 					//if (!newDevice.hidden) {
-						this.deviceList.set(newDevice.address, newDevice);
+					this.deviceList.set(newDevice.address, newDevice);
 					//}
 
 
@@ -365,15 +365,17 @@ export class ISY {
 	}
 
 	public finishInitialize(success: boolean, initializeCompleted: () => void) {
-		this.nodesLoaded = true;
-		initializeCompleted();
-		if (success) {
-			if (this.elkEnabled) {
-				this.deviceList[this.elkAlarmPanel.address] = this.elkAlarmPanel;
-			}
+		if (!this.nodesLoaded) {
+			this.nodesLoaded = true;
+			initializeCompleted();
+			if (success) {
+				if (this.elkEnabled) {
+					this.deviceList[this.elkAlarmPanel.address] = this.elkAlarmPanel;
+				}
 
-			this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
-			this.initializeWebSocket();
+				this.guardianTimer = setInterval(this.guardian.bind(this), 60000);
+				this.initializeWebSocket();
+			}
 		}
 	}
 
@@ -608,7 +610,7 @@ export class ISY {
 
 		}
 		finally {
-			if(this.nodesLoaded !== true)
+			if (this.nodesLoaded !== true)
 				this.finishInitialize(true, initializeCompleted);
 		}
 		return Promise.resolve(true);
