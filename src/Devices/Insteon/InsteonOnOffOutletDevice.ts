@@ -1,4 +1,4 @@
-import { ISY } from '../../isy';
+import { ISY } from '../../ISY';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 
 export class InsteonOnOffOutletDevice extends InsteonRelayDevice {

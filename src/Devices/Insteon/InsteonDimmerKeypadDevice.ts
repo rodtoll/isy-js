@@ -1,4 +1,4 @@
-import { KeypadDevice } from './insteondevice';
+import { KeypadDevice } from './InsteonDevice';
 import { InsteonDimmableDevice } from './InsteonDimmableDevice';
 
 export class InsteonDimmerKeypadDevice extends KeypadDevice(InsteonDimmableDevice) {

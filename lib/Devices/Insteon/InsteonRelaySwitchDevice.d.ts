@@ -12,9 +12,9 @@ declare const InsteonRelaySwitchDevice_base: {
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: import("../../ISYDevice").ISYDevice;
-        readonly children: import("../../ISYDevice").ISYDevice[];
-        readonly scenes: import("../../isyscene").ISYScene[];
+        _parentDevice: import("../ISYDevice").ISYDevice;
+        readonly children: import("../ISYDevice").ISYDevice[];
+        readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
@@ -22,9 +22,9 @@ declare const InsteonRelaySwitchDevice_base: {
         location: string;
         convertTo: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
         convertFrom: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
-        addLink(isyScene: import("../../isyscene").ISYScene): void;
-        addChild(childDevice: import("../../ISYDevice").ISYDevice): void;
-        readonly parentDevice: import("../../ISYDevice").ISYDevice;
+        addLink(isyScene: import("../../ISYScene").ISYScene): void;
+        addChild(childDevice: import("../ISYDevice").ISYDevice): void;
+        readonly parentDevice: import("../ISYDevice").ISYDevice;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -32,7 +32,7 @@ declare const InsteonRelaySwitchDevice_base: {
         sendCommand(command: any, ...parameters: any[]): Promise<any>;
         refresh(): Promise<any>;
         handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
-        readonly isy: import("../../isy").ISY;
+        readonly isy: import("../../ISY").ISY;
         readonly flag: any;
         readonly nodeDefId: string;
         readonly address: string;

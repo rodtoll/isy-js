@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { ISY } from './isy';
+import { ISY } from './ISY';
 export declare class ISYNode {
     readonly isy: ISY;
     readonly flag: any;

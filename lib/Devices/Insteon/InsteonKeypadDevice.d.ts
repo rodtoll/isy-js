@@ -1,4 +1,4 @@
-import { ISY } from '../../isy';
+import { ISY } from '../../ISY';
 declare const InsteonKeypadDevice_base: {
     new (isy: any, node: any): {
         [x: string]: any;

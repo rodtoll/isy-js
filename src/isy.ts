@@ -9,7 +9,7 @@ import { Categories } from './Categories';
 import { DeviceFactory } from './DeviceFactory';
 import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './Devices/Elk/ElkAlarmPanelDevice';
 import { InsteonBaseDevice } from './Devices/Insteon/InsteonBaseDevice';
-import { InsteonOutletDevice, InsteonSwitchDevice } from './Devices/Insteon/insteondevice';
+import { InsteonOutletDevice, InsteonSwitchDevice } from './Devices/Insteon/InsteonDevice';
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
 import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
@@ -19,14 +19,14 @@ import { InsteonLockDevice } from './Devices/Insteon/InsteonLockDevice';
 import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonThermostatDevice } from './Devices/Insteon/InsteonThermostatDevice';
+import { ISYDevice } from './Devices/ISYDevice';
 import { Families } from './Families';
-import { DeviceTypes, NodeTypes, Props, States, VariableTypes } from './isyconstants';
-import { ISYDevice } from './isydevice';
-import { ISYNode } from './isynode';
+import { DeviceTypes, NodeTypes, Props, States, VariableTypes } from './ISYConstants';
+import { ISYNode } from './ISYNode';
 import * as ProductInfoData from './isyproductinfo.json';
-import { ISYScene } from './isyscene';
-import { ISYVariable } from './isyvariable';
-import { getAsync } from './utils';
+import { ISYScene } from './ISYScene';
+import { ISYVariable } from './ISYVariable';
+import { getAsync } from './Utils';
 
 export {
 	ISYScene,
@@ -90,7 +90,7 @@ export class ISY {
 	public variableList: any[];
 	public variableIndex: {};
 	public variableCallback: any;
-	public nodesLoaded: boolean;
+	public nodesLoaded: boolean = false;
 	public wsprotocol: string;
 	public elkEnabled: boolean;
 	public debugLogEnabled: boolean;

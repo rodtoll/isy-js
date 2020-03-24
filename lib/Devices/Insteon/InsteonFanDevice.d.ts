@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import { ISY } from '../../isy';
-import { ISYDevice } from '../../isydevice';
+import { ISY } from '../../ISY';
+import { ISYDevice } from '../ISYDevice';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 import { InsteonDimmableDevice } from './InsteonDimmableDevice';
 declare const InsteonFanMotorDevice_base: {
@@ -16,7 +16,7 @@ declare const InsteonFanMotorDevice_base: {
         readonly type: any;
         _parentDevice: ISYDevice;
         readonly children: ISYDevice[];
-        readonly scenes: import("../../isyscene").ISYScene[];
+        readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
@@ -24,7 +24,7 @@ declare const InsteonFanMotorDevice_base: {
         location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
-        addLink(isyScene: import("../../isyscene").ISYScene): void;
+        addLink(isyScene: import("../../ISYScene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
         refreshProperty(propertyName: string): Promise<any>;
@@ -67,7 +67,7 @@ declare const InsteonFanMotorDevice_base: {
         readonly type: any;
         _parentDevice: ISYDevice;
         readonly children: ISYDevice[];
-        readonly scenes: import("../../isyscene").ISYScene[];
+        readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
@@ -75,7 +75,7 @@ declare const InsteonFanMotorDevice_base: {
         location: string;
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
-        addLink(isyScene: import("../../isyscene").ISYScene): void;
+        addLink(isyScene: import("../../ISYScene").ISYScene): void;
         addChild(childDevice: ISYDevice): void;
         readonly parentDevice: ISYDevice;
         refreshProperty(propertyName: string): Promise<any>;

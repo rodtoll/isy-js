@@ -1,5 +1,5 @@
-import { ISY } from '../../isy';
-import { Commands } from '../../isyconstants';
+import { ISY } from '../../ISY';
+import { Commands } from '../../ISYConstants';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 
 export class InsteonMotionSensorDevice extends InsteonBaseDevice {

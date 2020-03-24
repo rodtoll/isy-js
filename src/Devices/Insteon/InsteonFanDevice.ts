@@ -1,6 +1,6 @@
-import { ISY, ISYNode } from '../../isy';
-import { States } from '../../isyconstants';
-import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from '../../isydevice';
+import { ISY, ISYNode } from '../../ISY';
+import { States } from '../../ISYConstants';
+import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from '../ISYDevice';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 import { InsteonDimmableDevice } from './InsteonDimmableDevice';
 import { InsteonDimmerOutletDevice } from './InsteonDimmerOutletDevice';

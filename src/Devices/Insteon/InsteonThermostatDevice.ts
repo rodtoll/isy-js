@@ -1,5 +1,5 @@
-import { ISY } from '../../isy';
-import { Props } from '../../isyconstants';
+import { ISY } from '../../ISY';
+import { Props } from '../../ISYConstants';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 
 export class InsteonThermostatDevice extends InsteonBaseDevice {

@@ -1,6 +1,6 @@
-import { ISY } from '../../isy';
-import { Commands } from '../../isyconstants';
-import { byteToPct, pctToByte } from '../../utils';
+import { ISY } from '../../ISY';
+import { Commands } from '../../ISYConstants';
+import { byteToPct, pctToByte } from '../../Utils';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 
 export const InsteonLampDevice = (InsteonBaseDevice: any) =>

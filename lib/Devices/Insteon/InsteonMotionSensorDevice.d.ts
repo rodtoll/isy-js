@@ -1,4 +1,4 @@
-import { ISY } from '../../isy';
+import { ISY } from '../../ISY';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 export declare class InsteonMotionSensorDevice extends InsteonBaseDevice {
     constructor(isy: ISY, deviceNode: {

@@ -1,8 +1,9 @@
-import { ISYDevice } from '../../ISYDevice';
+import { ISYDevice } from '../ISYDevice';
 
 
 /////////////////////////////
 // ELKAlarmPanelDevice
+
 //
 export class ELKAlarmPanelDevice extends ISYDevice {
 	constructor (isy, area, node) {

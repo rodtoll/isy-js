@@ -1,10 +1,10 @@
 import { timingSafeEqual } from 'crypto';
 import { isNullOrUndefined } from 'util';
 
-import { Controls, ISY } from './isy';
-import { Commands, States } from './isyconstants';
-import { ISYNode } from './isynode';
-import { ISYScene } from './isyscene';
+import { Controls, ISY } from '../ISY';
+import { Commands, States } from '../ISYConstants';
+import { ISYNode } from '../ISYNode';
+import { ISYScene } from '../ISYScene';
 
 export class ISYDevice extends ISYNode {
 	public readonly typeCode: string;

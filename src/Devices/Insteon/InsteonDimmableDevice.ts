@@ -1,5 +1,5 @@
-import { ISY } from '../../isy';
-import { ISYLevelDevice } from '../../isydevice';
+import { ISY } from '../../ISY';
+import { ISYLevelDevice } from '../ISYDevice';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 
 export class InsteonDimmableDevice extends ISYLevelDevice(InsteonRelayDevice) {

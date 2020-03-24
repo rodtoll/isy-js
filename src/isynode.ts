@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import { isNullOrUndefined } from 'util';
 
-import { Categories, Controls, ISY, NodeTypes } from './isy';
-import { Families } from './isyconstants';
+import { Categories, Controls, ISY, NodeTypes } from './ISY';
+import { Families } from './ISYConstants';
 
 export class ISYNode {
 	public readonly isy: ISY;
@@ -60,7 +60,7 @@ export class ISYNode {
 				return isy.logger(`${this.name} (${this.address}): ${msg}`);
 			};
 		}
-		
+
 
 		this.logger(this.nodeDefId);
 		this.lastChanged = new Date();

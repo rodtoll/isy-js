@@ -1,7 +1,7 @@
 import { Families } from '../../Families';
-import { ISY } from '../../isy';
-import { ISYDevice } from '../../isydevice';
-import { byteToDegree, byteToPct, pctToByte } from '../../utils';
+import { ISY } from '../../ISY';
+import { byteToDegree, byteToPct, pctToByte } from '../../Utils';
+import { ISYDevice } from '../ISYDevice';
 
 //import { InsteonNLS } from './insteonfam'
 export class InsteonBaseDevice extends ISYDevice {

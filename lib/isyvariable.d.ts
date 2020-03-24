@@ -1,4 +1,4 @@
-import { ISY } from './isy';
+import { ISY } from './ISY';
 export declare class ISYVariable {
     isy: ISY;
     id: any;

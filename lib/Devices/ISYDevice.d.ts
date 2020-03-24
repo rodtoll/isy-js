@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { ISY } from './isy';
-import { ISYNode } from './isynode';
-import { ISYScene } from './isyscene';
+import { ISY } from '../ISY';
+import { ISYNode } from '../ISYNode';
+import { ISYScene } from '../ISYScene';
 export declare class ISYDevice extends ISYNode {
     readonly typeCode: string;
     readonly deviceClass: any;

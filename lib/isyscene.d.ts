@@ -1,5 +1,5 @@
-import { ISYDevice } from './isy';
-import { ISYNode } from './isynode';
+import { ISYDevice } from './ISY';
+import { ISYNode } from './ISYNode';
 export declare class ISYScene extends ISYNode {
     type: string;
     connectionType: string;

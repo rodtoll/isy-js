@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { ISY } from '../../isy';
+import { ISY } from '../../ISY';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 export declare const InsteonLampDevice: (InsteonBaseDevice: any) => {
     new (isy: any, node: any): {
@@ -22,9 +22,9 @@ export declare const InsteonSwitchDevice: (InsteonBaseDevice: typeof InsteonRela
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: import("../../ISYDevice").ISYDevice;
-        readonly children: import("../../ISYDevice").ISYDevice[];
-        readonly scenes: import("../../isyscene").ISYScene[];
+        _parentDevice: import("../ISYDevice").ISYDevice;
+        readonly children: import("../ISYDevice").ISYDevice[];
+        readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
         readonly pending: any;
@@ -32,9 +32,9 @@ export declare const InsteonSwitchDevice: (InsteonBaseDevice: typeof InsteonRela
         location: string;
         convertTo: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
         convertFrom: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
-        addLink(isyScene: import("../../isyscene").ISYScene): void;
-        addChild(childDevice: import("../../ISYDevice").ISYDevice): void;
-        readonly parentDevice: import("../../ISYDevice").ISYDevice;
+        addLink(isyScene: import("../../ISYScene").ISYScene): void;
+        addChild(childDevice: import("../ISYDevice").ISYDevice): void;
+        readonly parentDevice: import("../ISYDevice").ISYDevice;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;

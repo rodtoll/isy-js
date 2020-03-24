@@ -1,7 +1,7 @@
 import { format } from 'util';
 import { parseStringPromise } from 'xml2js';
 
-import { InsteonSwitchDevice, KeypadDevice } from './Devices/Insteon/insteondevice';
+import { InsteonSwitchDevice, KeypadDevice } from './Devices/Insteon/InsteonDevice';
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerKeypadDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
 import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
@@ -14,8 +14,8 @@ import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensor
 import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonRelaySwitchDevice } from './Devices/Insteon/InsteonRelaySwitchDevice';
-import { Families, ISYDevice } from './isy';
-import ISYConstants, { Categories } from './isyconstants';
+import { Families, ISYDevice } from './ISY';
+import ISYConstants, { Categories } from './ISYConstants';
 
 export class DeviceFactory {
 

@@ -1,6 +1,6 @@
-import { ISY } from '../../isy';
-import { Commands, DeviceTypes, States } from '../../isyconstants';
-import { ISYBinaryStateDevice } from '../../isydevice';
+import { ISY } from '../../ISY';
+import { Commands, DeviceTypes, States } from '../../ISYConstants';
+import { ISYBinaryStateDevice } from '../ISYDevice';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 
 export class InsteonLockDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {

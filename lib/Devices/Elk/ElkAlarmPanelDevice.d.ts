@@ -1,4 +1,4 @@
-import { ISYDevice } from '../../ISYDevice';
+import { ISYDevice } from '../ISYDevice';
 export declare class ELKAlarmPanelDevice extends ISYDevice {
     constructor(isy: any, area: any, node: any);
     sendSetAlarmModeCommand(alarmState: any): Promise<any>;

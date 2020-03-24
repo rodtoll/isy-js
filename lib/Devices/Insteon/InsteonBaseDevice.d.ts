@@ -1,5 +1,5 @@
-import { ISY } from '../../isy';
-import { ISYDevice } from '../../isydevice';
+import { ISY } from '../../ISY';
+import { ISYDevice } from '../ISYDevice';
 export declare class InsteonBaseDevice extends ISYDevice {
     constructor(isy: ISY, node: {
         type: string;

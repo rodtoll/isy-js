@@ -1,5 +1,5 @@
-import { ISY } from '../../isy';
-import { ISYBinaryStateDevice } from '../../isydevice';
+import { ISY } from '../../ISY';
+import { ISYBinaryStateDevice } from '../ISYDevice';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
 
 export class InsteonLeakSensorDevice extends ISYBinaryStateDevice(InsteonBaseDevice) {

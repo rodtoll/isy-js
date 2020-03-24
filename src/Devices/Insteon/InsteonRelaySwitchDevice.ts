@@ -1,4 +1,4 @@
-import { InsteonSwitchDevice } from './insteondevice';
+import { InsteonSwitchDevice } from './InsteonDevice';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 
 export class InsteonRelaySwitchDevice extends InsteonSwitchDevice(InsteonRelayDevice) {

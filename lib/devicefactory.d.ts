@@ -1,4 +1,4 @@
-import { ISYDevice } from './isy';
+import { ISYDevice } from './ISY';
 export declare class DeviceFactory {
     static createDevice(nodeDef: any): {
         name: string;
