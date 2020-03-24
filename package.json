@@ -17,7 +17,7 @@
         "poylglot"
     ],
 
-    "main": "./lib/isy.js",
+    "main": "./lib/ISY.js",
     "devDependencies": {
         "@types/node": "^10.17.15",
         "babel-preset-env": "^1.7.0",
