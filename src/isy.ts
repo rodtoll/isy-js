@@ -696,7 +696,7 @@ export class ISY {
 						}
 					}
 					else {
-						this.logger(`Unrecognized Event: ${EventType[Number(evt.control)]}${JSON.stringify(evt)}`);
+						this.logger(`Unrecognized Event: ${EventType[Number(stringControl)]}${JSON.stringify(evt)}`);
 					}
 
 					break;
