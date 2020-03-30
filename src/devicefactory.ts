@@ -1,6 +1,7 @@
 import { format } from 'util';
 import { parseStringPromise } from 'xml2js';
 
+import { Categories } from './Categories';
 import { InsteonSwitchDevice, KeypadDevice } from './Devices/Insteon/InsteonDevice';
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerKeypadDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
@@ -14,8 +15,7 @@ import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensor
 import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonRelaySwitchDevice } from './Devices/Insteon/InsteonRelaySwitchDevice';
-import { Families, ISYDevice } from './ISY';
-import ISYConstants, { Categories } from './ISYConstants';
+import { Family, ISYDevice } from './ISY';
 
 export class DeviceFactory {
 
@@ -65,7 +65,7 @@ export class DeviceFactory {
 	}
 
 	public static getDeviceDetails(family: number, typeCode: string): { name: string; modelNumber: string; version: string; class: typeof ISYDevice } {
-		if (family ?? Families.Insteon === Families.Insteon) {
+		if (family ?? Family.Insteon === Family.Insteon) {
 			return this.getInsteonDeviceDetails(typeCode);
 		} else return null;
 	}

@@ -12,12 +12,12 @@ import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensor
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonThermostatDevice } from './Devices/Insteon/InsteonThermostatDevice';
 import { ISYDevice } from './Devices/ISYDevice';
-import { Families } from './Families';
-import { DeviceTypes, NodeTypes, Props, States } from './ISYConstants';
+import { Family } from './Families';
+import { DeviceTypes, NodeType, Props, States } from './ISYConstants';
 import { ISYNode } from './ISYNode';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
-export { ISYScene, States, Families, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeTypes, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
+export { ISYScene, States, Family, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
 export declare class ISY {
     readonly deviceList: Map<string, ISYDevice>;

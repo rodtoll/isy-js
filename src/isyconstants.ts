@@ -1,9 +1,6 @@
 
 const ISYConstants = {
-	Events:
-	{
 
-	},
 	States: {
 		Off: 0,
 		On: 100,
@@ -151,58 +148,32 @@ const ISYConstants = {
 		thermostat: 'Thermostat',
 		polyNode: 'PolyNode'
 	},
-	VariableTypes: {
-		Integer: 1,
-		State: 2
-	},
-	NodeTypes: {
-		Device: 1,
-		Scene: 2,
-		Folder: 3,
-		X10A10: 4
-	},
-	Families: {
-		Insteon: 1,
-		UPB: 2,
-		ZigBee: 3,
-		ZWave: 4,
-		UDI: 7,
-		Poly: 10
-	},
+
+
 	UpdateTypes: {
 		elk: 'ELK_UPDATE',
 		zone: 'ZONE_UPDATE',
 		property: 'PROPERTY_UPDATE',
 		generic: 'GENERIC_UPDATE'
-	},
-	Categories: {
-		Controller: 0,
-		DimmableControl: 1,
-		RelayControl: 2,
-		NetworkBridge: 3,
-		IrrigationControl: 4,
-		ClimateControl: 5,
-		PoolControl: 6,
-		SensorActuator: 7,
-		HomeEntertainment: 8,
-		EnergyManagement: 9,
-		ApplianceControl: 10,
-		WindowShadeControl: 14,
-		AccessControl: 15,
-		SecurityHealthSafety: 16,
-		A10X10: 113,
-		Virtual: 127,
-		Unknown: 254
 	}
+
 };
+
+export enum VariableType {
+	Integer = 1,
+	State = 2
+}
+export enum NodeType {
+	Device = 1,
+	Scene = 2,
+	Folder = 3,
+	X10A10 = 4
+}
+
 
 export default ISYConstants;
 export const Props = ISYConstants.Props;
 export const States = ISYConstants.States;
 export const Commands = ISYConstants.Cmds;
 export const DeviceTypes = ISYConstants.deviceTypes;
-export const Families = ISYConstants.Families;
-export const VariableTypes = ISYConstants.VariableTypes;
 export const UpdateTypes = ISYConstants.UpdateTypes;
-export const NodeTypes = ISYConstants.NodeTypes;
-export const Categories = ISYConstants.Categories;

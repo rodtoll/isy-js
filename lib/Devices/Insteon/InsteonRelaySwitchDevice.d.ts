@@ -38,10 +38,10 @@ declare const InsteonRelaySwitchDevice_base: {
         readonly address: string;
         name: string;
         displayName: string;
-        family: any;
+        family: import("../../Families").Family;
         folder: string;
         parent: any;
-        parentType: number;
+        parentType: import("../../ISYConstants").NodeType;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;

@@ -1,8 +1,35 @@
-export declare enum Families {
+export declare enum Family {
     Insteon = 1,
     UPB = 2,
     ZigBee = 3,
     ZWave = 4,
     Generic = 7,
     Poly = 10
+}
+export declare enum EventType {
+    PropertyChanged = "",
+    Heartbeat = "_0",
+    Trigger = "_1",
+    DriverSpecific = "_2",
+    NodeChanged = "_3",
+    SystemConfigChanged = "_4",
+    SystemStatusChanged = "_5",
+    InternetAccessChanged = "_6",
+    ProgressReport = "_7",
+    SecuritySystem = "_8",
+    SystemAlert = "_9",
+    OpenADR = "_10",
+    Climate = "_11",
+    APISEP = "_12",
+    EnergyMonitoring = "_13",
+    UPBLinker = "_14",
+    UPBDeviceAdder = "_15",
+    UPBDeviceStatus = "_16",
+    GasMeter = "_17",
+    ZigBee = "_18",
+    Elk = "_19",
+    DeviceLinker = "_20",
+    ZWave = "_21",
+    Billing = "_22",
+    Portal = "_23"
 }

@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
 import { isNullOrUndefined } from 'util';
 
-import { Categories, Controls, ISY, NodeTypes } from './ISY';
-import { Families } from './ISYConstants';
+import { Family } from './Families';
+import { Categories, Controls, ISY, NodeType } from './ISY';
+
 
 export class ISYNode {
 	public readonly isy: ISY;
@@ -12,10 +13,10 @@ export class ISYNode {
 	[x: string]: any
 	public name: string;
 	public displayName: string;
-	public family: any;
+	public family: Family;
 	public folder: string = '';
 	public parent: any;
-	public parentType: number;
+	public parentType: NodeType;
 	public readonly elkId: string;
 	public nodeType: number;
 	public propertyChanged: EventEmitter;
@@ -31,21 +32,21 @@ export class ISYNode {
 		this.nodeDefId = node.nodeDefId;
 		this.address = node.address;
 		this.name = node.name;
-		this.family = node.family;
+		this.family = Number(node.family ?? Family.Insteon);
 
 		this.parent = node.parent;
-		if (!isNullOrUndefined(this.parent)) {
-			this.parentType = Number(this.parent.type);
-		}
+
+		this.parentType = Number(this.parent?.type);
+
 		this.enabled = node.enabled;
 		this.elkId = node.ELK_ID;
 		this.propertyChanged = new EventEmitter();
 		this.propsInitialized = false;
-		let s = this.name.split('.');
+		const s = this.name.split('.');
 		if (s.length > 1)
 			s.shift();
 		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').replace('  ',' ').trim();
-		if (this.parentType === NodeTypes.Folder) {
+		if (this.parentType === NodeType.Folder) {
 
 			this.folder = isy.folderMap.get(this.parent._);
 			isy.logger(`${this.name} this node is in folder ${this.folder}`);
@@ -60,7 +61,6 @@ export class ISYNode {
 				return isy.logger(`${this.name} (${this.address}): ${msg}`);
 			};
 		}
-
 
 		this.logger(this.nodeDefId);
 		this.lastChanged = new Date();

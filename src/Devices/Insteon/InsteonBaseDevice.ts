@@ -1,4 +1,4 @@
-import { Families } from '../../Families';
+import { Family } from '../../Families';
 import { ISY } from '../../ISY';
 import { byteToDegree, byteToPct, pctToByte } from '../../Utils';
 import { ISYDevice } from '../ISYDevice';
@@ -9,7 +9,7 @@ export class InsteonBaseDevice extends ISYDevice {
 		type: string;
 	}) {
 		super(isy, node);
-		this.family = Families.Insteon;
+		this.family = Family.Insteon;
 		//this.productName = InsteonNLS.getDeviceDescription(String.fromCharCode(category,device,version));
 		this.childDevices = {};
 	}

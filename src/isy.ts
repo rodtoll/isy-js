@@ -20,8 +20,8 @@ import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensor
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonThermostatDevice } from './Devices/Insteon/InsteonThermostatDevice';
 import { ISYDevice } from './Devices/ISYDevice';
-import { Families } from './Families';
-import { DeviceTypes, NodeTypes, Props, States, VariableTypes } from './ISYConstants';
+import { EventType, Family } from './Families';
+import { DeviceTypes, NodeType, Props, States, VariableType } from './ISYConstants';
 import { ISYNode } from './ISYNode';
 import * as ProductInfoData from './isyproductinfo.json';
 import { ISYScene } from './ISYScene';
@@ -31,7 +31,7 @@ import { getAsync } from './Utils';
 export {
 	ISYScene,
 	States,
-	Families,
+	Family,
 	DeviceTypes,
 	Categories,
 	Props,
@@ -50,7 +50,7 @@ export {
 	InsteonRelayDevice,
 	InsteonMotionSensorDevice,
 	ISYNode,
-	NodeTypes,
+	NodeType,
 	ElkAlarmSensorDevice,
 	ELKAlarmPanelDevice
 };
@@ -326,7 +326,7 @@ export class ISY {
 				name,
 				1,
 				id,
-				alarmDef === 17
+				alarmDef === '17'
 					? DeviceTypes.alarmDoorWindowSensor
 					: DeviceTypes.coSensor
 			);
@@ -568,8 +568,8 @@ export class ISY {
 			await this.loadConfig();
 			await this.loadNodes();
 			await this.refreshStatuses().then(() => {
-				this.loadVariables(VariableTypes.Integer, () => {
-					this.loadVariables(VariableTypes.State, () => {
+				this.loadVariables(VariableType.Integer, () => {
+					this.loadVariables(VariableType.State, () => {
 						if (this.elkEnabled) {
 							get(
 								`${this.protocol}://${that.address}/rest/elk/get/topology`,
@@ -640,7 +640,7 @@ export class ISY {
 				actionValue = Number(evt.action);
 			}
 			switch (evt.control) {
-				case '_19':
+				case EventType.Elk:
 					if (actionValue === 2) {
 						const aeElement = evt.eventInfo.ae;
 						if (aeElement !== null) {
@@ -660,7 +660,7 @@ export class ISY {
 					}
 					break;
 
-				case '_1':
+				case EventType.Trigger:
 					if (actionValue === 6) {
 						const varNode = evt.eventInfo.var;
 						if (varNode !== null) {

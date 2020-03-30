@@ -1,5 +1,4 @@
 declare const ISYConstants: {
-    Events: {};
     States: {
         Off: number;
         On: number;
@@ -139,50 +138,23 @@ declare const ISYConstants: {
         thermostat: string;
         polyNode: string;
     };
-    VariableTypes: {
-        Integer: number;
-        State: number;
-    };
-    NodeTypes: {
-        Device: number;
-        Scene: number;
-        Folder: number;
-        X10A10: number;
-    };
-    Families: {
-        Insteon: number;
-        UPB: number;
-        ZigBee: number;
-        ZWave: number;
-        UDI: number;
-        Poly: number;
-    };
     UpdateTypes: {
         elk: string;
         zone: string;
         property: string;
         generic: string;
     };
-    Categories: {
-        Controller: number;
-        DimmableControl: number;
-        RelayControl: number;
-        NetworkBridge: number;
-        IrrigationControl: number;
-        ClimateControl: number;
-        PoolControl: number;
-        SensorActuator: number;
-        HomeEntertainment: number;
-        EnergyManagement: number;
-        ApplianceControl: number;
-        WindowShadeControl: number;
-        AccessControl: number;
-        SecurityHealthSafety: number;
-        A10X10: number;
-        Virtual: number;
-        Unknown: number;
-    };
 };
+export declare enum VariableType {
+    Integer = 1,
+    State = 2
+}
+export declare enum NodeType {
+    Device = 1,
+    Scene = 2,
+    Folder = 3,
+    X10A10 = 4
+}
 export default ISYConstants;
 export declare const Props: {
     Status: string;
@@ -323,46 +295,9 @@ export declare const DeviceTypes: {
     thermostat: string;
     polyNode: string;
 };
-export declare const Families: {
-    Insteon: number;
-    UPB: number;
-    ZigBee: number;
-    ZWave: number;
-    UDI: number;
-    Poly: number;
-};
-export declare const VariableTypes: {
-    Integer: number;
-    State: number;
-};
 export declare const UpdateTypes: {
     elk: string;
     zone: string;
     property: string;
     generic: string;
-};
-export declare const NodeTypes: {
-    Device: number;
-    Scene: number;
-    Folder: number;
-    X10A10: number;
-};
-export declare const Categories: {
-    Controller: number;
-    DimmableControl: number;
-    RelayControl: number;
-    NetworkBridge: number;
-    IrrigationControl: number;
-    ClimateControl: number;
-    PoolControl: number;
-    SensorActuator: number;
-    HomeEntertainment: number;
-    EnergyManagement: number;
-    ApplianceControl: number;
-    WindowShadeControl: number;
-    AccessControl: number;
-    SecurityHealthSafety: number;
-    A10X10: number;
-    Virtual: number;
-    Unknown: number;
 };

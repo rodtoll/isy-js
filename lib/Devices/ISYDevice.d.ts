@@ -69,10 +69,10 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly address: string;
         name: string;
         displayName: string;
-        family: any;
+        family: import("../Families").Family;
         folder: string;
         parent: any;
-        parentType: number;
+        parentType: import("../ISYConstants").NodeType;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
@@ -121,10 +121,10 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly address: string;
         name: string;
         displayName: string;
-        family: any;
+        family: import("../Families").Family;
         folder: string;
         parent: any;
-        parentType: number;
+        parentType: import("../ISYConstants").NodeType;
         readonly elkId: string;
         nodeType: number;
         propertyChanged: import("events").EventEmitter;
