@@ -80,7 +80,7 @@ export class ISY {
 	public readonly folderMap: Map<string, string> = new Map();
 
 	public webSocket: Client;
-	public zoneMap: Map<string,ElkAlarmSensorDevice> = new Map();
+	public zoneMap: Map<string, ElkAlarmSensorDevice> = new Map();
 	public protocol: any;
 	public address: any;
 	public restlerOptions: any;
@@ -288,7 +288,7 @@ export class ISY {
 						this.logger('No notes found.');
 					}
 					//if (!newDevice.hidden) {
-						this.deviceList.set(newDevice.address, newDevice);
+					this.deviceList.set(newDevice.address, newDevice);
 					//}
 
 
@@ -646,10 +646,9 @@ export class ISY {
 				case EventType.Elk:
 					if (actionValue === 2) {
 						const aeElement = evt.eventInfo.ae;
-						if(this.elkAlarmPanel.handleEvent(event))
-						{
+						if (this.elkAlarmPanel.handleEvent(event)) {
 
-								this.nodeChangedHandler(this.elkAlarmPanel);
+							this.nodeChangedHandler(this.elkAlarmPanel);
 
 						}
 					} else if (actionValue === 3) {
@@ -695,9 +694,8 @@ export class ISY {
 							this.logger('Event for Unidentified Device: ' + JSON.stringify(evt));
 						}
 					}
-					else
-					{
-						this.logger('Unrecognized Event: ' + JSON.stringify(evt));
+					else {
+						this.logger(`Unrecognized Event: ${EventType[evt.control]}${JSON.stringify(evt)}`);
 					}
 
 					break;
@@ -750,7 +748,7 @@ export class ISY {
 			});
 	}
 
-	public getDevice(address: string, parentsOnly = false) :ISYDevice {
+	public getDevice(address: string, parentsOnly = false): ISYDevice {
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {
