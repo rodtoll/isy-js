@@ -1,4 +1,5 @@
 import { ISYBinaryStateDevice } from './Devices/ISYDevice';
+import { InsteonBaseDevice } from './ISY';
 
 export enum Family {
 	Insteon = 1,
@@ -7,6 +8,11 @@ export enum Family {
 	ZWave = 4,
 	Generic = 7,
 	Poly = 10
+}
+
+export interface Insteon
+{
+	family : Family.Insteon;
 }
 
 export enum EventType {
@@ -81,6 +87,7 @@ class PropertyChangedEvent extends NodeEvent<string>
 	constructor(eventData: any)
 	{
 		super(eventData);
+
 		this.property = eventData.control;
 		this.formattedValue = eventData.fmtAct;
 	}

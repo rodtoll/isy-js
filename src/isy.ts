@@ -74,7 +74,7 @@ interface ProductInfoEntry {
 }
 
 export class ISY {
-	public readonly deviceList: Map<string, ISYDevice> = new Map();
+	public readonly deviceList: Map<string, ISYDevice<any>> = new Map();
 	public readonly deviceMap: Map<string, string[]> = new Map();
 	public readonly sceneList: Map<string, ISYScene> = new Map();
 	public readonly folderMap: Map<string, string> = new Map();
@@ -262,7 +262,7 @@ export class ISY {
 			} else {
 				this.deviceMap[device.pnode].push(device.address);
 			}
-			let newDevice: ISYDevice = null;
+			let newDevice: ISYDevice<any>= null;
 
 			// let deviceTypeInfo = this.isyTypeToTypeName(device.type, device.address);
 			// this.logger(JSON.stringify(deviceTypeInfo));
@@ -643,7 +643,7 @@ export class ISY {
 				actionValue = Number(evt.action);
 			}
 			const stringControl = (evt.control as string)?.replace('_', '');
-			switch (evt.control) {
+			switch (stringControl) {
 				case EventType.Elk.toString():
 					if (actionValue === 2) {
 						const aeElement = evt.eventInfo.ae;
@@ -662,6 +662,7 @@ export class ISY {
 							}
 						}
 					}
+
 					break;
 
 				case EventType.Trigger.toString():
@@ -692,11 +693,11 @@ export class ISY {
 							impactedDevice.handleEvent(evt);
 						}
 						else {
-							this.logger('Event for Unidentified Device: ' + JSON.stringify(evt));
+							this.logger(EventType[Number(stringControl)] + ' Event for Unidentified Device: ' + JSON.stringify(evt));
 						}
 					}
 					else {
-						this.logger(`Unrecognized Event: ${EventType[Number(stringControl)]}${JSON.stringify(evt)}`);
+						this.logger(`Unhandled ${EventType[Number(stringControl)]} Event: ${JSON.stringify(evt)}`);
 					}
 
 					break;
@@ -749,7 +750,7 @@ export class ISY {
 			});
 	}
 
-	public getDevice(address: string, parentsOnly = false): ISYDevice {
+	public getDevice(address: string, parentsOnly = false): ISYDevice<any>{
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {
@@ -796,39 +797,18 @@ export class ISY {
 		return this.callISY(uriToUse);
 	}
 
-	public sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void) {
+	public async sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void) {
 		const uriToUse = `${this.protocol}://${
 			this.address
 			}/rest/vars/get/${type}/${id}`;
 		this.logger(`Sending ISY command...${uriToUse}`);
-		const options = {
-			username: this.userName,
-			password: this.password
-		};
-		get(uriToUse, options).on('complete', (result: any, response: { statusCode: number; }) => {
-			if (response.statusCode === 200) {
-				const document = new XmlDocument(result);
-				const val = parseInt(document.childNamed('val').val);
-				const init = parseInt(document.childNamed('init').val);
-				handleResult(val, init);
-			}
-		});
+
+		return this.callISY(uriToUse).then(p => handleResult(p.val,p.init));
 	}
-	public sendSetVariable(id: any, type: any, value: any, handleResult: { (success: any): void; (arg0: boolean): void; (arg0: boolean): void; }) {
-		const uriToUse = `${this.protocol}://${
-			this.address
-			}/rest/vars/set/${type}/${id}/${value}`;
+	public async sendSetVariable(id: any, type: any, value: any, handleResult: { (success: any): void; (arg0: boolean): void; (arg0: boolean): void; }) {
+		const uriToUse = `/rest/vars/set/${type}/${id}/${value}`;
 		this.logger(`Sending ISY command...${uriToUse}`);
-		const options = {
-			username: this.userName,
-			password: this.password
-		};
-		get(uriToUse, options).on('complete', (result: any, response: { statusCode: number; }) => {
-			if (response.statusCode === 200) {
-				handleResult(true);
-			} else {
-				handleResult(false);
-			}
-		});
+
+		return this.callISY(uriToUse);
 	}
 }

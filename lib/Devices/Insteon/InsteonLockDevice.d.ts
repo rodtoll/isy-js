@@ -6,14 +6,15 @@ declare const InsteonLockDevice_base: {
         [x: string]: any;
         readonly state: boolean;
         updateState(state: boolean): Promise<any>;
+        family: any;
         readonly typeCode: string;
         readonly deviceClass: any;
         readonly parentAddress: any;
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: import("../ISYDevice").ISYDevice;
-        readonly children: import("../ISYDevice").ISYDevice[];
+        _parentDevice: import("../ISYDevice").ISYDevice<any>;
+        readonly children: import("../ISYDevice").ISYDevice<any>[];
         readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -23,8 +24,8 @@ declare const InsteonLockDevice_base: {
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("../../ISYScene").ISYScene): void;
-        addChild(childDevice: import("../ISYDevice").ISYDevice): void;
-        readonly parentDevice: import("../ISYDevice").ISYDevice;
+        addChild(childDevice: import("../ISYDevice").ISYDevice<any>): void;
+        readonly parentDevice: import("../ISYDevice").ISYDevice<any>;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -38,7 +39,6 @@ declare const InsteonLockDevice_base: {
         readonly address: string;
         name: string;
         displayName: string;
-        family: import("../../Families").Family;
         folder: string;
         parent: any;
         parentType: import("../../ISYConstants").NodeType;

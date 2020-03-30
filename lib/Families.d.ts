@@ -6,6 +6,9 @@ export declare enum Family {
     Generic = 7,
     Poly = 10
 }
+export interface Insteon {
+    family: Family.Insteon;
+}
 export declare enum EventType {
     PropertyChanged = "",
     Heartbeat = 0,

@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { Family } from './Families';
 import { ISY, NodeType } from './ISY';
 export declare class ISYNode {
     readonly isy: ISY;
@@ -10,7 +9,6 @@ export declare class ISYNode {
     [x: string]: any;
     name: string;
     displayName: string;
-    family: Family;
     folder: string;
     parent: any;
     parentType: NodeType;

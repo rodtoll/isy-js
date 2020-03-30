@@ -1,5 +1,6 @@
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
-import { InsteonRelayDevice, ISYDevice } from './ISY';
+import { Family } from './Families';
+import { InsteonRelayDevice, ISY, ISYDevice } from './ISY';
 import { Commands, DeviceTypes } from './ISYConstants';
 import { ISYNode } from './ISYNode';
 
@@ -9,7 +10,7 @@ export class ISYScene extends ISYNode {
 	public batteryOperated: boolean;
 	public deviceType: any;
 	public deviceFriendlyName: string;
-	public childDevices: ISYDevice[];
+	public childDevices: ISYDevice<any>[];
 	public isDimmable: boolean;
 	public typeCode: string;
 	constructor(isy, scene) {

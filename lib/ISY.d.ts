@@ -20,7 +20,7 @@ import { ISYVariable } from './ISYVariable';
 export { ISYScene, States, Family, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
 export declare class ISY {
-    readonly deviceList: Map<string, ISYDevice>;
+    readonly deviceList: Map<string, ISYDevice<any>>;
     readonly deviceMap: Map<string, string[]>;
     readonly sceneList: Map<string, ISYScene>;
     readonly folderMap: Map<string, string>;
@@ -98,14 +98,14 @@ export declare class ISY {
         data: any;
     }): void;
     initializeWebSocket(): void;
-    getDevice(address: string, parentsOnly?: boolean): ISYDevice;
+    getDevice(address: string, parentsOnly?: boolean): ISYDevice<any>;
     getScene(address: string | number): any;
     sendISYCommand(path: string): Promise<any>;
     sendNodeCommand(node: ISYNode, command: string, ...parameters: any[]): Promise<any>;
-    sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void): void;
+    sendGetVariable(id: any, type: any, handleResult: (arg0: number, arg1: number) => void): Promise<void>;
     sendSetVariable(id: any, type: any, value: any, handleResult: {
         (success: any): void;
         (arg0: boolean): void;
         (arg0: boolean): void;
-    }): void;
+    }): Promise<any>;
 }

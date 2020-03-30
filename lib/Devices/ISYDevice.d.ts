@@ -1,16 +1,18 @@
 /// <reference types="node" />
+import { Family } from '../Families';
 import { ISY } from '../ISY';
 import { ISYNode } from '../ISYNode';
 import { ISYScene } from '../ISYScene';
-export declare class ISYDevice extends ISYNode {
+export declare class ISYDevice<T extends Family> extends ISYNode {
+    family: T;
     readonly typeCode: string;
     readonly deviceClass: any;
     readonly parentAddress: any;
     readonly category: number;
     readonly subCategory: number;
     readonly type: any;
-    _parentDevice: ISYDevice;
-    readonly children: ISYDevice[];
+    _parentDevice: ISYDevice<T>;
+    readonly children: ISYDevice<T>[];
     readonly scenes: ISYScene[];
     readonly formatted: any[string];
     readonly uom: any[string];
@@ -21,8 +23,8 @@ export declare class ISYDevice extends ISYNode {
     convertTo(value: any, uom: number): any;
     convertFrom(value: any, uom: number): any;
     addLink(isyScene: ISYScene): void;
-    addChild(childDevice: ISYDevice): void;
-    get parentDevice(): ISYDevice;
+    addChild(childDevice: ISYDevice<T>): void;
+    get parentDevice(): ISYDevice<T>;
     refreshProperty(propertyName: string): Promise<any>;
     refreshNotes(): Promise<void>;
     getNotes(): Promise<any>;
@@ -32,19 +34,20 @@ export declare class ISYDevice extends ISYNode {
     handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
 }
 declare type Constructor<T> = new (...args: any[]) => T;
-export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Base: T) => {
+export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice<any>>>(Base: T) => {
     new (...args: any[]): {
         [x: string]: any;
         readonly state: boolean;
         updateState(state: boolean): Promise<any>;
+        family: any;
         readonly typeCode: string;
         readonly deviceClass: any;
         readonly parentAddress: any;
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: ISYDevice;
-        readonly children: ISYDevice[];
+        _parentDevice: ISYDevice<any>;
+        readonly children: ISYDevice<any>[];
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -54,8 +57,8 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
-        addChild(childDevice: ISYDevice): void;
-        readonly parentDevice: ISYDevice;
+        addChild(childDevice: ISYDevice<any>): void;
+        readonly parentDevice: ISYDevice<any>;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -69,7 +72,6 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         readonly address: string;
         name: string;
         displayName: string;
-        family: import("../Families").Family;
         folder: string;
         parent: any;
         parentType: import("../ISYConstants").NodeType;
@@ -84,19 +86,20 @@ export declare const ISYBinaryStateDevice: <T extends Constructor<ISYDevice>>(Ba
         onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
 } & T;
-export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T) => {
+export declare const ISYLevelDevice: <T extends Constructor<ISYDevice<any>>>(base: T) => {
     new (...args: any[]): {
         [x: string]: any;
         readonly level: number;
         updateLevel(level: number): Promise<any>;
+        family: any;
         readonly typeCode: string;
         readonly deviceClass: any;
         readonly parentAddress: any;
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: ISYDevice;
-        readonly children: ISYDevice[];
+        _parentDevice: ISYDevice<any>;
+        readonly children: ISYDevice<any>[];
         readonly scenes: ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -106,8 +109,8 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: ISYScene): void;
-        addChild(childDevice: ISYDevice): void;
-        readonly parentDevice: ISYDevice;
+        addChild(childDevice: ISYDevice<any>): void;
+        readonly parentDevice: ISYDevice<any>;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -121,7 +124,6 @@ export declare const ISYLevelDevice: <T extends Constructor<ISYDevice>>(base: T)
         readonly address: string;
         name: string;
         displayName: string;
-        family: import("../Families").Family;
         folder: string;
         parent: any;
         parentType: import("../ISYConstants").NodeType;

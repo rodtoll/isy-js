@@ -1,3 +1,4 @@
+import { Family } from '../../Families';
 import { ISY, ISYNode } from '../../ISY';
 import { States } from '../../ISYConstants';
 import { ISYBinaryStateDevice, ISYDevice, ISYLevelDevice } from '../ISYDevice';
@@ -57,7 +58,7 @@ export class InsteonFanDevice extends InsteonBaseDevice {
         return null;
     }
 
-	public addChild(childDevice: ISYDevice) {
+	public addChild(childDevice: ISYDevice<Family.Insteon>) {
 		super.addChild(childDevice);
 		if (childDevice instanceof InsteonFanMotorDevice) {
             this.logger('Fan Motor Found');

@@ -23,6 +23,9 @@ export class ISYVariable {
 	public sendSetValue(value, onComplete) {
 		this.isy.sendSetVariable(this.id, this.type, value, (success) => onComplete(success));
 	}
+
+
+
 	public async updateValue(value): Promise<void> {
 		const p = await this.isy.callISY(`vars\\${this.type}\\${this.id}\\${value}`);
 		this.value = value;

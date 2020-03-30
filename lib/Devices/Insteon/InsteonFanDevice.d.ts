@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { Family } from '../../Families';
 import { ISY } from '../../ISY';
 import { ISYDevice } from '../ISYDevice';
 import { InsteonBaseDevice } from './InsteonBaseDevice';
@@ -8,14 +9,15 @@ declare const InsteonFanMotorDevice_base: {
         [x: string]: any;
         readonly level: number;
         updateLevel(level: number): Promise<any>;
+        family: any;
         readonly typeCode: string;
         readonly deviceClass: any;
         readonly parentAddress: any;
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: ISYDevice;
-        readonly children: ISYDevice[];
+        _parentDevice: ISYDevice<any>;
+        readonly children: ISYDevice<any>[];
         readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -25,8 +27,8 @@ declare const InsteonFanMotorDevice_base: {
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("../../ISYScene").ISYScene): void;
-        addChild(childDevice: ISYDevice): void;
-        readonly parentDevice: ISYDevice;
+        addChild(childDevice: ISYDevice<any>): void;
+        readonly parentDevice: ISYDevice<any>;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -40,7 +42,6 @@ declare const InsteonFanMotorDevice_base: {
         readonly address: string;
         name: string;
         displayName: string;
-        family: import("../../Families").Family;
         folder: string;
         parent: any;
         parentType: import("../../ISYConstants").NodeType;
@@ -59,14 +60,15 @@ declare const InsteonFanMotorDevice_base: {
         [x: string]: any;
         readonly state: boolean;
         updateState(state: boolean): Promise<any>;
+        family: any;
         readonly typeCode: string;
         readonly deviceClass: any;
         readonly parentAddress: any;
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: ISYDevice;
-        readonly children: ISYDevice[];
+        _parentDevice: ISYDevice<any>;
+        readonly children: ISYDevice<any>[];
         readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -76,8 +78,8 @@ declare const InsteonFanMotorDevice_base: {
         convertTo(value: any, uom: number): any;
         convertFrom(value: any, uom: number): any;
         addLink(isyScene: import("../../ISYScene").ISYScene): void;
-        addChild(childDevice: ISYDevice): void;
-        readonly parentDevice: ISYDevice;
+        addChild(childDevice: ISYDevice<any>): void;
+        readonly parentDevice: ISYDevice<any>;
         refreshProperty(propertyName: string): Promise<any>;
         refreshNotes(): Promise<void>;
         getNotes(): Promise<any>;
@@ -91,7 +93,6 @@ declare const InsteonFanMotorDevice_base: {
         readonly address: string;
         name: string;
         displayName: string;
-        family: import("../../Families").Family;
         folder: string;
         parent: any;
         parentType: import("../../ISYConstants").NodeType;
@@ -122,7 +123,7 @@ export declare class InsteonFanDevice extends InsteonBaseDevice {
     Light: InsteonDimmableDevice;
     Motor: InsteonFanMotorDevice;
     handleEvent(event: any): boolean;
-    addChild(childDevice: ISYDevice): void;
+    addChild(childDevice: ISYDevice<Family.Insteon>): void;
     updateFanSpeed(level: number): Promise<any>;
     updateIsOn(isOn: boolean): Promise<void>;
 }

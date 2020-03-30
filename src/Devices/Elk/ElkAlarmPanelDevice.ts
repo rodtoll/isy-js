@@ -1,3 +1,4 @@
+import { Family } from '../../Families';
 import { ISYDevice } from '../ISYDevice';
 
 
@@ -5,7 +6,7 @@ import { ISYDevice } from '../ISYDevice';
 // ELKAlarmPanelDevice
 
 //
-export class ELKAlarmPanelDevice extends ISYDevice {
+export class ELKAlarmPanelDevice extends ISYDevice<Family> {
 
 	 alarmTripState : AlarmTripState;
 	 alarmState : AlarmState;
@@ -163,7 +164,7 @@ ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_WITH_BYPASS = 6;
 /////////////////////////////
 // ELKAlarmSensor
 //
-export class ElkAlarmSensorDevice extends ISYDevice {
+export class ElkAlarmSensorDevice extends ISYDevice<Family> {
 	constructor (isy, name, area, zone, deviceType) {
 		super(isy, area);
 

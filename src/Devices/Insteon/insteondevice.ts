@@ -1,6 +1,5 @@
 import { ISY } from '../../ISY';
 import { Commands } from '../../ISYConstants';
-import { byteToPct, pctToByte } from '../../Utils';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 
 export const InsteonLampDevice = (InsteonBaseDevice: any) =>
@@ -10,14 +9,7 @@ export const InsteonLampDevice = (InsteonBaseDevice: any) =>
 				super(isy, node);
 				this.isDimmable = true;
 			}
-			get brightnessLevel() {
-				return byteToPct(this.status);
-			}
-			public updateBrightnessLevel(level: number, resultHandler: any) {
-				if (level !== this.brightnessLevel) {
-					this.isy.sendRestCommand(this.address, Commands.On, pctToByte(level), resultHandler);
-				}
-			}
+
 		};
 	};
 export const InsteonSwitchDevice = (InsteonBaseDevice: typeof InsteonRelayDevice) =>

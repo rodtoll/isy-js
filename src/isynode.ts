@@ -13,7 +13,7 @@ export class ISYNode {
 	[x: string]: any
 	public name: string;
 	public displayName: string;
-	public family: Family;
+	
 	public folder: string = '';
 	public parent: any;
 	public parentType: NodeType;
@@ -32,7 +32,7 @@ export class ISYNode {
 		this.nodeDefId = node.nodeDefId;
 		this.address = node.address;
 		this.name = node.name;
-		this.family = Number(node.family ?? Family.Insteon);
+		this.family = node.family ?? Family.Insteon;
 
 		this.parent = node.parent;
 

@@ -1,20 +1,22 @@
 import { timingSafeEqual } from 'crypto';
 import { isNullOrUndefined } from 'util';
 
+import { Family } from '../Families';
 import { Controls, ISY } from '../ISY';
 import { Commands, States } from '../ISYConstants';
 import { ISYNode } from '../ISYNode';
 import { ISYScene } from '../ISYScene';
 
-export class ISYDevice extends ISYNode {
+export class ISYDevice<T extends Family> extends ISYNode {
+	public family: T;
 	public readonly typeCode: string;
 	public readonly deviceClass: any;
 	public readonly parentAddress: any;
 	public readonly category: number;
 	public readonly subCategory: number;
 	public readonly type: any;
-	public _parentDevice: ISYDevice;
-	public readonly children: ISYDevice[] = [];
+	public _parentDevice: ISYDevice<T>;
+	public readonly children: ISYDevice<T>[] = [];
 	public readonly scenes: ISYScene[] = [];
 	public readonly formatted: any[string] = {};
 	public readonly uom: any[string] = {};
@@ -24,6 +26,7 @@ export class ISYDevice extends ISYNode {
 
 	constructor (isy: ISY, node: any) {
 		super(isy, node);
+		this.family = node.family ?? Family.Generic;
 		this.nodeType = 1;
 		this.type = node.type;
 		this._enabled = node.enabled;
@@ -85,11 +88,11 @@ export class ISYDevice extends ISYNode {
 		this.scenes.push(isyScene);
 	}
 
-	public addChild(childDevice: ISYDevice) {
+	public addChild(childDevice: ISYDevice<T>) {
 		this.children.push(childDevice);
 	}
 
-	get parentDevice(): ISYDevice {
+	get parentDevice(): ISYDevice<T> {
 		if (this._parentDevice === undefined) {
 			if (
 				this.parentAddress !== this.address &&
@@ -235,7 +238,7 @@ export class ISYDevice extends ISYNode {
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export const ISYBinaryStateDevice = <T extends Constructor<ISYDevice>>(
+export const ISYBinaryStateDevice = <T extends Constructor<ISYDevice<any>>>(
 	Base: T
 ) => {
 	return class extends Base {
@@ -256,7 +259,8 @@ export const ISYBinaryStateDevice = <T extends Constructor<ISYDevice>>(
 	};
 };
 
-export const ISYLevelDevice = <T extends Constructor<ISYDevice>>(base: T) =>
+// tslint:disable-next-line: variable-name
+export const ISYLevelDevice = <T extends Constructor<ISYDevice<any>>>(base: T) =>
 	class extends base {
 		get level(): number {
 			return this.ST;

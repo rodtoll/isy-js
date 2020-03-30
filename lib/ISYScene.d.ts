@@ -6,7 +6,7 @@ export declare class ISYScene extends ISYNode {
     batteryOperated: boolean;
     deviceType: any;
     deviceFriendlyName: string;
-    childDevices: ISYDevice[];
+    childDevices: ISYDevice<any>[];
     isDimmable: boolean;
     typeCode: string;
     constructor(isy: any, scene: any);
