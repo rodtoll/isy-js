@@ -80,7 +80,7 @@ export class ISY {
 	public readonly folderMap: Map<string, string> = new Map();
 
 	public webSocket: Client;
-	public zoneMap: any;
+	public zoneMap: Map<string,ElkAlarmSensorDevice> = new Map();
 	public protocol: any;
 	public address: any;
 	public restlerOptions: any;
@@ -140,7 +140,7 @@ export class ISY {
 		this.protocol = useHttps === true ? 'https' : 'http';
 		this.wsprotocol = 'ws';
 		this.elkEnabled = elkEnabled;
-		this.zoneMap = {};
+
 
 		this.debugLogEnabled =
 			enableDebugLogging === undefined ? false : enableDebugLogging;
@@ -198,7 +198,7 @@ export class ISY {
 
 
 
-	public nodeChangedHandler(node: ELKAlarmPanelDevice, propertyName = null) {
+	public nodeChangedHandler(node: ELKAlarmPanelDevice | ElkAlarmSensorDevice, propertyName = null) {
 		const that = this;
 		if (this.nodesLoaded) {
 			// this.logger(`Node: ${node.address} changed`);
@@ -288,7 +288,7 @@ export class ISY {
 						this.logger('No notes found.');
 					}
 					//if (!newDevice.hidden) {
-					this.deviceList.set(newDevice.address, newDevice);
+						this.deviceList.set(newDevice.address, newDevice);
 					//}
 
 
@@ -530,7 +530,7 @@ export class ISY {
 				const device = that.getDevice(node.id);
 				if (Array.isArray(node.property)) {
 					for (const prop of node.property) {
-						device[prop.id] = Number(prop.value);
+						device[prop.id] = device.convertFrom(Number(prop.value), Number(prop.uom));
 						device.formatted[prop.id] = prop.formatted;
 						device.uom[prop.id] = prop.uom;
 						device.logger(
@@ -540,7 +540,10 @@ export class ISY {
 						);
 					}
 				} else {
-					device[node.property.id] = Number(node.property.value);
+					device[node.property.id] = device.convertFrom(
+						Number(node.property.value),
+						Number(node.property.uom)
+					);
 					device.formatted[node.property.id] = node.property.formatted;
 					device.uom[node.property.id] = node.property.uom;
 					device.logger(
@@ -554,7 +557,7 @@ export class ISY {
 			}
 		}
 		catch (e) {
-			throw new Error('Error refreshing statuses: ' + JSON.stringify(e));
+			throw new Error(`Error refreshing statuses: ${JSON.stringify(e)}`);
 		}
 	}
 
@@ -643,10 +646,11 @@ export class ISY {
 				case EventType.Elk:
 					if (actionValue === 2) {
 						const aeElement = evt.eventInfo.ae;
-						if (aeElement !== null) {
-							if (this.elkAlarmPanel.setFromAreaUpdate(aeElement)) {
+						if(this.elkAlarmPanel.handleEvent(event))
+						{
+
 								this.nodeChangedHandler(this.elkAlarmPanel);
-							}
+
 						}
 					} else if (actionValue === 3) {
 						const zeElement = evt.eventInfo.ze;
@@ -686,10 +690,16 @@ export class ISY {
 						const impactedDevice = this.getDevice(evt.node);
 						if (impactedDevice !== undefined && impactedDevice !== null) {
 							impactedDevice.handleEvent(evt);
-						} else {
-							this.logger(JSON.stringify(evt));
+						}
+						else {
+							this.logger('Event for Unidentified Device: ' + JSON.stringify(evt));
 						}
 					}
+					else
+					{
+						this.logger('Unrecognized Event: ' + JSON.stringify(evt));
+					}
+
 					break;
 			}
 		});
@@ -740,7 +750,7 @@ export class ISY {
 			});
 	}
 
-	public getDevice(address: string, parentsOnly = false) {
+	public getDevice(address: string, parentsOnly = false) :ISYDevice {
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {

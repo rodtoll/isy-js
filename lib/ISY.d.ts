@@ -25,7 +25,7 @@ export declare class ISY {
     readonly sceneList: Map<string, ISYScene>;
     readonly folderMap: Map<string, string>;
     webSocket: Client;
-    zoneMap: any;
+    zoneMap: Map<string, ElkAlarmSensorDevice>;
     protocol: any;
     address: any;
     restlerOptions: any;
@@ -51,7 +51,7 @@ export declare class ISY {
     lastActivity: any;
     constructor(address: string, username: string, password: string, elkEnabled: boolean, changeCallback: any, useHttps: boolean, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: (msg: any) => void);
     callISY(url: string): Promise<any>;
-    nodeChangedHandler(node: ELKAlarmPanelDevice, propertyName?: any): void;
+    nodeChangedHandler(node: ELKAlarmPanelDevice | ElkAlarmSensorDevice, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;
     loadNodes(): Promise<any>;
     loadFolders(result: {
@@ -98,7 +98,7 @@ export declare class ISY {
         data: any;
     }): void;
     initializeWebSocket(): void;
-    getDevice(address: string, parentsOnly?: boolean): any;
+    getDevice(address: string, parentsOnly?: boolean): ISYDevice;
     getScene(address: string | number): any;
     sendISYCommand(path: string): Promise<any>;
     sendNodeCommand(node: ISYNode, command: string, ...parameters: any[]): Promise<any>;

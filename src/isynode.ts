@@ -71,7 +71,7 @@ export class ISYNode {
 		return true;
 	}
 
-	public handleEvent(event: any) {
+	public handleEvent(event: any) : boolean{
 		let actionValue = null;
 		if (event.action instanceof Object) {
 			actionValue = event.action._;

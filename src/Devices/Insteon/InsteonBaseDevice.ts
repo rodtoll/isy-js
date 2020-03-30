@@ -35,6 +35,6 @@ export class InsteonBaseDevice extends ISYDevice {
 		}
 	}
 	public async sendBeep(level: number = 100): Promise<any> {
-		return this.isy.sendNodeCommand(this, 'BEEP');
+		return this.sendCommand(this, 'BEEP');
 	}
 }
