@@ -642,8 +642,9 @@ export class ISY {
 			} else if (evt.action instanceof Number || evt.action instanceof String) {
 				actionValue = Number(evt.action);
 			}
+			const stringControl = (evt.control as string)?.replace('_', '');
 			switch (evt.control) {
-				case EventType.Elk:
+				case EventType.Elk.toString():
 					if (actionValue === 2) {
 						const aeElement = evt.eventInfo.ae;
 						if (this.elkAlarmPanel.handleEvent(event)) {
@@ -663,7 +664,7 @@ export class ISY {
 					}
 					break;
 
-				case EventType.Trigger:
+				case EventType.Trigger.toString():
 					if (actionValue === 6) {
 						const varNode = evt.eventInfo.var;
 						if (varNode !== null) {
@@ -695,7 +696,7 @@ export class ISY {
 						}
 					}
 					else {
-						this.logger(`Unrecognized Event: ${EventType[evt.control]}${JSON.stringify(evt)}`);
+						this.logger(`Unrecognized Event: ${EventType[Number(evt.control)]}${JSON.stringify(evt)}`);
 					}
 
 					break;
