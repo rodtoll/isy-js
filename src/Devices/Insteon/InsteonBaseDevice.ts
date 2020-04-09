@@ -21,7 +21,7 @@ export class InsteonBaseDevice extends ISYDevice<Family.Insteon>{
 			case 100:
 				return byteToPct(value);
 			case 17:
-				return value / 100;
+				return value / 10;
 			default:
 				return super.convertFrom(value, uom);
 		}
@@ -34,7 +34,7 @@ export class InsteonBaseDevice extends ISYDevice<Family.Insteon>{
 			case 100:
 				return pctToByte(nuom);
 			case 17:
-				return Math.round(value * 100);
+				return Math.round(value * 10);
 			default:
 				return nuom;
 		}
