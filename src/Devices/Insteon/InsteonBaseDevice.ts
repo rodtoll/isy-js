@@ -4,13 +4,13 @@ import { byteToDegree, byteToPct, pctToByte } from '../../Utils';
 import { ISYDevice } from '../ISYDevice';
 
 //import { InsteonNLS } from './insteonfam'
-export class InsteonBaseDevice extends ISYDevice<Family.Insteon> implements Insteon {
+export class InsteonBaseDevice extends ISYDevice<Family.Insteon>{
 	constructor (isy: ISY, node: {
 		type: string;
 	}) {
-	
-		super(isy, node);
 
+		super(isy, node);
+		this.family = Family.Insteon;
 		//this.productName = InsteonNLS.getDeviceDescription(String.fromCharCode(category,device,version));
 		this.childDevices = {};
 	}
@@ -20,6 +20,8 @@ export class InsteonBaseDevice extends ISYDevice<Family.Insteon> implements Inst
 				return byteToDegree(value);
 			case 100:
 				return byteToPct(value);
+			case 17:
+				return value / 100;
 			default:
 				return super.convertFrom(value, uom);
 		}
@@ -31,6 +33,8 @@ export class InsteonBaseDevice extends ISYDevice<Family.Insteon> implements Inst
 				return nuom * 2;
 			case 100:
 				return pctToByte(nuom);
+			case 17:
+				return Math.round(value * 100);
 			default:
 				return nuom;
 		}

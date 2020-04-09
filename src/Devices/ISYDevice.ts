@@ -114,18 +114,23 @@ export class ISYDevice<T extends Family> extends ISYNode {
 	}
 
 	public async refreshNotes() {
+		const that = this;
 		try {
-			const that = this;
+
 			const result = await this.getNotes();
 			if (result !== null && result !== undefined) {
 				that.location = result.location;
 				that.displayName = (that.location ?? that.folder) + ' ' + result.spoken;
 				that.logger('The friendly name updated to: ' + that.displayName);
 			}
+			else
+			{
+				that.logger('No notes found.');
+			}
 		}
 		catch (e){
 
-			this.logger(e);
+			that.logger(e);
 		}
 
 	}

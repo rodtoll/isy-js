@@ -9,6 +9,7 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
 		super(isy, deviceNode);
 		this._isMotionDetected = false;
 	}
+
 	public handleEvent(event: {
 		control: string;
 	}) {
@@ -23,6 +24,7 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
 					this.propertyChanged.emit('', 'motionDetected', false, false);
 				}, 30000);
 			}
+
 			else if (event.control === Commands.Off) {
 				this._isMotionDetected = false;
 				this.logger('No motion detected.');
@@ -34,4 +36,7 @@ export class InsteonMotionSensorDevice extends InsteonBaseDevice {
 	get isMotionDetected() {
 		return this._isMotionDetected;
 	}
+
+
+	
 }

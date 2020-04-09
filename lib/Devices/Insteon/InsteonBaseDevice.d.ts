@@ -1,7 +1,7 @@
-import { Family, Insteon } from '../../Families';
+import { Family } from '../../Families';
 import { ISY } from '../../ISY';
 import { ISYDevice } from '../ISYDevice';
-export declare class InsteonBaseDevice extends ISYDevice<Family.Insteon> implements Insteon {
+export declare class InsteonBaseDevice extends ISYDevice<Family.Insteon> {
     constructor(isy: ISY, node: {
         type: string;
     });

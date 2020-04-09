@@ -308,7 +308,7 @@ export class ISY {
 			}
 		}
 
-		this.logger(`Devices: ${this.deviceList.entries.length} added.`);
+		this.logger(`Devices: ${this.deviceList.size} added.`);
 	}
 
 	public loadElkNodes(result: any) {
