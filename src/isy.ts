@@ -684,6 +684,10 @@ export class ISY {
 						}
 					}
 					break;
+				case EventType.Heartbeat.toString():
+					{
+					this.logger(`Received ${EventType[Number(stringControl)]} Signal from ISY: ${JSON.stringify(evt)}`);
+					}
 
 				default:
 					if (evt.node !== '' && evt.node !== undefined && evt.node !== null) {
