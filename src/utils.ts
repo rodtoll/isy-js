@@ -1,5 +1,7 @@
 import { get } from 'restler';
 
+import * as log4js from '@log4js-node/log4js-api';
+
 import { Categories } from './Categories';
 
 
@@ -54,16 +56,35 @@ export enum Family {
 	UPB = 7
 }
 
-export function getCategory(device) {
+export interface LoggerLike extends Partial<log4js.Logger> {
+	prefix?: string;
+	(msg: any): void;
+	default(msg: any): void;
+
+}
+
+export function parseTypeCode(typeCode: string) : {category: Categories, deviceCode: number, firmwareVersion: number, minorVersion: number }
+{
+	try {
+		const s = typeCode.split('.');
+
+		let output = { category: Number(s[0]), deviceCode: Number(s[1]), firmwareVersion: Number(Number(s[2]).toString(16)), minorVersion: Number(Number(s[3]).toString(16)) };
+
+		return output;
+	} catch (err) {
+		return null;
+	}
+}
+
+export function getCategory(device: { type: string; }) {
 	try {
 		const s = device.type.split('.');
-
 		return Number(s[0]);
 	} catch (err) {
 		return Categories.Unknown;
 	}
 }
-export function getSubcategory(device) {
+export function getSubcategory(device: { type: string; }) {
 	try {
 		const s = device.type.split('.');
 		return Number(s[1]);

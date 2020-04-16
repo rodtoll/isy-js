@@ -16,7 +16,7 @@ export interface Insteon
 }
 
 export enum EventType {
-	PropertyChanged = '',
+	PropertyChanged = -1,
 	Heartbeat = 0,
 	Trigger = 1,
 	DriverSpecific = 2,
@@ -41,8 +41,6 @@ export enum EventType {
 	ZWave = 21,
 	Billing = 22,
 	Portal = 23
-
-
 
 }
 class ISYEvent<TAction> {

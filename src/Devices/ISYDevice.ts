@@ -251,6 +251,8 @@ export const ISYBinaryStateDevice = <T extends Constructor<ISYDevice<any>>>(
 			return this.ST > 0;
 		}
 
+		
+
 		public async updateState(state: boolean): Promise<any> {
 			if (state !== this.state || this.pending.ST > 0 !== this.state) {
 				this.pending.ST = state ? States.On : States.Off;

@@ -26,7 +26,7 @@ import { ISYNode } from './ISYNode';
 import * as ProductInfoData from './isyproductinfo.json';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
-import { getAsync } from './Utils';
+import { getAsync, LoggerLike } from './Utils';
 
 export {
 	ISYScene,
@@ -80,49 +80,33 @@ export class ISY {
 	public readonly folderMap: Map<string, string> = new Map();
 
 	public webSocket: Client;
-	public zoneMap: Map<string, ElkAlarmSensorDevice> = new Map();
-	public protocol: any;
-	public address: any;
+	public readonly zoneMap: Map<string, ElkAlarmSensorDevice> = new Map();
+	public protocol: string;
+	public address: string;
 	public restlerOptions: any;
-	public userName: string;
-	public password: string;
 	public credentials: { username: string; password: string; };
 	public variableList: any[];
 	public variableIndex: {};
-	public variableCallback: any;
 	public nodesLoaded: boolean = false;
-	public wsprotocol: string;
+	public wsprotocol: string = 'ws';
 	public elkEnabled: boolean;
 	public debugLogEnabled: boolean;
-	public scenesInDeviceList: any;
+
 	public guardianTimer: any;
 	public elkAlarmPanel: ELKAlarmPanelDevice;
-	public changeCallback: any;
-	public log: (msg: any) => void;
-	public logger: (msg: any) => void;
+	public logger: LoggerLike;
 	public lastActivity: any;
 	constructor (
-		address: string,
-		username: string,
-		password: string,
-		elkEnabled: boolean,
-		changeCallback: any,
-		useHttps: boolean,
-		scenesInDeviceList: any,
-		enableDebugLogging: any,
-		variableCallback: any,
-		log: (msg: any) => void
-	) {
-		this.address = address;
-		this.userName = username;
-		this.password = password;
+		config: { address: string, username: string, password: string, elkEnabled?: boolean, useHttps?: boolean, debugLogEnabled?: boolean; }, logger: LoggerLike) {
+		this.address = config.address;
+		this.logger = logger;
 		this.credentials = {
-			username: this.userName,
-			password: this.password
+			username: config.username,
+			password: config.password
 		};
 		this.restlerOptions = {
-			username: this.userName,
-			password: this.password,
+			username: this.credentials.username,
+			password: this.credentials.password,
 			parser: parsers.xml,
 			xml2js: {
 				explicitArray: false,
@@ -135,47 +119,21 @@ export class ISY {
 		// this.deviceMap = new Map();
 		this.variableList = [];
 		this.variableIndex = {};
-		this.variableCallback = variableCallback;
-		this.nodesLoaded = false;
-		this.protocol = useHttps === true ? 'https' : 'http';
-		this.wsprotocol = 'ws';
-		this.elkEnabled = elkEnabled;
 
+		this.nodesLoaded = false;
+		this.protocol = config.useHttps === true ? 'https' : 'http';
+		this.wsprotocol = 'ws';
+		this.elkEnabled = config.elkEnabled ?? true;
 
 		this.debugLogEnabled =
-			enableDebugLogging === undefined ? false : enableDebugLogging;
-		this.scenesInDeviceList =
-			scenesInDeviceList === undefined ? false : scenesInDeviceList;
+			config.debugLogEnabled ?? false;
+
 		this.guardianTimer = null;
 
 		if (this.elkEnabled) {
 			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1, null);
 		}
-		this.changeCallback = changeCallback;
-
-		log === undefined ? this.log = (msg) => {
-			const timeStamp = new Date();
-			// tslint:disable-next-line:no-console
-			console.log(
-				`${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}#${timeStamp.getHours()}:${timeStamp.getMinutes()}:${timeStamp.getSeconds()}- ${msg}`
-			);
-		} : this.log = log;
-
-		this.logger = (msg) => {
-			if (
-				this.debugLogEnabled ||
-				(process.env.ISYJSDEBUG !== undefined &&
-					process.env.ISYJSDEBUG !== null)
-			) {
-				this.log(msg);
-			}
-			else {
-				console.log(msg);
-			}
-		};
 	}
-
-
 
 	public async callISY(url: string): Promise<any> {
 		url = `${this.protocol}://${this.address}/rest/${url}/`;
@@ -184,27 +142,24 @@ export class ISY {
 			const response = await getAsync(url, this.restlerOptions);
 
 			if (this.checkForFailure(response)) {
-				//this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
+				// this.logger(`Error calling ISY: ${JSON.stringify(response)}`);
 				throw new Error(`Error calling ISY: ${JSON.stringify(response)}`);
-			}
-			else
+			} else {
 				return response;
-		}
-		catch (e) {
+			}
+		} catch (e) {
 			throw new Error(JSON.stringify(e));
 		}
 
 	}
 
-
-
 	public nodeChangedHandler(node: ELKAlarmPanelDevice | ElkAlarmSensorDevice, propertyName = null) {
 		const that = this;
 		if (this.nodesLoaded) {
 			// this.logger(`Node: ${node.address} changed`);
-			if (this.changeCallback !== undefined && this.changeCallback !== null) {
-				this.changeCallback(that, node, propertyName);
-			}
+			//if (this.changeCallback !== undefined && this.changeCallback !== null) {
+			//t//his.changeCallback(that, node, propertyName);
+			//}
 		}
 	}
 
@@ -215,14 +170,13 @@ export class ISY {
 	public async loadNodes(): Promise<any> {
 		try {
 			const result = await this.callISY('nodes');
-			if (this.debugLogEnabled) {
+			if (this.debugLogEnabled) { ; } {
 				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
 			}
 			this.loadFolders(result);
 			await this.loadDevices(result);
 			this.loadScenes(result);
-		}
-		catch (e) {
+		} catch (e) {
 
 			throw new Error(`Error loading nodes: ${e}`);
 		}
@@ -262,7 +216,7 @@ export class ISY {
 			} else {
 				this.deviceMap[device.pnode].push(device.address);
 			}
-			let newDevice: ISYDevice<any>= null;
+			let newDevice: ISYDevice<any> = null;
 
 			// let deviceTypeInfo = this.isyTypeToTypeName(device.type, device.address);
 			// this.logger(JSON.stringify(deviceTypeInfo));
@@ -283,18 +237,15 @@ export class ISY {
 					try {
 						await newDevice.refreshNotes();
 
-					}
-					catch (e) {
+					} catch (e) {
 						this.logger('No notes found.');
 					}
-					//if (!newDevice.hidden) {
+					// if (!newDevice.hidden) {
 					this.deviceList.set(newDevice.address, newDevice);
-					//}
-
+					// }
 
 					// this.deviceList.push(newDevice);
-				}
-				else {
+				} else {
 					this.logger(
 						`Device ${device.name} with type: ${device.type} and nodedef: ${
 						device.nodeDefId
@@ -392,12 +343,9 @@ export class ISY {
 
 	public variableChangedHandler(variable: { id: string; type: string; }) {
 		this.logger(`Variable:${variable.id} (${variable.type}) changed`);
-		if (this.variableCallback !== null && this.variableCallback !== undefined) {
-			this.variableCallback(this, variable);
-		}
+
 	}
 	public checkForFailure(response: any): boolean {
-
 
 		return (
 			response === null ||
@@ -408,13 +356,10 @@ export class ISY {
 
 	public loadVariables(type: string | number, done: { (): void; (): void; (): void; (): void; }) {
 		const that = this;
-		const options = {
-			username: this.userName,
-			password: this.password
-		};
+
 		get(
 			`${that.protocol}://${that.address}/rest/vars/definitions/${type}`,
-			options
+			this.restlerOptions
 		).on('complete', (result: any, response: any) => {
 			if (that.checkForFailure(response)) {
 				that.logger(
@@ -425,7 +370,7 @@ export class ISY {
 				that.createVariables(type, result);
 				get(
 					`${that.protocol}://${that.address}/rest/vars/get/${type}`,
-					options
+					this.restlerOptions
 				).on('complete', (result: { message: string; }, response: any) => {
 					if (that.checkForFailure(response)) {
 						that.logger(`Error loading variables from isy: ${result.message}`);
@@ -516,8 +461,6 @@ export class ISY {
 		}
 	}
 
-
-
 	public async refreshStatuses() {
 		try {
 			const that = this;
@@ -555,8 +498,7 @@ export class ISY {
 					);
 				}
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			throw new Error(`Error refreshing statuses: ${JSON.stringify(e)}`);
 		}
 	}
@@ -564,8 +506,8 @@ export class ISY {
 	public async initialize(initializeCompleted: any): Promise<any> {
 		const that = this;
 		const options = {
-			username: this.userName,
-			password: this.password
+			username: this.credentials.username,
+			password: this.credentials.password
 		};
 		try {
 			await this.loadConfig();
@@ -607,20 +549,19 @@ export class ISY {
 					});
 				});
 			});
-		}
-		catch (e) {
+		} catch (e) {
 			this.logger(`Error initializing ISY: ${JSON.stringify(e)}`);
 
-		}
-		finally {
-			if (this.nodesLoaded !== true)
+		} finally {
+			if (this.nodesLoaded !== true) {
 				this.finishInitialize(true, initializeCompleted);
+			}
 		}
 		return Promise.resolve(true);
 
 	}
 
-	public async handleInitializeError(step: string, reason: any): Promise<any> {
+	public async; public handleInitializeError(step: string, reason: any): Promise<any> {
 		this.logger(`Error initializing ISY (${step}): ${JSON.stringify(reason)}`);
 		return Promise.reject(reason);
 	}
@@ -685,9 +626,9 @@ export class ISY {
 					}
 					break;
 				case EventType.Heartbeat.toString():
-					{
+
 					this.logger(`Received ${EventType[Number(stringControl)]} Signal from ISY: ${JSON.stringify(evt)}`);
-					}
+					break;
 
 				default:
 					if (evt.node !== '' && evt.node !== undefined && evt.node !== null) {
@@ -695,12 +636,10 @@ export class ISY {
 						const impactedDevice = this.getDevice(evt.node);
 						if (impactedDevice !== undefined && impactedDevice !== null) {
 							impactedDevice.handleEvent(evt);
-						}
-						else {
+						} else {
 							this.logger(EventType[Number(stringControl)] + ' Event for Unidentified Device: ' + JSON.stringify(evt));
 						}
-					}
-					else {
+					} else {
 						this.logger(`Unhandled ${EventType[Number(stringControl)]} Event: ${JSON.stringify(evt)}`);
 					}
 
@@ -712,7 +651,7 @@ export class ISY {
 	public initializeWebSocket() {
 		const that = this;
 		const auth =
-			`Basic ${new Buffer(`${this.userName}:${this.password}`).toString('base64')}`;
+			`Basic ${new Buffer(`${this.credentials.username}:${this.credentials.password}`).toString('base64')}`;
 		that.logger(
 			`Connecting to: ${this.wsprotocol}://${this.address}/rest/subscribe`
 		);
@@ -754,7 +693,7 @@ export class ISY {
 			});
 	}
 
-	public getDevice(address: string, parentsOnly = false): ISYDevice<any>{
+	public getDevice(address: string, parentsOnly = false): ISYDevice<any> {
 		let s = this.deviceList.get(address);
 		if (!parentsOnly) {
 			if (s === null) {
@@ -765,7 +704,7 @@ export class ISY {
 				s.parentAddress !== undefined &&
 				s.parentAddress !== s.address &&
 				s.parentAddress !== null
-			) {
+			) { ; } {
 				s = this.deviceList[s.parentAddress];
 			}
 		}
@@ -777,7 +716,7 @@ export class ISY {
 		return this.sceneList[address];
 	}
 
-	public async sendISYCommand(path: string): Promise<any> {
+	public async  sendISYCommand(path: string): Promise<any> {
 		// const uriToUse = `${this.protocol}://${this.address}/rest/${path}`;
 		this.logger(`Sending command...${path}`);
 
@@ -807,7 +746,7 @@ export class ISY {
 			}/rest/vars/get/${type}/${id}`;
 		this.logger(`Sending ISY command...${uriToUse}`);
 
-		return this.callISY(uriToUse).then(p => handleResult(p.val,p.init));
+		return this.callISY(uriToUse).then((p) => handleResult(p.val, p.init));
 	}
 	public async sendSetVariable(id: any, type: any, value: any, handleResult: { (success: any): void; (arg0: boolean): void; (arg0: boolean): void; }) {
 		const uriToUse = `/rest/vars/set/${type}/${id}/${value}`;

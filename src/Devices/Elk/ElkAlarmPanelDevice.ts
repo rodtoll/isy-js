@@ -1,18 +1,17 @@
 import { Family } from '../../Families';
 import { ISYDevice } from '../ISYDevice';
 
-
 /////////////////////////////
 // ELKAlarmPanelDevice
 
 //
 export class ELKAlarmPanelDevice extends ISYDevice<Family> {
 
-	 alarmTripState : AlarmTripState;
-	 alarmState : AlarmState;
-	 alarmMode : AlarmMode;
+	 public alarmTripState: AlarmTripState;
+	 public alarmState: AlarmState;
+	 public alarmMode: AlarmMode;
 
-	constructor (isy, area, node) {
+	constructor(isy, area, node) {
 		super(isy, node);
 
 		this.area = area;
@@ -30,59 +29,57 @@ export class ELKAlarmPanelDevice extends ISYDevice<Family> {
 			.lastChanged = new Date();
 	}
 
-
-	async sendCommand(command): Promise<any> {
+	public async sendCommand(command): Promise<any> {
 
 		return this.isy.sendISYCommand(`elk/area/${this.area}/cmd/${command}`);
 
 	}
 
-	async sendSetAlarmModeCommand(alarmState) {
+	public async sendSetAlarmModeCommand(alarmState) {
 		if (alarmState === 'disarm') {
 			return this.sendCommand('disarm');
-		}
-		else {
+		} else {
 			return this.sendCommand(`arm?armType=${alarmState}`);
 		}
 	}
-	async clearAllBypasses() {
+	public async clearAllBypasses() {
 		return this.sendCommand('unbypass');
 	}
-	getAlarmStatusAsText() {
+	public getAlarmStatusAsText() {
 		return `AM [${this.alarmMode}] AS [${this.alarmState}] ATS [${this.alarmTripState}]`;
 	}
-	getAlarmTripState() {
+	public getAlarmTripState() {
 		return this.alarmTripState;
 	}
-	getAlarmState() {
+	public getAlarmState() {
 		return this.alarmState;
 	}
-	getAlarmMode() {
+	public getAlarmMode() {
 		return this.alarmMode;
 	}
-	handleEvent(event) {
-		const areaUpdate = event.eventInfo.ae
+	public handleEvent(event) {
+		const areaUpdate = event.eventInfo.ae;
 		const areaId = areaUpdate.attr.area;
 		const updateType = areaUpdate.attr.type;
 		const valueToSet = Number(areaUpdate.attr.val);
 		let valueChanged = false;
 		if (areaId == this.area) {
-
 			if (updateType == AlarmPanelProperty.AlarmTripState) {
 				if (this.alarmTripState != valueToSet) {
 					this.alarmTripState = valueToSet;
+					this.propertyChanged?.emit('', 'alarmTripState', valueToSet);
 					valueChanged = true;
 				}
-			}
-			else if (updateType == AlarmPanelProperty.AlarmState) {
+			} else if (updateType == AlarmPanelProperty.AlarmState) {
 				if (this.alarmState != valueToSet) {
 					this.alarmState = valueToSet;
+					this.propertyChanged?.emit('', 'alarmState', valueToSet);
 					valueChanged = true;
 				}
-			}
-			else if (updateType == AlarmPanelProperty.AlarmMode) {
+			} else if (updateType == AlarmPanelProperty.AlarmMode) {
 				if (this.alarmMode != valueToSet) {
 					this.alarmMode = valueToSet;
+					this.propertyChanged?.emit('', 'alarmMode', valueToSet);
 					valueChanged = true;
 				}
 			}
@@ -90,6 +87,7 @@ export class ELKAlarmPanelDevice extends ISYDevice<Family> {
 		if (valueChanged) {
 			this.lastChanged = new Date();
 		}
+
 		return valueChanged;
 	}
 
@@ -101,8 +99,7 @@ export enum AlarmPanelProperty {
 	AlarmTripState = 1
 }
 
-export  enum AlarmMode
-{
+export  enum AlarmMode {
 	DISARMED = 0,
 	AWAY = 1,
 	STAY = 2,
@@ -119,8 +116,7 @@ export enum AlarmTripState {
 
 }
 
-export enum AlarmState
-{
+export enum AlarmState {
 	NOT_READY_TO_ARM = 0,
 	READY_TO_ARM = 1,
 	READY_TO_ARM_VIOLATION = 2,
@@ -129,7 +125,7 @@ export enum AlarmState
 	FORCE_ARMED_VIOLATION = 5,
 	ARMED_WITH_BYPASS = 6
 
-};
+}
 
 // Alarm mode constanrs
 ELKAlarmPanelDevice.prototype.ALARM_MODE_DISARMED = 0;
@@ -154,18 +150,11 @@ ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_FULLY = 4;
 ELKAlarmPanelDevice.prototype.ALARM_STATE_FORCE_ARMED_VIOLATION = 5;
 ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_WITH_BYPASS = 6;
 
-
-
-
-
-
-
-
 /////////////////////////////
 // ELKAlarmSensor
 //
 export class ElkAlarmSensorDevice extends ISYDevice<Family> {
-	constructor (isy, name, area, zone, deviceType) {
+	constructor(isy, name, area, zone, deviceType) {
 		super(isy, area);
 
 		this.area = area;
@@ -181,33 +170,33 @@ export class ElkAlarmSensorDevice extends ISYDevice<Family> {
 		this.lastChanged = new Date();
 	}
 
-	async sendBypassToggleCommand() {
+	public async sendBypassToggleCommand() {
 		return this.isy.sendISYCommand('elk/zone/' + this.zone + '/cmd/toggle/bypass');
 	}
-	getPhysicalState() {
+	public getPhysicalState() {
 		return this.physicalState;
 	}
-	isBypassed() {
+	public isBypassed() {
 		return (this.logicalState === 3);
 	}
-	getLogicalState() {
+	public getLogicalState() {
 		return this.logicalState;
 	}
-	getCurrentDoorWindowState() {
+	public getCurrentDoorWindowState() {
 		return (this.physicalState == this.SENSOR_STATE_PHYSICAL_OPEN || this.logicalState == this.SENSOR_STATE_LOGICAL_VIOLATED);
 	}
-	getSensorStatus() {
+	public getSensorStatus() {
 		return 'PS [' + this.physicalState + '] LS [' + this.logicatState + ']';
 	}
-	isPresent() {
+	public isPresent() {
 		if (this.voltage < 65 || this.voltage > 80) {
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
-	setFromZoneUpdate(zoneUpdate) {
+	public handleEvent(event) {
+		const zoneUpdate = event.eventInfo.ze;
 		const zone = zoneUpdate.attr.zone;
 		const updateType = zoneUpdate.attr.type;
 		const valueToSet = zoneUpdate.attr.val;
@@ -216,19 +205,20 @@ export class ElkAlarmSensorDevice extends ISYDevice<Family> {
 			if (updateType == 51) {
 				if (this.logicalState != valueToSet) {
 					this.logicalState = valueToSet;
+					this.propertyChanged?.emit('', 'logicalState', valueToSet);
 					// Not triggering change update on logical state because physical always follows and don't want double notify.
 					// valueChanged = true;
 				}
-			}
-			else if (updateType == 52) {
+			} else if (updateType == 52) {
 				if (this.physicalState != valueToSet) {
 					this.physicalState = valueToSet;
+					this.propertyChanged?.emit('', 'physicalState', valueToSet);
 					valueChanged = true;
 				}
-			}
-			else if (updateType == 53) {
+			} else if (updateType == 53) {
 				if (this.voltage != valueToSet) {
 					this.voltage = valueToSet;
+					this.propertyChanged?.emit('', 'voltage', valueToSet);
 					valueChanged = true;
 				}
 			}
