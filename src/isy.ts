@@ -392,6 +392,7 @@ export class ISY {
 			}
 
 			const controls = result.configuration.controls;
+
 			// this.logger(result.configuration);
 			if (controls !== undefined) {
 				// this.logger(controls.control);
@@ -424,7 +425,7 @@ export class ISY {
 		return `${type}:${id}`;
 	}
 	public createVariables(type: VariableType, result: any) {
-		for(const variable of result.e)
+		for(const variable of result.CList.e)
 		{
 			const id = Number(variable.id);
 			const name = variable.name;
@@ -435,7 +436,7 @@ export class ISY {
 	}
 	public setVariableValues(result: any) {
 
-		for (const vals of result.var)
+		for (const vals of result.vars.var)
 		{
 			const type = Number(vals.type) as VariableType;
 			const id = Number(vals.id);
@@ -675,7 +676,7 @@ export class ISY {
 				s.parentAddress !== undefined &&
 				s.parentAddress !== s.address &&
 				s.parentAddress !== null
-			) { ; } {
+			) {
 				s = this.deviceList[s.parentAddress];
 			}
 		}
