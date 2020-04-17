@@ -1,4 +1,5 @@
 export declare enum Family {
+    Elk = 0,
     Insteon = 1,
     UPB = 2,
     ZigBee = 3,

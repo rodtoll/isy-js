@@ -127,7 +127,7 @@ export class ISY {
 		this.guardianTimer = null;
 
 		if (this.elkEnabled) {
-			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1, null);
+			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1);
 		}
 	}
 
@@ -272,10 +272,7 @@ export class ISY {
 				this,
 				name,
 				1,
-				id,
-				alarmDef === '17'
-					? DeviceTypes.alarmDoorWindowSensor
-					: DeviceTypes.coSensor
+				id /*TODO: Handle CO Sensor vs. Door/Window Sensor */
 			);
 			this.zoneMap[newDevice.zone] = newDevice;
 		}

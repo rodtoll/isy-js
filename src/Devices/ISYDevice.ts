@@ -24,8 +24,8 @@ export class ISYDevice<T extends Family> extends ISYNode {
 	public hidden: boolean = false;
 	public location: string;
 
-	constructor (isy: ISY, node: any) {
-		super(isy, node);
+	constructor (isy: ISY, node: { family: any; type?: any; enabled: any; deviceClass?: any; pnode?: any; property?: any; flag?: any; nodeDefId?: string; address?: string; name?: string; parent?: any; ELK_ID?: string; }) {
+		super(isy, node );
 		this.family = node.family ?? Family.Generic;
 		this.nodeType = 1;
 		this.type = node.type;
@@ -251,7 +251,7 @@ export const ISYBinaryStateDevice = <T extends Constructor<ISYDevice<any>>>(
 			return this.ST > 0;
 		}
 
-		
+
 
 		public async updateState(state: boolean): Promise<any> {
 			if (state !== this.state || this.pending.ST > 0 !== this.state) {

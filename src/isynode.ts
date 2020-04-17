@@ -13,7 +13,7 @@ export class ISYNode {
 	[x: string]: any
 	public name: string;
 	public displayName: string;
-	
+
 	public folder: string = '';
 	public parent: any;
 	public parentType: NodeType;
@@ -24,7 +24,7 @@ export class ISYNode {
 	public logger: (msg: any) => void;
 	public lastChanged: Date;
 	public enabled: boolean;
-	constructor (isy: ISY, node: any) {
+	constructor (isy: ISY, node: { flag?: any; nodeDefId?: string; address?: string; name?: string; family?: Family; parent?: any; enabled: boolean; ELK_ID?: string; } ) {
 
 		this.isy = isy;
 		this.nodeType = 0;

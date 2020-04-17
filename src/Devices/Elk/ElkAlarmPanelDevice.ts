@@ -1,27 +1,29 @@
 import { Family } from '../../Families';
 import { ISYDevice } from '../ISYDevice';
+import { ISY } from '../../ISY';
 
 /////////////////////////////
 // ELKAlarmPanelDevice
 
 //
-export class ELKAlarmPanelDevice extends ISYDevice<Family> {
+export class ELKAlarmPanelDevice extends ISYDevice<Family.Elk> {
 
 	 public alarmTripState: AlarmTripState;
 	 public alarmState: AlarmState;
 	 public alarmMode: AlarmMode;
 
-	constructor(isy, area, node) {
-		super(isy, node);
+	constructor(isy: ISY, area: number) {
+
+		super(isy, { family: Family.Elk, type: '0.0.0.0', enabled: true, address: 'ElkAlarmPanel' + area, name: 'Elk Alarm Panel ' + area });
 
 		this.area = area;
 		this.alarmTripState = AlarmTripState.DISARMED;
 		this.alarmState = AlarmState.NOT_READY_TO_ARM;
 		this.alarmMode = AlarmMode.DISARMED;
-		// this.name = "Elk Alarm Panel " + area;
-		// this.address = "ElkPanel" + area;
-		this.deviceFriendlyName = 'Elk Main Alarm Panel';
-		this.deviceType = isy.DEVICE_TYPE_ALARM_PANEL;
+
+
+		this.deviceFriendlyName = 'Elk Alarm Panel ' + area;
+
 		this.connectionType = 'Elk Network Module';
 		this.batteryOperated = false;
 		this.voltage = 71;
@@ -153,16 +155,18 @@ ELKAlarmPanelDevice.prototype.ALARM_STATE_ARMED_WITH_BYPASS = 6;
 /////////////////////////////
 // ELKAlarmSensor
 //
-export class ElkAlarmSensorDevice extends ISYDevice<Family> {
-	constructor(isy, name, area, zone, deviceType) {
-		super(isy, area);
+export class ElkAlarmSensorDevice extends ISYDevice<Family.Elk> {
+	constructor(isy, name, area, zone) {
+		super(isy, {family: Family.Elk, name, address: `ElkZone${zone}`, enabled: true});
 
 		this.area = area;
 		this.zone = zone;
 		// this.name = name;
 		// this.address = "ElkZone" + zone;
-		this.deviceFriendlyName = 'Elk Connected Sensor';
-		this.deviceType = deviceType;
+		this.displayName = 'Elk Connected Sensor ' + zone;
+
+		this.deviceFriendlyName = 'Elk Connected Sensor ' + zone;
+
 		this.connectionType = 'Elk Network';
 		this.batteryOperated = false;
 		this.physicalState = this.SENSOR_STATE_PHYSICAL_NOT_CONFIGURED;

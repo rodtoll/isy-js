@@ -1,10 +1,11 @@
 import { Family } from '../../Families';
 import { ISYDevice } from '../ISYDevice';
-export declare class ELKAlarmPanelDevice extends ISYDevice<Family> {
+import { ISY } from '../../ISY';
+export declare class ELKAlarmPanelDevice extends ISYDevice<Family.Elk> {
     alarmTripState: AlarmTripState;
     alarmState: AlarmState;
     alarmMode: AlarmMode;
-    constructor(isy: any, area: any, node: any);
+    constructor(isy: ISY, area: number);
     sendCommand(command: any): Promise<any>;
     sendSetAlarmModeCommand(alarmState: any): Promise<any>;
     clearAllBypasses(): Promise<any>;
@@ -42,8 +43,8 @@ export declare enum AlarmState {
     FORCE_ARMED_VIOLATION = 5,
     ARMED_WITH_BYPASS = 6
 }
-export declare class ElkAlarmSensorDevice extends ISYDevice<Family> {
-    constructor(isy: any, name: any, area: any, zone: any, deviceType: any);
+export declare class ElkAlarmSensorDevice extends ISYDevice<Family.Elk> {
+    constructor(isy: any, name: any, area: any, zone: any);
     sendBypassToggleCommand(): Promise<any>;
     getPhysicalState(): any;
     isBypassed(): boolean;

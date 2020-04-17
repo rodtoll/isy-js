@@ -5,9 +5,7 @@ import { ISYDevice } from '../ISYDevice';
 
 //import { InsteonNLS } from './insteonfam'
 export class InsteonBaseDevice extends ISYDevice<Family.Insteon>{
-	constructor (isy: ISY, node: {
-		type: string;
-	}) {
+	constructor (isy: ISY, node: any) {
 
 		super(isy, node);
 		this.family = Family.Insteon;

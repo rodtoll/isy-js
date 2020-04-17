@@ -19,7 +19,20 @@ export declare class ISYDevice<T extends Family> extends ISYNode {
     readonly pending: any[string];
     hidden: boolean;
     location: string;
-    constructor(isy: ISY, node: any);
+    constructor(isy: ISY, node: {
+        family: any;
+        type?: any;
+        enabled: any;
+        deviceClass?: any;
+        pnode?: any;
+        property?: any;
+        flag?: any;
+        nodeDefId?: string;
+        address?: string;
+        name?: string;
+        parent?: any;
+        ELK_ID?: string;
+    });
     convertTo(value: any, uom: number): any;
     convertFrom(value: any, uom: number): any;
     addLink(isyScene: ISYScene): void;

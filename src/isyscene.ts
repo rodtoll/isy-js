@@ -13,7 +13,7 @@ export class ISYScene extends ISYNode {
 	public childDevices: ISYDevice<any>[];
 	public isDimmable: boolean;
 	public typeCode: string;
-	constructor(isy, scene) {
+	constructor(isy: ISY, scene: { members?: any; flag?: any; nodeDefId?: string; address?: string; name?: string; family?: Family; parent?: any; enabled: boolean; ELK_ID?: string; }) {
 		super(isy, scene);
 		// this.logger(JSON.stringify(scene));
 		this.typeCode = '';
