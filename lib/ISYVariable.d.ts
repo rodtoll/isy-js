@@ -1,13 +1,17 @@
+/// <reference types="node" />
+import { EventEmitter } from 'events';
 import { ISY } from './ISY';
-export declare class ISYVariable {
+import { VariableType } from './ISYConstants';
+export declare class ISYVariable extends EventEmitter {
     isy: ISY;
-    id: any;
-    name: any;
+    id: number;
+    name: string;
     value: any;
     init: any;
-    type: any;
+    type: VariableType;
     lastChanged: Date;
-    constructor(isy: ISY, id: string, name: string, type: any);
+    constructor(isy: ISY, id: number, name: string, type: any);
+    handleEvent(event: any): void;
     markAsChanged(): void;
     sendSetValue(value: any, onComplete: any): void;
     updateValue(value: any): Promise<void>;

@@ -13,7 +13,7 @@ import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonThermostatDevice } from './Devices/Insteon/InsteonThermostatDevice';
 import { ISYDevice } from './Devices/ISYDevice';
 import { Family } from './Families';
-import { DeviceTypes, NodeType, Props, States } from './ISYConstants';
+import { DeviceTypes, NodeType, Props, States, VariableType } from './ISYConstants';
 import { ISYNode } from './ISYNode';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
@@ -34,8 +34,7 @@ export declare class ISY {
         username: string;
         password: string;
     };
-    variableList: any[];
-    variableIndex: {};
+    variableList: Map<string, ISYVariable>;
     nodesLoaded: boolean;
     wsprotocol: string;
     elkEnabled: boolean;
@@ -80,18 +79,17 @@ export declare class ISY {
         type: string;
     }): void;
     checkForFailure(response: any): boolean;
-    loadVariables(type: string | number, done: {
+    loadVariables(type: number, done: {
         (): void;
         (): void;
         (): void;
         (): void;
     }): void;
     loadConfig(): Promise<void>;
-    getVariableList(): any[];
-    getVariable(type: any, id: any): any;
-    handleISYVariableUpdate(id: any, type: any, value: number, ts: Date): void;
-    createVariableKey(type: string, id: string): string;
-    createVariables(type: any, result: any): void;
+    getVariableList(): Map<string, ISYVariable>;
+    getVariable(type: VariableType, id: number): ISYVariable;
+    createVariableKey(type: VariableType, id: number): string;
+    createVariables(type: VariableType, result: any): void;
     setVariableValues(result: any): void;
     refreshStatuses(): Promise<void>;
     initialize(initializeCompleted: any): Promise<any>;

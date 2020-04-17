@@ -1,6 +1,8 @@
 import { ISYBinaryStateDevice } from './Devices/ISYDevice';
 import { InsteonBaseDevice } from './ISY';
 
+
+
 export enum Family {
 	Insteon = 1,
 	UPB = 2,

@@ -85,8 +85,8 @@ export class ISY {
 	public address: string;
 	public restlerOptions: any;
 	public credentials: { username: string; password: string; };
-	public variableList: any[];
-	public variableIndex: {};
+	public variableList: Map<string,ISYVariable> = new Map();
+
 	public nodesLoaded: boolean = false;
 	public wsprotocol: string = 'ws';
 	public elkEnabled: boolean;
@@ -115,10 +115,6 @@ export class ISY {
 				valueProcessors: [parseNumbers, parseBooleans]
 			}
 		};
-
-		// this.deviceMap = new Map();
-		this.variableList = [];
-		this.variableIndex = {};
 
 		this.nodesLoaded = false;
 		this.protocol = config.useHttps === true ? 'https' : 'http';
@@ -345,6 +341,7 @@ export class ISY {
 		this.logger(`Variable:${variable.id} (${variable.type}) changed`);
 
 	}
+
 	public checkForFailure(response: any): boolean {
 
 		return (
@@ -354,7 +351,10 @@ export class ISY {
 		);
 	}
 
-	public loadVariables(type: string | number, done: { (): void; (): void; (): void; (): void; }) {
+
+
+
+	public loadVariables(type: number, done: { (): void; (): void; (): void; (): void; }) {
 		const that = this;
 
 		get(
@@ -410,54 +410,39 @@ export class ISY {
 	public getVariableList() {
 		return this.variableList;
 	}
-	public getVariable(type: any, id: any) {
+	public getVariable(type: VariableType, id: number) : ISYVariable {
 		const key = this.createVariableKey(type, id);
 		if (
-			this.variableIndex[key] !== null &&
-			this.variableIndex[key] !== undefined
+			this.variableList.has(key)
 		) {
-			return this.variableIndex[key];
+			return this.variableList[key];
 		}
 		return null;
 	}
-	public handleISYVariableUpdate(id: any, type: any, value: number, ts: Date) {
-		const variableToUpdate = this.getVariable(type, id);
-		if (variableToUpdate !== null) {
-			variableToUpdate.value = value;
-			variableToUpdate.lastChanged = ts;
-			this.variableChangedHandler(variableToUpdate);
-		}
+
+	public createVariableKey(type: VariableType, id: number) {
+		return `${type}:${id}`;
 	}
-	public createVariableKey(type: string, id: string) {
-		return type + ':' + id;
-	}
-	public createVariables(type: any, result: any) {
-		const document = new XmlDocument(result);
-		const variables = document.childrenNamed('e');
-		for (let index = 0; index < variables.length; index++) {
-			const id = variables[index].attr.id;
-			const name = variables[index].attr.name;
+	public createVariables(type: VariableType, result: any) {
+		for(const variable of result.e)
+		{
+			const id = Number(variable.id);
+			const name = variable.name;
 			const newVariable = new ISYVariable(this, id, name, type);
-			this.variableList.push(newVariable);
-			this.variableIndex[this.createVariableKey(type, id)] = newVariable;
+			this.variableList.set(this.createVariableKey(type, id),newVariable);
+
 		}
 	}
 	public setVariableValues(result: any) {
-		const document = new XmlDocument(result);
-		const variables = document.childrenNamed('var');
-		for (let index = 0; index < variables.length; index++) {
-			const variableNode = variables[index];
-			const id = variableNode.attr.id;
-			const type = variableNode.attr.type;
-			const init = parseInt(variableNode.childNamed('init').val);
-			const value = parseInt(variableNode.childNamed('val').val);
-			const ts = variableNode.childNamed('ts').val;
+
+		for (const vals of result.var)
+		{
+			const type = Number(vals.type) as VariableType;
+			const id = Number(vals.id);
 			const variable = this.getVariable(type, id);
-			if (variable !== null) {
-				variable.value = value;
-				variable.init = init;
-				variable.lastChanged = new Date(ts);
-			}
+			variable.init = vals.init;
+			variable.value = vals.val;
+			variable.lastChanged = new Date(vals.ts);
 		}
 	}
 
@@ -587,18 +572,15 @@ export class ISY {
 			switch (stringControl) {
 				case EventType.Elk.toString():
 					if (actionValue === 2) {
-						const aeElement = evt.eventInfo.ae;
-						if (this.elkAlarmPanel.handleEvent(event)) {
 
-							this.nodeChangedHandler(this.elkAlarmPanel);
+						this.elkAlarmPanel.handleEvent(event);
 
-						}
 					} else if (actionValue === 3) {
 						const zeElement = evt.eventInfo.ze;
 						const zoneId = zeElement.zone;
 						const zoneDevice = this.zoneMap[zoneId];
 						if (zoneDevice !== null) {
-							if (zoneDevice.setFromZoneUpdate(zeElement)) {
+							if (zoneDevice.handleEvent(event)) {
 								this.nodeChangedHandler(zoneDevice);
 							}
 						}
@@ -609,20 +591,9 @@ export class ISY {
 				case EventType.Trigger.toString():
 					if (actionValue === 6) {
 						const varNode = evt.eventInfo.var;
-						if (varNode !== null) {
 							const id = varNode.id;
 							const type = varNode.type;
-							const val = parseInt(varNode.val);
-							const year = parseInt(varNode.ts.substr(0, 4));
-							const month = parseInt(varNode.ts.substr(4, 2));
-							const day = parseInt(varNode.ts.substr(6, 2));
-							const hour = parseInt(varNode.ts.substr(9, 2));
-							const min = parseInt(varNode.ts.substr(12, 2));
-							const sec = parseInt(varNode.ts.substr(15, 2));
-							const timeStamp = new Date(year, month, day, hour, min, sec);
-
-							this.handleISYVariableUpdate(id, type, val, timeStamp);
-						}
+						this.getVariable(type, id)?.handleEvent(evt);
 					}
 					break;
 				case EventType.Heartbeat.toString():
