@@ -14,8 +14,3 @@ export class InsteonSwitchKeypadDevice extends KeypadDevice(InsteonRelayDevice) 
 		super(isy, deviceNode);
 	}
 }
-
-export class InsteonRemoteDevice extends InsteonBaseDevice
-{
-	
-}

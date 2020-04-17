@@ -17,6 +17,7 @@ import { DeviceTypes, NodeType, Props, States } from './ISYConstants';
 import { ISYNode } from './ISYNode';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
+import { LoggerLike } from './Utils';
 export { ISYScene, States, Family, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
 export declare class ISY {
@@ -25,31 +26,32 @@ export declare class ISY {
     readonly sceneList: Map<string, ISYScene>;
     readonly folderMap: Map<string, string>;
     webSocket: Client;
-    zoneMap: Map<string, ElkAlarmSensorDevice>;
-    protocol: any;
-    address: any;
+    readonly zoneMap: Map<string, ElkAlarmSensorDevice>;
+    protocol: string;
+    address: string;
     restlerOptions: any;
-    userName: string;
-    password: string;
     credentials: {
         username: string;
         password: string;
     };
     variableList: any[];
     variableIndex: {};
-    variableCallback: any;
     nodesLoaded: boolean;
     wsprotocol: string;
     elkEnabled: boolean;
     debugLogEnabled: boolean;
-    scenesInDeviceList: any;
     guardianTimer: any;
     elkAlarmPanel: ELKAlarmPanelDevice;
-    changeCallback: any;
-    log: (msg: any) => void;
-    logger: (msg: any) => void;
+    logger: LoggerLike;
     lastActivity: any;
-    constructor(address: string, username: string, password: string, elkEnabled: boolean, changeCallback: any, useHttps: boolean, scenesInDeviceList: any, enableDebugLogging: any, variableCallback: any, log: (msg: any) => void);
+    constructor(config: {
+        host: string;
+        username: string;
+        password: string;
+        elkEnabled?: boolean;
+        useHttps?: boolean;
+        debugLogEnabled?: boolean;
+    }, logger: LoggerLike);
     callISY(url: string): Promise<any>;
     nodeChangedHandler(node: ELKAlarmPanelDevice | ElkAlarmSensorDevice, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;
@@ -93,6 +95,7 @@ export declare class ISY {
     setVariableValues(result: any): void;
     refreshStatuses(): Promise<void>;
     initialize(initializeCompleted: any): Promise<any>;
+    async: any;
     handleInitializeError(step: string, reason: any): Promise<any>;
     handleWebSocketMessage(event: {
         data: any;

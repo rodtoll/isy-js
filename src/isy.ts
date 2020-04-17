@@ -97,8 +97,8 @@ export class ISY {
 	public logger: LoggerLike;
 	public lastActivity: any;
 	constructor (
-		config: { address: string, username: string, password: string, elkEnabled?: boolean, useHttps?: boolean, debugLogEnabled?: boolean; }, logger: LoggerLike) {
-		this.address = config.address;
+		config: { host: string, username: string, password: string, elkEnabled?: boolean, useHttps?: boolean, debugLogEnabled?: boolean; }, logger: LoggerLike) {
+		this.address = config.host;
 		this.logger = logger;
 		this.credentials = {
 			username: config.username,

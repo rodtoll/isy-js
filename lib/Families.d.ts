@@ -10,7 +10,7 @@ export interface Insteon {
     family: Family.Insteon;
 }
 export declare enum EventType {
-    PropertyChanged = "",
+    PropertyChanged = -1,
     Heartbeat = 0,
     Trigger = 1,
     DriverSpecific = 2,

@@ -51,5 +51,5 @@ export declare class ElkAlarmSensorDevice extends ISYDevice<Family> {
     getCurrentDoorWindowState(): boolean;
     getSensorStatus(): string;
     isPresent(): boolean;
-    setFromZoneUpdate(zoneUpdate: any): boolean;
+    handleEvent(event: any): boolean;
 }
