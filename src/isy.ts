@@ -125,10 +125,8 @@ export class ISY {
 			config.debugLogEnabled ?? false;
 
 		this.guardianTimer = null;
-
-		if (this.elkEnabled) {
 			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1);
-		}
+	
 	}
 
 	public async callISY(url: string): Promise<any> {
