@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { ISY } from '../../ISY';
+import { ISY, InsteonBaseDevice, Family, ISYDevice } from '../../ISY';
 import { InsteonRelayDevice } from './InsteonRelayDevice';
 export declare const InsteonLampDevice: (InsteonBaseDevice: any) => {
     new (isy: any, node: any): {
@@ -21,8 +21,8 @@ export declare const InsteonSwitchDevice: (InsteonBaseDevice: typeof InsteonRela
         readonly category: number;
         readonly subCategory: number;
         readonly type: any;
-        _parentDevice: import("../ISYDevice").ISYDevice<any> & import("../ISYDevice").ISYDevice<import("../../Families").Family.Insteon>;
-        readonly children: import("../ISYDevice").ISYDevice<any>[] & import("../ISYDevice").ISYDevice<import("../../Families").Family.Insteon>[];
+        _parentDevice: ISYDevice<any> & ISYDevice<Family.Insteon>;
+        readonly children: ISYDevice<any>[] & ISYDevice<Family.Insteon>[];
         readonly scenes: import("../../ISYScene").ISYScene[];
         readonly formatted: any;
         readonly uom: any;
@@ -32,8 +32,8 @@ export declare const InsteonSwitchDevice: (InsteonBaseDevice: typeof InsteonRela
         convertTo: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
         convertFrom: ((value: any, uom: number) => any) & ((value: any, uom: number) => any);
         addLink: ((isyScene: import("../../ISYScene").ISYScene) => void) & ((isyScene: import("../../ISYScene").ISYScene) => void);
-        addChild: ((childDevice: import("../ISYDevice").ISYDevice<any>) => void) & ((childDevice: import("../ISYDevice").ISYDevice<import("../../Families").Family.Insteon>) => void);
-        readonly parentDevice: import("../ISYDevice").ISYDevice<any> & import("../ISYDevice").ISYDevice<import("../../Families").Family.Insteon>;
+        addChild: ((childDevice: ISYDevice<any>) => void) & ((childDevice: ISYDevice<Family.Insteon>) => void);
+        readonly parentDevice: ISYDevice<any> & ISYDevice<Family.Insteon>;
         refreshProperty: ((propertyName: string) => Promise<any>) & ((propertyName: string) => Promise<any>);
         refreshNotes: (() => Promise<void>) & (() => Promise<void>);
         getNotes: (() => Promise<any>) & (() => Promise<any>);
@@ -62,11 +62,56 @@ export declare const InsteonSwitchDevice: (InsteonBaseDevice: typeof InsteonRela
         sendBeep(level?: number): Promise<any>;
     };
 };
-export declare const KeypadDevice: (InsteonBaseDevice: any) => {
+export declare const KeypadDevice: (IB: typeof InsteonBaseDevice) => {
     new (isy: any, node: any): {
         [x: string]: any;
+        addChild(childDevice: ISYDevice<Family.Insteon>): void;
+        convertFrom(value: any, uom: number): any;
+        convertTo(value: any, uom: number): any;
+        sendBeep(level?: number): Promise<any>;
+        family: Family.Insteon;
+        readonly typeCode: string;
+        readonly deviceClass: any;
+        readonly parentAddress: any;
+        readonly category: number;
+        readonly subCategory: number;
+        readonly type: any;
+        _parentDevice: ISYDevice<Family.Insteon>;
+        readonly children: ISYDevice<Family.Insteon>[];
+        readonly scenes: import("../../ISYScene").ISYScene[];
+        readonly formatted: any;
+        readonly uom: any;
+        readonly pending: any;
+        hidden: boolean;
+        location: string;
+        addLink(isyScene: import("../../ISYScene").ISYScene): void;
+        readonly parentDevice: ISYDevice<Family.Insteon>;
+        refreshProperty(propertyName: string): Promise<any>;
+        refreshNotes(): Promise<void>;
+        getNotes(): Promise<any>;
+        updateProperty(propertyName: string, value: string): Promise<any>;
+        sendCommand(command: any, ...parameters: any[]): Promise<any>;
+        refresh(): Promise<any>;
+        handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
+        readonly isy: ISY;
+        readonly flag: any;
+        readonly nodeDefId: string;
+        readonly address: string;
+        name: string;
+        displayName: string;
+        folder: string;
+        parent: any;
+        parentType: import("../../ISYConstants").NodeType;
+        readonly elkId: string;
+        nodeType: number;
+        propertyChanged: import("events").EventEmitter;
+        propsInitialized: boolean;
+        logger: (msg: any) => void;
+        lastChanged: Date;
+        enabled: boolean;
+        handleEvent(event: any): boolean;
+        onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
     };
-    [x: string]: any;
 };
 export declare class InsteonOutletDevice extends InsteonRelayDevice {
     constructor(isy: ISY, deviceNode: any);

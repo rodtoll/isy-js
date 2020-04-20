@@ -2,20 +2,21 @@ import { format } from 'util';
 import { parseStringPromise } from 'xml2js';
 
 import { Categories } from './Categories';
-import { InsteonSwitchDevice, KeypadDevice } from './Devices/Insteon/InsteonDevice';
+import { InsteonSwitchDevice, KeypadDevice, InsteonLampDevice } from './Devices/Insteon/InsteonDevice';
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
-import { InsteonDimmerKeypadDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
+import { InsteonKeypadDimmerDevice, InsteonKeypadRelayDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
 import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
 import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
 import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
 import { InsteonFanDevice, InsteonFanMotorDevice } from './Devices/Insteon/InsteonFanDevice';
-import { InsteonKeypadDevice } from './Devices/Insteon/InsteonKeypadDevice';
+import {  InsteonKeypadButtonDevice } from './Devices/Insteon/InsteonKeypadDevice';
 import { InsteonLeakSensorDevice } from './Devices/Insteon/InsteonLeakSensorDevice';
 import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
 import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
 import { InsteonRelaySwitchDevice } from './Devices/Insteon/InsteonRelaySwitchDevice';
 import { Family, ISYDevice } from './ISY';
+import { parseTypeCode } from './Utils';
 
 export class DeviceFactory {
 
@@ -52,7 +53,6 @@ export class DeviceFactory {
 		} else if (category === 0o016) {
 			str = DeviceFactory.getNLSWindowsCovering(device);
 		}
-
 		str.version = version.toString(16);
 
 		if(nodeDefId === 'FanLincMotor')
@@ -60,7 +60,13 @@ export class DeviceFactory {
 
 			str.class = InsteonFanMotorDevice;
 		}
-
+		if(nodeDefId === 'KeypadButton' || nodeDefId === 'KeypadButton_ADV')
+		{
+			str.class = InsteonKeypadButtonDevice;
+		}
+		if(str.class  === InsteonOnOffOutletDevice && (nodeDef.address as string).split(' ')[3] === '2') {
+			str.class = InsteonRelayDevice;
+		}
 		return str;
 	}
 
@@ -71,10 +77,11 @@ export class DeviceFactory {
 	}
 
 	public static getInsteonDeviceDetails(typeCode: string): { name: string; modelNumber: string; version: string; class: typeof ISYDevice } {
-		const typeArray = typeCode.split('.');
-		const category = Number(typeArray[0]);
-		const device = Number(typeArray[1]);
-		const version = Number(typeArray[2]);
+		const type = parseTypeCode(typeCode);
+		//const typeArray = typeCode.split('.');
+		const category = type.category;
+		const device = type.deviceCode;
+
 		let str = null;
 		if (category === Categories.Controller) {
 			str = DeviceFactory.getNLSControllerInfo(device);
@@ -100,7 +107,7 @@ export class DeviceFactory {
 			str = DeviceFactory.getNLSWindowsCovering(device);
 		}
 
-		str.version = version.toString(16);
+		str.version = type.firmwareVersion;
 
 		// str = str + version.toString(16);
 
@@ -188,10 +195,10 @@ export class DeviceFactory {
 				// return 'EZSwitch30';
 				break;
 			case String.fromCharCode(0o017):
-				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6' };
+				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6', class: InsteonKeypadRelayDevice };
 				break;
 			case String.fromCharCode(0o005):
-				retVal = { name: 'KeypadLinc Relay (8 buttons)', modelNumber: '2486S/WH8' };
+				retVal = { name: 'KeypadLinc Relay (8 buttons)', modelNumber: '2486S/WH8', class: InsteonKeypadRelayDevice  };
 				break;
 			case String.fromCharCode(0o020):
 				retVal = { name: 'In-LineLinc Relay', modelNumber: '2475S' };
@@ -224,13 +231,13 @@ export class DeviceFactory {
 				retVal = { name: 'SwitchLinc Relay 220 V. w/Beeper', modelNumber: '2494S220' };
 				break;
 			case String.fromCharCode(0o034):
-				retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S', class: InsteonKeypadDevice };
+				retVal = { name: 'SwitchLinc Relay - Remote Control On/Off Switch', modelNumber: '2476S', class: InsteonRelaySwitchDevice };
 				break;
 			case '%':
-				retVal = { name: 'KeypadLinc Timer Relay (8 buttons)', modelNumber: '2484S/WH8' };
+				retVal = { name: 'KeypadLinc Timer Relay (8 buttons)', modelNumber: '2484S/WH8', class: InsteonKeypadRelayDevice  };
 				break;
 			case ' ':
-				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6-SP', class: InsteonKeypadDevice };
+				retVal = { name: 'KeypadLinc Relay', modelNumber: '2486S/WH6-SP', class: InsteonKeypadRelayDevice  };
 				break;
 			case '!':
 				retVal = { name: 'OutletLinc', modelNumber: '2473-SP', class: InsteonOnOffOutletDevice };
@@ -244,7 +251,7 @@ export class DeviceFactory {
 			case String.fromCharCode(0o036):
 				break;
 			case ',':
-				retVal = { name: 'Dual Band KeypadLinc Relay', modelNumber: '2487S', class: InsteonKeypadDevice };
+				retVal = { name: 'Dual Band KeypadLinc Relay', modelNumber: '2487S', class: InsteonKeypadRelayDevice };
 				break;
 			case String.fromCharCode(0o037):
 				retVal = { name: 'Dual Band InlineLinc On/Off Switch', modelNumber: '2475SDB', class: InsteonRelaySwitchDevice };
@@ -264,18 +271,18 @@ export class DeviceFactory {
 				retVal = { name: 'Micro Module On/Off', modelNumber: '2443-522' };
 				break;
 			case '.':
-				retVal = { name: 'Din Rail Relay', modelNumber: '2453-222' };
+				retVal = { name: 'Din Rail Relay', modelNumber: '2453-222', class: InsteonRelaySwitchDevice  };
 				break;
 			case '3':
-				retVal = { name: 'Din Rail Relay', modelNumber: '2453-422' };
+				retVal = { name: 'Din Rail Relay', modelNumber: '2453-422', class: InsteonRelaySwitchDevice };
 				break;
 			case '4':
 				break;
 			case '=':
-				retVal = { name: 'Din Rail Relay', modelNumber: '2453-522' };
+				retVal = { name: 'Din Rail Relay', modelNumber: '2453-522', class: InsteonRelaySwitchDevice};
 				break;
 			case '7':
-				retVal = { name: 'On/Off Module', modelNumber: '2635-222' };
+				retVal = { name: 'On/Off Module', modelNumber: '2635-222', };
 				break;
 			case '8':
 				retVal = { name: 'On/Off Outdoor Module', modelNumber: '2634-222' };
@@ -334,7 +341,7 @@ export class DeviceFactory {
 				retVal = { name: 'SocketLinc', modelNumber: '2454D' };
 				break;
 			case '\f':
-				retVal = { name: 'KeypadLinc Dimmer 8 Button', modelNumber: '2486DWH8', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Dimmer 8 Button', modelNumber: '2486DWH8', class: InsteonKeypadDimmerDevice };
 				break;
 			case String.fromCharCode(0o023):
 				retVal = { name: 'Icon SwitchLinc Dimmer for Bell Canada' };
@@ -354,10 +361,10 @@ export class DeviceFactory {
 				retVal = { name: 'KeypadLinc Countdown Timer', modelNumber: '2484DWH8' };
 				break;
 			case String.fromCharCode(0o033):
-				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2486D', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2486D', class: InsteonKeypadDimmerDevice };
 				break;
 			case String.fromCharCode(0o034):
-				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2486D', class: InsteonKeypadDimmerDevice };
 				break;
 			case String.fromCharCode(0o031):
 				retVal = { name: 'SwitchLinc Dimmer W/Beeper', modelNumber: '2476D' };
@@ -454,13 +461,13 @@ export class DeviceFactory {
 				retVal = { name: 'Din Rail Dimmer', modelNumber: '2452-522' };
 				break;
 			case 'B':
-				retVal = { name: 'KeypadLinc Dimmer 5 Buttons', modelNumber: '2334-2', class: InsteonDimmerKeypadDevice};
+				retVal = { name: 'KeypadLinc Dimmer 5 Buttons', modelNumber: '2334-2', class: InsteonKeypadDimmerDevice};
 				break;
 			case 'A':
-				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2334-2', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Dimmer 8 Buttons', modelNumber: '2334-2', class: InsteonKeypadDimmerDevice };
 				break;
 			case 'V':
-				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2334-632', class: InsteonDimmerKeypadDevice };
+				retVal = { name: 'KeypadLinc Dimmer 6 Buttons', modelNumber: '2334-632', class: InsteonKeypadDimmerDevice };
 				break;
 			case String.fromCharCode(0o013):
 				retVal = { name: 'Plugin Dimmer', modelNumber: '2632-422' };

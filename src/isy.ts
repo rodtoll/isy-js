@@ -5,6 +5,7 @@ import { Parser } from 'xml2js';
 import { parseBooleans, parseNumbers } from 'xml2js/lib/processors';
 import { XmlDocument } from 'xmldoc';
 
+import { timingSafeEqual } from 'crypto';
 import { Categories } from './Categories';
 import { DeviceFactory } from './DeviceFactory';
 import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './Devices/Elk/ElkAlarmPanelDevice';
@@ -14,6 +15,7 @@ import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
 import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
 import { InsteonFanDevice, InsteonFanMotorDevice } from './Devices/Insteon/InsteonFanDevice';
+import {InsteonKeypadRelayDevice, InsteonKeypadDimmerDevice} from './Devices/Insteon/InsteonDimmerKeypadDevice'
 import { InsteonLeakSensorDevice } from './Devices/Insteon/InsteonLeakSensorDevice';
 import { InsteonLockDevice } from './Devices/Insteon/InsteonLockDevice';
 import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
@@ -27,11 +29,16 @@ import * as ProductInfoData from './isyproductinfo.json';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
 import { getAsync, LoggerLike } from './Utils';
+import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
+import { InsteonSmokeSensorDevice } from './Devices/Insteon/InsteonSmokeSensorDevice';
+import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
+import { InsteonKeypadButtonDevice } from './Devices/Insteon/InsteonKeypadDevice';
 
 export {
 	ISYScene,
 	States,
 	Family,
+	VariableType,
 	DeviceTypes,
 	Categories,
 	Props,
@@ -39,13 +46,19 @@ export {
 	InsteonBaseDevice,
 	InsteonOutletDevice,
 	ISYDevice,
+	InsteonKeypadDimmerDevice,
+	InsteonKeypadRelayDevice,
+	InsteonKeypadButtonDevice,
 	InsteonDimmableDevice,
 	InsteonFanDevice,
 	InsteonFanMotorDevice,
+	InsteonLeakSensorDevice,
+	InsteonSmokeSensorDevice,
+	InsteonDimmerOutletDevice,
+	InsteonOnOffOutletDevice,
 	InsteonLockDevice,
 	InsteonThermostatDevice,
 	InsteonDoorWindowSensorDevice,
-	InsteonSwitchDevice,
 	InsteonDimmerSwitchDevice,
 	InsteonRelayDevice,
 	InsteonMotionSensorDevice,
@@ -85,7 +98,7 @@ export class ISY {
 	public address: string;
 	public restlerOptions: any;
 	public credentials: { username: string; password: string; };
-	public variableList: Map<string,ISYVariable> = new Map();
+	public variableList: Map<string, ISYVariable> = new Map();
 
 	public nodesLoaded: boolean = false;
 	public wsprotocol: string = 'ws';
@@ -96,7 +109,9 @@ export class ISY {
 	public elkAlarmPanel: ELKAlarmPanelDevice;
 	public logger: LoggerLike;
 	public lastActivity: any;
-	constructor (
+	public model: any;
+	public serverVersion: any;
+	constructor(
 		config: { host: string, username: string, password: string, elkEnabled?: boolean, useHttps?: boolean, debugLogEnabled?: boolean; }, logger: LoggerLike) {
 		this.address = config.host;
 		this.logger = logger;
@@ -119,14 +134,16 @@ export class ISY {
 		this.nodesLoaded = false;
 		this.protocol = config.useHttps === true ? 'https' : 'http';
 		this.wsprotocol = 'ws';
-		this.elkEnabled = config.elkEnabled ?? true;
+		this.elkEnabled = config.elkEnabled ?? false;
 
 		this.debugLogEnabled =
 			config.debugLogEnabled ?? false;
 
 		this.guardianTimer = null;
+		if (this.elkEnabled) {
 			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1);
-	
+		}
+
 	}
 
 	public async callISY(url: string): Promise<any> {
@@ -151,9 +168,9 @@ export class ISY {
 		const that = this;
 		if (this.nodesLoaded) {
 			// this.logger(`Node: ${node.address} changed`);
-			//if (this.changeCallback !== undefined && this.changeCallback !== null) {
-			//t//his.changeCallback(that, node, propertyName);
-			//}
+			// if (this.changeCallback !== undefined && this.changeCallback !== null) {
+			// t//his.changeCallback(that, node, propertyName);
+			// }
 		}
 	}
 
@@ -164,7 +181,7 @@ export class ISY {
 	public async loadNodes(): Promise<any> {
 		try {
 			const result = await this.callISY('nodes');
-			if (this.debugLogEnabled) { ; } {
+			if (this.debugLogEnabled) {  } {
 				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
 			}
 			this.loadFolders(result);
@@ -346,37 +363,10 @@ export class ISY {
 		);
 	}
 
-
-
-
-	public loadVariables(type: number, done: { (): void; (): void; (): void; (): void; }) {
+	public async loadVariables(type: VariableType): Promise<any> {
 		const that = this;
-
-		get(
-			`${that.protocol}://${that.address}/rest/vars/definitions/${type}`,
-			this.restlerOptions
-		).on('complete', (result: any, response: any) => {
-			if (that.checkForFailure(response)) {
-				that.logger(
-					'Error loading variables from isy. Device likely doesn\'t have any variables defined. Safe to ignore.'
-				);
-				done();
-			} else {
-				that.createVariables(type, result);
-				get(
-					`${that.protocol}://${that.address}/rest/vars/get/${type}`,
-					this.restlerOptions
-				).on('complete', (result: { message: string; }, response: any) => {
-					if (that.checkForFailure(response)) {
-						that.logger(`Error loading variables from isy: ${result.message}`);
-						throw new Error('Unable to load variables from the ISY');
-					} else {
-						that.setVariableValues(result);
-					}
-					done();
-				});
-			}
-		});
+		return this.callISY(`vars/definitions/${type}`).then((result) => that.createVariables(type, result))
+			.then(() => that.callISY(`vars/get/${type}`)).then(that.setVariableValues.bind(that));
 	}
 
 	public async loadConfig() {
@@ -387,7 +377,9 @@ export class ISY {
 			}
 
 			const controls = result.configuration.controls;
-
+			this.model = result.configuration.deviceSpecs.model;
+			this.serverVersion = result.configuration.app_version;
+			// TODO: Check Installed Features
 			// this.logger(result.configuration);
 			if (controls !== undefined) {
 				// this.logger(controls.control);
@@ -406,7 +398,7 @@ export class ISY {
 	public getVariableList() {
 		return this.variableList;
 	}
-	public getVariable(type: VariableType, id: number) : ISYVariable {
+	public getVariable(type: VariableType, id: number): ISYVariable {
 		const key = this.createVariableKey(type, id);
 		if (
 			this.variableList.has(key)
@@ -420,25 +412,25 @@ export class ISY {
 		return `${type}:${id}`;
 	}
 	public createVariables(type: VariableType, result: any) {
-		for(const variable of result.CList.e)
-		{
+		for (const variable of result.CList.e) {
 			const id = Number(variable.id);
 			const name = variable.name;
 			const newVariable = new ISYVariable(this, id, name, type);
-			this.variableList.set(this.createVariableKey(type, id),newVariable);
+			this.variableList.set(this.createVariableKey(type, id), newVariable);
 
 		}
 	}
 	public setVariableValues(result: any) {
 
-		for (const vals of result.vars.var)
-		{
+		for (const vals of result.vars.var) {
 			const type = Number(vals.type) as VariableType;
 			const id = Number(vals.id);
 			const variable = this.getVariable(type, id);
-			variable.init = vals.init;
-			variable.value = vals.val;
-			variable.lastChanged = new Date(vals.ts);
+			if (variable) {
+				variable.init = vals.init;
+				variable.value = vals.val;
+				variable.lastChanged = new Date(vals.ts);
+			}
 		}
 	}
 
@@ -493,42 +485,41 @@ export class ISY {
 		try {
 			await this.loadConfig();
 			await this.loadNodes();
+			await this.loadVariables(VariableType.Integer);
+			await this.loadVariables(VariableType.State);
 			await this.refreshStatuses().then(() => {
-				this.loadVariables(VariableType.Integer, () => {
-					this.loadVariables(VariableType.State, () => {
-						if (this.elkEnabled) {
+				if (this.elkEnabled) {
+					get(
+						`${this.protocol}://${that.address}/rest/elk/get/topology`,
+						options
+					).on('complete', (result: { message: string; }, response: any) => {
+						if (that.checkForFailure(response)) {
+							that.logger('Error loading from elk: ' + result.message);
+							throw new Error(
+								'Unable to contact the ELK to get the topology'
+							);
+						} else {
+							that.loadElkNodes(result);
 							get(
-								`${this.protocol}://${that.address}/rest/elk/get/topology`,
+								`${that.protocol}://${that.address}/rest/elk/get/status`,
 								options
 							).on('complete', (result: { message: string; }, response: any) => {
 								if (that.checkForFailure(response)) {
-									that.logger('Error loading from elk: ' + result.message);
+									that.logger(`Error:${result.message}`);
 									throw new Error(
-										'Unable to contact the ELK to get the topology'
+										'Unable to get the status from the elk'
 									);
 								} else {
-									that.loadElkNodes(result);
-									get(
-										`${that.protocol}://${that.address}/rest/elk/get/status`,
-										options
-									).on('complete', (result: { message: string; }, response: any) => {
-										if (that.checkForFailure(response)) {
-											that.logger(`Error:${result.message}`);
-											throw new Error(
-												'Unable to get the status from the elk'
-											);
-										} else {
-											that.loadElkInitialStatus(result);
-											that.finishInitialize(true, initializeCompleted);
-										}
-									});
+									that.loadElkInitialStatus(result);
+									that.finishInitialize(true, initializeCompleted);
 								}
 							});
-						} else {
-							that.finishInitialize(true, initializeCompleted);
 						}
 					});
-				});
+				} else {
+					that.finishInitialize(true, initializeCompleted);
+				}
+
 			});
 		} catch (e) {
 			this.logger(`Error initializing ISY: ${JSON.stringify(e)}`);
@@ -542,7 +533,7 @@ export class ISY {
 
 	}
 
-	public async; public handleInitializeError(step: string, reason: any): Promise<any> {
+	public async  handleInitializeError(step: string, reason: any): Promise<any> {
 		this.logger(`Error initializing ISY (${step}): ${JSON.stringify(reason)}`);
 		return Promise.reject(reason);
 	}
@@ -587,8 +578,8 @@ export class ISY {
 				case EventType.Trigger.toString():
 					if (actionValue === 6) {
 						const varNode = evt.eventInfo.var;
-							const id = varNode.id;
-							const type = varNode.type;
+						const id = varNode.id;
+						const type = varNode.type;
 						this.getVariable(type, id)?.handleEvent(evt);
 					}
 					break;

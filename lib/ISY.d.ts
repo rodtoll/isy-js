@@ -2,11 +2,13 @@ import { Client } from 'faye-websocket';
 import { Categories } from './Categories';
 import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './Devices/Elk/ElkAlarmPanelDevice';
 import { InsteonBaseDevice } from './Devices/Insteon/InsteonBaseDevice';
-import { InsteonOutletDevice, InsteonSwitchDevice } from './Devices/Insteon/InsteonDevice';
+import { InsteonOutletDevice } from './Devices/Insteon/InsteonDevice';
 import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
 import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
 import { InsteonFanDevice, InsteonFanMotorDevice } from './Devices/Insteon/InsteonFanDevice';
+import { InsteonKeypadRelayDevice, InsteonKeypadDimmerDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
+import { InsteonLeakSensorDevice } from './Devices/Insteon/InsteonLeakSensorDevice';
 import { InsteonLockDevice } from './Devices/Insteon/InsteonLockDevice';
 import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
 import { InsteonRelayDevice } from './Devices/Insteon/InsteonRelayDevice';
@@ -18,7 +20,11 @@ import { ISYNode } from './ISYNode';
 import { ISYScene } from './ISYScene';
 import { ISYVariable } from './ISYVariable';
 import { LoggerLike } from './Utils';
-export { ISYScene, States, Family, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonSwitchDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
+import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDevice';
+import { InsteonSmokeSensorDevice } from './Devices/Insteon/InsteonSmokeSensorDevice';
+import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
+import { InsteonKeypadButtonDevice } from './Devices/Insteon/InsteonKeypadDevice';
+export { ISYScene, States, Family, VariableType, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonKeypadDimmerDevice, InsteonKeypadRelayDevice, InsteonKeypadButtonDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLeakSensorDevice, InsteonSmokeSensorDevice, InsteonDimmerOutletDevice, InsteonOnOffOutletDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
 export declare class ISY {
     readonly deviceList: Map<string, ISYDevice<any>>;
@@ -43,6 +49,8 @@ export declare class ISY {
     elkAlarmPanel: ELKAlarmPanelDevice;
     logger: LoggerLike;
     lastActivity: any;
+    model: any;
+    serverVersion: any;
     constructor(config: {
         host: string;
         username: string;
@@ -79,12 +87,7 @@ export declare class ISY {
         type: string;
     }): void;
     checkForFailure(response: any): boolean;
-    loadVariables(type: number, done: {
-        (): void;
-        (): void;
-        (): void;
-        (): void;
-    }): void;
+    loadVariables(type: VariableType): Promise<any>;
     loadConfig(): Promise<void>;
     getVariableList(): Map<string, ISYVariable>;
     getVariable(type: VariableType, id: number): ISYVariable;
@@ -93,7 +96,6 @@ export declare class ISY {
     setVariableValues(result: any): void;
     refreshStatuses(): Promise<void>;
     initialize(initializeCompleted: any): Promise<any>;
-    async: any;
     handleInitializeError(step: string, reason: any): Promise<any>;
     handleWebSocketMessage(event: {
         data: any;
