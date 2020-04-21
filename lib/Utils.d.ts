@@ -1,5 +1,7 @@
+/// <reference types="node" />
 import * as log4js from '@log4js-node/log4js-api';
 import { Categories } from './Categories';
+import { EventEmitter } from 'events';
 export declare function byteToPct(value: any): number;
 export declare function pctToByte(value: any): number;
 export declare function byteToDegree(value: any): number;
@@ -12,6 +14,9 @@ export interface LoggerLike extends Partial<log4js.Logger> {
     prefix?: string;
     (msg: any): void;
     default(msg: any): void;
+}
+export interface PropertyChangedEventEmitter extends EventEmitter {
+    on(event: 'PropertyChanged', listener: (propertyName: string, newValue: any, oldValue: any, formattedValue: string) => void): this;
 }
 export declare function parseTypeCode(typeCode: string): {
     category: Categories;

@@ -2,7 +2,8 @@
 import { EventEmitter } from 'events';
 import { Family } from './Families';
 import { ISY, NodeType } from './ISY';
-export declare class ISYNode {
+import { PropertyChangedEventEmitter } from './Utils';
+export declare class ISYNode extends EventEmitter implements PropertyChangedEventEmitter {
     readonly isy: ISY;
     readonly flag: any;
     readonly nodeDefId: string;
@@ -31,6 +32,8 @@ export declare class ISYNode {
         ELK_ID?: string;
     });
     handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean;
+    on(event: 'PropertyChanged', listener: (propertyName: string, newValue: any, oldValue: any, formattedValue: string) => any): this;
+    emit(event: 'PropertyChanged', propertyName: string, newValue: any, oldValue: any, formattedValue: string): boolean;
     handleEvent(event: any): boolean;
     onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
 }

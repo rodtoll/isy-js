@@ -3,14 +3,15 @@ import { isNullOrUndefined } from 'util';
 
 import { Family } from './Families';
 import { Categories, Controls, ISY, NodeType } from './ISY';
+import { PropertyChangedEventEmitter } from './Utils';
 
 
-export class ISYNode {
+export class ISYNode extends EventEmitter implements PropertyChangedEventEmitter {
 	public readonly isy: ISY;
 	public readonly flag: any;
 	public readonly nodeDefId: string;
 	public readonly address: string;
-	[x: string]: any
+	[x: string]: any;
 	public name: string;
 	public displayName: string;
 
@@ -24,8 +25,8 @@ export class ISYNode {
 	public logger: (msg: any) => void;
 	public lastChanged: Date;
 	public enabled: boolean;
-	constructor (isy: ISY, node: { flag?: any; nodeDefId?: string; address?: string; name?: string; family?: Family; parent?: any; enabled: boolean; ELK_ID?: string; } ) {
-
+	constructor (isy: ISY, node: { flag?: any; nodeDefId?: string; address?: string; name?: string; family?: Family; parent?: any; enabled: boolean; ELK_ID?: string; }) {
+		super();
 		this.isy = isy;
 		this.nodeType = 0;
 		this.flag = node.flag;
@@ -45,7 +46,7 @@ export class ISYNode {
 		const s = this.name.split('.');
 		if (s.length > 1)
 			s.shift();
-		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').replace('  ',' ').trim();
+		this.displayName = s.join(' ').replace(/([A-Z])/g, ' $1').replace('  ', ' ').trim();
 		if (this.parentType === NodeType.Folder) {
 
 			this.folder = isy.folderMap.get(this.parent._);
@@ -68,10 +69,20 @@ export class ISYNode {
 
 	public handlePropertyChange(propertyName: string, value: any, formattedValue: string): boolean {
 		this.lastChanged = new Date();
+
 		return true;
 	}
 
-	public handleEvent(event: any) : boolean{
+	public on(event: 'PropertyChanged', listener: (propertyName: string, newValue: any, oldValue: any, formattedValue: string) => any): this {
+		super.on('PropertyChanged', listener);
+		return this;
+	}
+
+	public emit(event: 'PropertyChanged', propertyName: string, newValue: any, oldValue: any, formattedValue: string) {
+		return super.emit(event, propertyName, newValue, oldValue, formattedValue);
+	}
+
+	public handleEvent(event: any): boolean {
 		let actionValue = null;
 		if (event.action instanceof Object) {
 			actionValue = event.action._;

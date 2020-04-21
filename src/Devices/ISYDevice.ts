@@ -6,6 +6,7 @@ import { Controls, ISY } from '../ISY';
 import { Commands, States } from '../ISYConstants';
 import { ISYNode } from '../ISYNode';
 import { ISYScene } from '../ISYScene';
+import { threadId } from 'worker_threads';
 
 export class ISYDevice<T extends Family> extends ISYNode {
 	public family: T;
@@ -199,12 +200,15 @@ export class ISYDevice<T extends Family> extends ISYNode {
 
 	public handlePropertyChange(propertyName: string, value: any, formattedValue: string) {
 		let changed = false;
+		let priorVal = this[propertyName];
 		try {
 			const val = this.convertFrom(
 				Number(value),
 				Number(this.uom[propertyName])
 			);
+
 			if (this[propertyName] !== val) {
+
 				this.logger(
 					`Property ${
 					Controls[propertyName].label
@@ -222,6 +226,7 @@ export class ISYDevice<T extends Family> extends ISYNode {
 				);
 			}
 			if (changed) {
+				this.emit('PropertyChanged',propertyName,val,priorVal,formattedValue);
 				this.propertyChanged.emit(
 					propertyName,
 					propertyName,

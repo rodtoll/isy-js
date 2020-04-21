@@ -3,6 +3,7 @@ import { get } from 'restler';
 import * as log4js from '@log4js-node/log4js-api';
 
 import { Categories } from './Categories';
+import { EventEmitter } from 'events';
 
 
 //import { get } from 'http';
@@ -60,6 +61,12 @@ export interface LoggerLike extends Partial<log4js.Logger> {
 	prefix?: string;
 	(msg: any): void;
 	default(msg: any): void;
+
+}
+
+export interface PropertyChangedEventEmitter extends EventEmitter
+{
+	on(event:'PropertyChanged', listener: (propertyName : string, newValue: any, oldValue: any, formattedValue: string) => void) : this;
 
 }
 

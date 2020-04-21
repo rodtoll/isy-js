@@ -15,7 +15,7 @@ import { InsteonDimmableDevice } from './Devices/Insteon/InsteonDimmableDevice';
 import { InsteonDimmerSwitchDevice } from './Devices/Insteon/InsteonDimmerSwitchDevice';
 import { InsteonDoorWindowSensorDevice } from './Devices/Insteon/InsteonDoorWindowSensorDevice';
 import { InsteonFanDevice, InsteonFanMotorDevice } from './Devices/Insteon/InsteonFanDevice';
-import {InsteonKeypadRelayDevice, InsteonKeypadDimmerDevice} from './Devices/Insteon/InsteonDimmerKeypadDevice'
+import { InsteonKeypadRelayDevice, InsteonKeypadDimmerDevice } from './Devices/Insteon/InsteonDimmerKeypadDevice';
 import { InsteonLeakSensorDevice } from './Devices/Insteon/InsteonLeakSensorDevice';
 import { InsteonLockDevice } from './Devices/Insteon/InsteonLockDevice';
 import { InsteonMotionSensorDevice } from './Devices/Insteon/InsteonMotionSensorDevice';
@@ -33,6 +33,7 @@ import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDe
 import { InsteonSmokeSensorDevice } from './Devices/Insteon/InsteonSmokeSensorDevice';
 import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
 import { InsteonKeypadButtonDevice } from './Devices/Insteon/InsteonKeypadDevice';
+import { EventEmitter } from 'events';
 
 export {
 	ISYScene,
@@ -86,7 +87,7 @@ interface ProductInfoEntry {
 	batteryOperated: boolean;
 }
 
-export class ISY {
+export class ISY extends EventEmitter {
 	public readonly deviceList: Map<string, ISYDevice<any>> = new Map();
 	public readonly deviceMap: Map<string, string[]> = new Map();
 	public readonly sceneList: Map<string, ISYScene> = new Map();
@@ -111,14 +112,16 @@ export class ISY {
 	public lastActivity: any;
 	public model: any;
 	public serverVersion: any;
-	constructor(
+	constructor (
 		config: { host: string, username: string, password: string, elkEnabled?: boolean, useHttps?: boolean, debugLogEnabled?: boolean; }, logger: LoggerLike) {
+		super();
 		this.address = config.host;
 		this.logger = logger;
 		this.credentials = {
 			username: config.username,
 			password: config.password
 		};
+
 		this.restlerOptions = {
 			username: this.credentials.username,
 			password: this.credentials.password,
@@ -144,6 +147,16 @@ export class ISY {
 			this.elkAlarmPanel = new ELKAlarmPanelDevice(this, 1);
 		}
 
+	}
+
+	public emit(event: 'InitializeCompleted' | 'NodeAdded' | 'NodeRemoved' | 'NodeChanged', node?: ISYNode): boolean {
+		return super.emit(event, node);
+	}
+
+
+
+	public on(event: 'InitializeCompleted' | 'NodeAdded' | 'NodeRemoved' | 'NodeChanged', listener: (node?: ISYNode) => void): this {
+		return super.on(event, listener);
 	}
 
 	public async callISY(url: string): Promise<any> {
@@ -181,7 +194,7 @@ export class ISY {
 	public async loadNodes(): Promise<any> {
 		try {
 			const result = await this.callISY('nodes');
-			if (this.debugLogEnabled) {  } {
+			if (this.debugLogEnabled) { } {
 				writeFile('ISYNodesDump.json', JSON.stringify(result), this.logger);
 			}
 			this.loadFolders(result);

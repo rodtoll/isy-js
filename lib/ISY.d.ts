@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Client } from 'faye-websocket';
 import { Categories } from './Categories';
 import { ELKAlarmPanelDevice, ElkAlarmSensorDevice } from './Devices/Elk/ElkAlarmPanelDevice';
@@ -24,9 +25,10 @@ import { InsteonOnOffOutletDevice } from './Devices/Insteon/InsteonOnOffOutletDe
 import { InsteonSmokeSensorDevice } from './Devices/Insteon/InsteonSmokeSensorDevice';
 import { InsteonDimmerOutletDevice } from './Devices/Insteon/InsteonDimmerOutletDevice';
 import { InsteonKeypadButtonDevice } from './Devices/Insteon/InsteonKeypadDevice';
+import { EventEmitter } from 'events';
 export { ISYScene, States, Family, VariableType, DeviceTypes, Categories, Props, ISYVariable, InsteonBaseDevice, InsteonOutletDevice, ISYDevice, InsteonKeypadDimmerDevice, InsteonKeypadRelayDevice, InsteonKeypadButtonDevice, InsteonDimmableDevice, InsteonFanDevice, InsteonFanMotorDevice, InsteonLeakSensorDevice, InsteonSmokeSensorDevice, InsteonDimmerOutletDevice, InsteonOnOffOutletDevice, InsteonLockDevice, InsteonThermostatDevice, InsteonDoorWindowSensorDevice, InsteonDimmerSwitchDevice, InsteonRelayDevice, InsteonMotionSensorDevice, ISYNode, NodeType, ElkAlarmSensorDevice, ELKAlarmPanelDevice };
 export declare let Controls: {};
-export declare class ISY {
+export declare class ISY extends EventEmitter {
     readonly deviceList: Map<string, ISYDevice<any>>;
     readonly deviceMap: Map<string, string[]>;
     readonly sceneList: Map<string, ISYScene>;
@@ -59,6 +61,8 @@ export declare class ISY {
         useHttps?: boolean;
         debugLogEnabled?: boolean;
     }, logger: LoggerLike);
+    emit(event: 'InitializeCompleted' | 'NodeAdded' | 'NodeRemoved' | 'NodeChanged', node?: ISYNode): boolean;
+    on(event: 'InitializeCompleted' | 'NodeAdded' | 'NodeRemoved' | 'NodeChanged', listener: (node?: ISYNode) => void): this;
     callISY(url: string): Promise<any>;
     nodeChangedHandler(node: ELKAlarmPanelDevice | ElkAlarmSensorDevice, propertyName?: any): void;
     getElkAlarmPanel(): ELKAlarmPanelDevice;

@@ -49,8 +49,23 @@ declare const InsteonSmokeSensorDevice_base: {
         logger: (msg: any) => void;
         lastChanged: Date;
         enabled: boolean;
+        on(event: "PropertyChanged", listener: (propertyName: string, newValue: any, oldValue: any, formattedValue: string) => any): any;
+        emit(event: "PropertyChanged", propertyName: string, newValue: any, oldValue: any, formattedValue: string): boolean;
         handleEvent(event: any): boolean;
         onPropertyChanged(propertyName: any, callback: (...args: any[]) => void): void;
+        addListener(event: string | symbol, listener: (...args: any[]) => void): any;
+        once(event: string | symbol, listener: (...args: any[]) => void): any;
+        prependListener(event: string | symbol, listener: (...args: any[]) => void): any;
+        prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): any;
+        removeListener(event: string | symbol, listener: (...args: any[]) => void): any;
+        off(event: string | symbol, listener: (...args: any[]) => void): any;
+        removeAllListeners(event?: string | symbol): any;
+        setMaxListeners(n: number): any;
+        getMaxListeners(): number;
+        listeners(event: string | symbol): Function[];
+        rawListeners(event: string | symbol): Function[];
+        eventNames(): (string | symbol)[];
+        listenerCount(type: string | symbol): number;
     };
 } & typeof InsteonBaseDevice;
 export declare class InsteonSmokeSensorDevice extends InsteonSmokeSensorDevice_base {
