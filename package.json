@@ -29,7 +29,7 @@
         "url": "https://github.com/rodtoll/isy-js/issues"
     },
     "repository" : {
-         "type" : "git", 
+         "type" : "git",
          "url" : "https://github.com/rodtoll/isy-js.git"
     }
 }
