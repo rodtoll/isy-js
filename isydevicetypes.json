@@ -31,7 +31,7 @@
   { "type": "2.15.54.157", "address": "", "name": "(2486S/WH6) KeypadLinc Relay v.36", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.20.56.0", "address": "", "name": "(B2475S) In-LineLinc Relay W/ Sense v.38", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.20.56.157", "address": "", "name": "(B2475S) In-LineLinc Relay W/ Sense v.38", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
-  { "type": "2.22.57.0", "address": "", "name": "(28763B) Icon Relay Switch v.39", "deviceType": "Fan", "connectionType": "Insteon Wired", "batteryOperated": false },
+  { "type": "2.22.57.0", "address": "", "name": "(28763B) Icon Relay Switch v.39", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.26.65.0", "address": "", "name": "(2466S) ToggleLinc Relay v.41", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.28.58.0", "address": "", "name": "(2476S) SwitchLinc Relay - Remote Control On/Off Switch v.3A", "deviceType": "Light", "connectionType": "Insteon Wired", "batteryOperated": false },
   { "type": "2.42.67.0", "address": "", "name": "(2477S) Dual Band SwitchLinc On/Off Switch v.43", "deviceType": "Light", "connectionType": "Insteon Wireless", "batteryOperated": false },
