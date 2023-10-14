@@ -258,7 +258,7 @@
     "type": "2.22.57.0",
     "address": "",
     "name": "(28763B) Icon Relay Switch v.39",
-    "deviceType": "fan",
+    "deviceType": "light",
     "connectionType": "Insteon Wired",
     "batteryOperated": false
   },
